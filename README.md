@@ -31,7 +31,7 @@ http://bedops.readthedocs.org/en/latest/content/reference/statistics/bedmap.html
 -visulization: RCAS_dag.pdf
 
 ###Test case
-####Aim: **generate annotation** for coordinates in the targetfiles
+####Aim: **generate annotation** for coordinates in the target bed files
 
 1. clone the source: **git clone https://github.com/dyusuf/RCAS**
 
