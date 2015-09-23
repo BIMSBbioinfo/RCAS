@@ -6,6 +6,8 @@ Make a standalone RNA Centric Annotation System that provides intuitive reports 
 
 ###RCAS dependencies:
 
+-**snakemake**: https://bitbucket.org/johanneskoester/snakemake/wiki/Documentation
+
 -**gff2bed**:
 http://bedops.readthedocs.org/en/latest/content/reference/file-management/conversion/gff2bed.html
 
@@ -20,11 +22,9 @@ http://bedops.readthedocs.org/en/latest/content/reference/statistics/bedmap.html
 
 -**parse_anot.py**: src/parse_anot.py
 
--**snakemake**: https://bitbucket.org/johanneskoester/snakemake/wiki/Documentation
-
 -**gff track** e.g.  wget -qO- ftp://ftp.sanger.ac.uk/pub/gencode/Gencode_human/release_23/gencode.v23.annotation.gff3.gz     | gunzip > gencode.v23.annotation.gff3
 
-###RCAS workflow is built with **snakemake**:
+###RCAS workflow is built with snakemake:
 
 -rules: src/RCAS.snakefile
 
@@ -43,5 +43,10 @@ http://bedops.readthedocs.org/en/latest/content/reference/statistics/bedmap.html
 
 5. command: **snakemake -s ../src/RCAS.snakefile -p --config ref=path_to/gencode.v23.annotation.gff3 infile=PAR*bed**
 
+6. output: **PARCLIP_AGO1234_Hafner2010a_hg19_xaa.anot.bed  PARCLIP_AGO1234_Hafner2010a_hg19_xab.anot.bed  PARCLIP_AGO1234_Hafner2010a_hg19_xac.anot.bed**
 
 
+
+
+
+    
