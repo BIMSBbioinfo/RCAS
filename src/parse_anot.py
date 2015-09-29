@@ -42,7 +42,7 @@ def determine_feature(feature_ids, gene_set):
 	# if the above features are not associated, then it is annoated as intron
 	
 	if feature_ids == "":
-		gene_type, gene_name, feature, gene_id  = "None", "None",  "intergenic", "None"
+		gene_type, gene_name, feature, gene_id  = "unknown", "unknown",  "intergenic", "unknown"
 		
 	else:
 		
@@ -52,7 +52,10 @@ def determine_feature(feature_ids, gene_set):
 		elif "UTR3" in feature_ids:
 			feature = "UTR3"
 			
-		elif "exon" in feature_ids:
+		elif "CDS" in feature_ids:
+			feature = "CDS"
+
+		elif "exon" in feature_ids:	
 			feature = "exon"
 		
 		else:
