@@ -24,7 +24,7 @@ http://bedtools.readthedocs.org/en/latest/content/installation.html
 ###Test case
 ####Aim: **generate annotation** for coordinates in the target bed files
 
-1. clone the source: **git clone https://github.com/dyusuf/RCAS**
+1. clone the source: **git clone https://github.com/BIMSBbioinfo/RCAS**
 
 2. make dependency tools system wise executable, e.g. **ln -s path_to/RCAS/src/parse_anot.py ~/bin/.**
 
