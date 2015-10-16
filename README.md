@@ -19,7 +19,7 @@ http://bedtools.readthedocs.org/en/latest/content/installation.html
 
 -rules: src/RCAS.snakefile
 
--visulization: RCAS_dag.pdf
+-visualization: RCAS_dag.pdf
 
 ###Test case
 ####Aim: **generate annotation** for coordinates in the target bed files
