@@ -8,17 +8,8 @@ Make a standalone RNA Centric Annotation System that provides intuitive reports 
 
 -**snakemake**: https://bitbucket.org/johanneskoester/snakemake/wiki/Documentation
 
--**gff2bed**:
-http://bedops.readthedocs.org/en/latest/content/reference/file-management/conversion/gff2bed.html
-
--**sort-bed**:
-http://bedops.readthedocs.org/en/latest/content/reference/file-management/sorting/sort-bed.html
-
--**bedmap**:
-http://bedops.readthedocs.org/en/latest/content/reference/statistics/bedmap.html
-
--**installation of gff2bed, sort-bed, bedmap**:
-http://bedops.readthedocs.org/en/latest/content/reference/statistics/bedmap.html
+-**bedtools**:
+http://bedtools.readthedocs.org/en/latest/content/installation.html
 
 -**parse_anot.py**: src/parse_anot.py
 
@@ -43,7 +34,7 @@ http://bedops.readthedocs.org/en/latest/content/reference/statistics/bedmap.html
 
 5. command: **snakemake -s ../src/RCAS.snakefile -p --config ref=path_to/gencode.v23.annotation.gff3 infile=PAR*bed**
 
-6. output: **PARCLIP_AGO1234_Hafner2010a_hg19_xaa.anot.bed  PARCLIP_AGO1234_Hafner2010a_hg19_xab.anot.bed  PARCLIP_AGO1234_Hafner2010a_hg19_xac.anot.bed**
+6. output: **PARCLIP_AGO1234_Hafner2010a_hg19_xaa.anot.tsv  PARCLIP_AGO1234_Hafner2010a_hg19_xab.anot.tsv  PARCLIP_AGO1234_Hafner2010a_hg19_xac.anot.tsv**
 
 
 

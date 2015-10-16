@@ -1,175 +1,250 @@
 #! /usr/bin/env python
 
-def process_ref_line(line):
-	# extract last column where the attributes are
-	
-	attribute = line[:-1].split("\t")[-1]
-	attribute = attribute.split(";")
-	
-	return attribute
-
-def update_gene_set(attribute, gene_set):
-	#determine the association between gene_id  and (gene_type, gene_name)
-	#update in gene_set: {gene_id:[gene_type, gene_name]}
-	
-	gene_id, gene_type, gene_name = [item.split("=")[-1]
-									 for item in attribute
-									 if item.split("=")[0] in
-									 ("gene_id", "gene_type",  "gene_name")]
-	if gene_id not in gene_set:
-		gene_set[gene_id] = (gene_type, gene_name)
-
-def process_cor_line(line):
-	#process each line,
-	#return coordinate info & feature ids 
-	
-	cor_info, feature_ids = line[:-1].split("|")
-
-	return cor_info, feature_ids
-	
-def determine_feature(feature_ids, gene_set):
-	# determine appropriate features based on the reference ids  
-	
-	# genecode use following rule to rgister different features
-	# for gene and transcript: only use  ID
-	# for other features such as exon, UTR, intron, etc. use feature:transcript_ID:number
-	
-	# if there are no overlap with known gene coordinartes
-	# it is annotated as intergenic
-	
-	# if there are overlap with known gene coordinates
-	# make step-wise determination follwoing order: UTR3, UTR5, exon
-	# if the above features are not associated, then it is annoated as intron
-	
-	if feature_ids == "":
-		gene_type, gene_name, feature, gene_id  = "unknown", "unknown",  "intergenic", "unknown"
-		
-	else:
-		
-		if "UTR5" in feature_ids:
-			feature = "UTR5"
-			
-		elif "UTR3" in feature_ids:
-			feature = "UTR3"
-			
-		elif "CDS" in feature_ids:
-			feature = "CDS"
-
-		elif "exon" in feature_ids:	
-			feature = "exon"
-		
-		else:
-			feature = "intron"
-			
-		for feature_id in feature_ids.split(";"):
-			
-			if gene_set.has_key(feature_id):
-				gene_id = feature_id
-				gene_type, gene_name =  gene_set[gene_id]
-				break
-
-	return "\t".join([gene_type, gene_name, feature, gene_id])	
-
-def check_argv(argv):
+def check_argv(argv, handler):
 	
 	usage = """
 	parse_anot.py
 	
-	version: 0.0.1
-	authors: Dilmurat Yusuf
+	version: 0.0.2
+	author: Dilmurat Yusuf
 	
 	Usage:
 	
-	$ parse_anot.py -r track < bedmapBED > outputBed
+	$ parse_anot.py < bedtools_output > annotation_in_BED_format
   
-	$ bedmap_upstream_process ... | parse_anot.py -r track > outputBed
+	$ bedtools_upstream_process ... | parse_anot.py > annotation_in_BED_format
 	
-	The output consists of coordinate info, gene_type, gene_name, feature,  gene_id.
-	The format is tab delimited bed format.
-
-	Parse feature ids from bedmap output and then map to genomic featurs
-	according to given track which is specified by '-r' or '--track'.
+	The following parameters should be used in bedtools_upstream_process:
+	bedtools intersect -b reference_in_gff3 -a coordinates_in_BED -wao
 	
-	The script assums each cooridinate is only assocaited with a single gene_id.
+	The format is tab delimited bed format and output consists of following columns:
+	chromosome_id, start_position, end_position, seq_id, score, strand, feature, feature_id, gene_id, transcript_id, gene_type, gene_name, gene_strand, overlap_number, weight
 	
-	The reported features include exon, UTR, CDS, intron, intergenic,
-	gene_type, gene_name, gene_id.
+	The reported features include exon, UTR5/3, CDS, intron and intergenic.
 	
-	For a coordinate which is assocaited with a gene_id
+	For a coordinate which is assocaited with a transcript_id
 	but NOT with exons, it is annotated as intron.
 
-	For a coordiate which is NOT assocaited with a genes_ids,
+	For a coordiate which is NOT assocaited with a genes_id,
 	it is annotated as intergenic.
-	
 	"""
 
 	try:
-		opts, args = getopt.getopt(argv,"hr:",["track="])
+		opts, args = getopt.getopt(argv,"h",[""])
 		
 	except getopt.GetoptError:
 		print usage
 		sys.exit(1)
-		
-	if opts == []:
-		print usage
-		sys.exit(1)	
 	
 	for opt, arg in opts:
 		if opt == '-h' :
 			print  usage
 			sys.exit()
-		elif opt in ("-r", "--track"):
-			track = arg
+	
+	#if there is input data, the connection to tty (terminal) will be False
+	tty = handler.isatty() 
+	if tty == True:
+		print  usage
+		sys.exit()		
+
+def process_cor_line(line):
+	#process each line,
+	#return coordinate info & feature infos
+
+	line = line.strip().split("\t")
+	cor_info = "\t".join(line[:6])
+	anot_info = line[8], line[12], line[-2], line[-1]
+
+	return cor_info, anot_info
+
+def extract_info(cor_anot):
+	#extract cor_info, feature_info, child_id, parent_id
+	
+	child_id = "None"
+	parent_id = "None"
+	
+	core_info, anot_info = cor_anot
+	feature_info = anot_info[-2]
+	
+	if feature_info != '.':
 			
-			return track
+		infos = feature_info.split(";")
+		
+		child_id = infos[0].split("=")[1]
+		
+		if "Parent=" not in feature_info:
+			parent_id = "None"
+		else:
+			parent_id = infos[1].replace("Parent=", "")
+	
+	return core_info, anot_info, child_id, parent_id
+
+def update_child_and_parent(child_id, parent_id, child_and_parent):
+	if child_id not in child_and_parent:
+			child_and_parent[child_id] = parent_id
+	
+	return 	child_and_parent
+
+def update_id_and_info(child_id, anot_info, id_and_info):
+	if child_id not in id_and_info:
+			id_and_info[child_id] = anot_info
+	
+	return 	id_and_info
+
+def update_cor_and_ids(child_id, core_info, cor_and_ids):
+	try:
+		cor_and_ids[core_info].add(child_id)
+	except:
+		cor_and_ids[core_info] = set([child_id])
+		#use set to remove unwanted techinical duplicates
+		#which input file can contain 
+	
+	return 	cor_and_ids
+
+def substract_parent_id(child_ids, child_and_parent):
+	
+	parent_ids = set([])
+
+	for child_id in child_ids:
+		parent_id = child_and_parent[child_id]
+		parent_ids.add(parent_id)
+	
+	child_ids = child_ids - parent_ids
+	
+	return child_ids
+
+def substract_parent_exon(child_ids):
+	
+	#collect child_ids which are associate with identical exon_id
+	exon_features = {}
+	for child_id in child_ids:
+		if ":" in child_id:
+			exon_id = ":".join(child_id.split(":")[1:])
+			
+			try:
+				exon_features[exon_id].append(child_id)
+			except:
+				exon_features[exon_id] = [child_id]
+	
+	#collect exon_ids that are co-present with UTR and CDS
+	#also collect start/stop_codon ids
+	exon_start_stop = []
+	for feature_ids in exon_features.values():
+		# example of feature_ids
+		# ['exon:ENST00000483335.1:3'], the case of no CDS or UTR documentation in reference
+		# ['exon:ENST00000287078.6:2', 'CDS:ENST00000287078.6:2']
+		#
+		
+		if len(feature_ids) > 1:
+			for child_id in feature_ids:
+				feature = child_id.split(":")[0]
+				if feature in ('exon', 'start_codon', 'stop_codon'):
+					exon_start_stop.append(child_id)
+					
+	child_ids = child_ids - set(exon_start_stop)
+	
+	return child_ids
+
+
+
+def extract_feature(anot_info):
+	
+	feature, strand, info, ovelap_number = anot_info
+	
+	if feature == ".":
+		feature = "intergenic"
+		feature_id = "unknown"
+		gene_id = "unknown"
+		transcript_id = "unknown"
+		gene_type = "unknown"
+		gene_name = "unknown"
+		strand = "*"
+	
+	else:
+		info = info.split(";")
+		
+		feature_id = info[0].split("=")[1]
+		gene_id = info[2].split("=")[1]
+		transcript_id = info[3].split("=")[1]
+		gene_type = info[4].split("=")[1]
+		gene_name = info[6].split("=")[1]
+		
+		if feature == "transcript":
+			feature = "intronic"
+		
+		if feature == "UTR":
+			feature = feature_id.split(":")[0]
+	
+	return  "\t".join([feature, feature_id, gene_id, transcript_id, gene_type, gene_name, strand, ovelap_number])
+		
+
+def update_table(cor, child_ids, id_and_info, table):
+	weight = 1. / len(child_ids)
+		
+	for child_id in child_ids:
+		anot_info = id_and_info[child_id]
+		
+		feature_info = extract_feature(anot_info)
+		
+		table.append("%s\t%s\t%f" % (cor, feature_info, weight))
+	
+	return table	
 		
 		
 if __name__ == '__main__':
 	import sys, getopt
 	
-	"""
-	the script consists of two components
+	argv = sys.argv[1:]
+	handler = sys.stdin
 	
-	component 1: retrieve reference info
+	#check commandline options
+	check_argv(argv, handler)
 	
-	update gene_set = {gene_id:[gene_type, gene_name]}
-	"""
+	#extract coordinate info & feature infos
+	cor_anot_list = [process_cor_line(line) for line in handler]
 	
-	track = check_argv(sys.argv[1:])
-	
-	# extract attribute columns
-	with open(track) as read_track:
-		attribute_set = [process_ref_line(line) for line in read_track]
-	
-	# gene_set: {gene_id:[gene_type, gene_name]}
-	gene_set = {}
-	
-	# update gene set 
-	[update_gene_set(attribute, gene_set) for attribute in attribute_set]
-	
-	
-	#----------------------------------------------------------
-	
-	"""
-	component 2: map ids to features
-	"""
-	
-	read_cor_ids = sys.stdin	
-	
-	#extract coordinate info & feature ids
-	cor_ID_set = [process_cor_line(line) for line in read_cor_ids]
+	#build dictionary between child_id and parent_id defined in gene:transcript:exon
+	child_and_parent =  {}
 
-	#determine appropriate features based on the reference ids
-	# cor_id[0] :  coordinate info
-	# cor_id[1] : feature ids
-	cor_feature_set = ["\t".join([
-					  cor_id[0], determine_feature(cor_id[1], gene_set)
-					  ])
-					  for cor_id in cor_ID_set]
+	#build dictionary between child_id and complete anot info
+	id_and_info = {}
 	
-	#transform list into strings
-	print "\n".join(cor_feature_set)
+	#build a list of dictionaries between coordinate info and list of associated ids
+	cor_and_ids = {}
 	
+	#update child_and_parent, id_and_info, cor_and_ids
+	for cor_anot in cor_anot_list:
+		core_info, anot_info, child_id, parent_id = extract_info(cor_anot)
+		 
+		child_and_parent = update_child_and_parent(child_id, parent_id, child_and_parent)
+		
+		cor_and_ids = update_cor_and_ids(child_id, core_info, cor_and_ids)
+		
+		id_and_info = update_id_and_info(child_id, anot_info, id_and_info)
+	
+	#remove duplicate representation (gene:transcript:exon) in a gene model
+	for cor, child_ids in cor_and_ids.items():
+				
+		if child_ids != set(["None"]):
+			
+			#for each coordinate, substract parent ids defined in gene:transcript:exon
+			child_ids = substract_parent_id(child_ids, child_and_parent)
+			
+			#for each coordinate, substract exon ids defined in exon:CDS or exon:UTR
+			#unfortunately in gencode gff3,  the relation is not clear between exon and CDS or UTR
+			#that's why it can not be implemented by substract_parent_id()
+			child_ids = substract_parent_exon(child_ids)
+			
+			cor_and_ids[cor] = child_ids
+	
+	#generate table
+	header = 'chromosome_id\tstart_position\tend_position\tseq_id\tscore\tstrand\tfeature\tfeature_id\tgene_id\ttranscript_id\tgene_type\tgene_name\tgene_strand\toverlap_number\tweight'
+	table = [header]
+	for cor, child_ids in cor_and_ids.items():
+		table = update_table(cor, child_ids, id_and_info, table)
+		
+	
+	print "\n".join(table)
 	
 		
 	
