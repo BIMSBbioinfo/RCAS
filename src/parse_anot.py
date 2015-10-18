@@ -95,9 +95,10 @@ def update_cor_and_ids(child_id, core_info, cor_and_ids):
 	try:
 		cor_and_ids[core_info].add(child_id)
 	except:
-		cor_and_ids[core_info] = set([child_id])
 		#use set to remove unwanted techinical duplicates
 		#which input file can contain 
+		cor_and_ids[core_info] = set([child_id])
+		
 	
 	return 	cor_and_ids
 
@@ -209,7 +210,7 @@ if __name__ == '__main__':
 	#build dictionary between child_id and complete anot info
 	id_and_info = {}
 	
-	#build a list of dictionaries between coordinate info and list of associated ids
+	#build dictionary between coordinate info and list of associated ids
 	cor_and_ids = {}
 	
 	#update child_and_parent, id_and_info, cor_and_ids
@@ -227,10 +228,10 @@ if __name__ == '__main__':
 				
 		if child_ids != set(["None"]):
 			
-			#for each coordinate, substract parent ids defined in gene:transcript:exon
+			#for each coordinate, substract associated parent ids defined in gene:transcript:exon
 			child_ids = substract_parent_id(child_ids, child_and_parent)
 			
-			#for each coordinate, substract exon ids defined in exon:CDS or exon:UTR
+			#for each coordinate, substract associated parent exon ids defined in exon:CDS or exon:UTR
 			#unfortunately in gencode gff3,  the relation is not clear between exon and CDS or UTR
 			#that's why it can not be implemented by substract_parent_id()
 			child_ids = substract_parent_exon(child_ids)
