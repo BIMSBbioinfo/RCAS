@@ -63,11 +63,15 @@ def extract_info(cor_anot):
 	child_id = "None"
 	parent_id = "None"
 	
-	core_info, anot_info = cor_anot
+	cor_info, anot_info = cor_anot
 	feature_info = anot_info[-2]
+	anot_info, overlap_number = anot_info[:-1], anot_info[-1]
+	
+	# overlap_number is conditioned to cor_info and anot_info
+	cor_info = "%s\t%s" % (cor_info, overlap_number) 
 	
 	if feature_info != '.':
-			
+		
 		infos = feature_info.split(";")
 		
 		child_id = infos[0].split("=")[1]
@@ -77,7 +81,7 @@ def extract_info(cor_anot):
 		else:
 			parent_id = infos[1].replace("Parent=", "")
 	
-	return core_info, anot_info, child_id, parent_id
+	return cor_info, anot_info, child_id, parent_id
 
 def update_child_and_parent(child_id, parent_id, child_and_parent):
 	if child_id not in child_and_parent:
@@ -88,17 +92,16 @@ def update_child_and_parent(child_id, parent_id, child_and_parent):
 def update_id_and_info(child_id, anot_info, id_and_info):
 	if child_id not in id_and_info:
 			id_and_info[child_id] = anot_info
-	
+			
 	return 	id_and_info
 
-def update_cor_and_ids(child_id, core_info, cor_and_ids):
+def update_cor_and_ids(child_id, cor_info, cor_and_ids):
 	try:
-		cor_and_ids[core_info].add(child_id)
+		cor_and_ids[cor_info].add(child_id)
 	except:
 		#use set to remove unwanted techinical duplicates
 		#which input file can contain 
-		cor_and_ids[core_info] = set([child_id])
-		
+		cor_and_ids[cor_info] = set([child_id])
 	
 	return 	cor_and_ids
 
@@ -150,7 +153,7 @@ def substract_parent_exon(child_ids):
 
 def extract_feature(anot_info):
 	
-	feature, strand, info, ovelap_number = anot_info
+	feature, strand, info = anot_info
 	
 	if feature == ".":
 		feature = "intergenic"
@@ -176,10 +179,10 @@ def extract_feature(anot_info):
 		if feature == "UTR":
 			feature = feature_id.split(":")[0]
 	
-	return  "\t".join([feature, feature_id, gene_id, transcript_id, gene_type, gene_name, strand, ovelap_number])
+	return  "\t".join([feature, feature_id, gene_id, transcript_id, gene_type, gene_name, strand])
 		
 
-def update_table(cor, child_ids, id_and_info, table):
+def update_table(cor_info, child_ids, id_and_info, table):
 	weight = 1. / len(child_ids)
 		
 	for child_id in child_ids:
@@ -187,7 +190,7 @@ def update_table(cor, child_ids, id_and_info, table):
 		
 		feature_info = extract_feature(anot_info)
 		
-		table.append("%s\t%s\t%f" % (cor, feature_info, weight))
+		table.append("%s\t%f\t%s" % (cor_info, weight, feature_info))
 	
 	return table	
 		
@@ -215,11 +218,11 @@ if __name__ == '__main__':
 	
 	#update child_and_parent, id_and_info, cor_and_ids
 	for cor_anot in cor_anot_list:
-		core_info, anot_info, child_id, parent_id = extract_info(cor_anot)
+		cor_info, anot_info, child_id, parent_id = extract_info(cor_anot)
 		 
 		child_and_parent = update_child_and_parent(child_id, parent_id, child_and_parent)
 		
-		cor_and_ids = update_cor_and_ids(child_id, core_info, cor_and_ids)
+		cor_and_ids = update_cor_and_ids(child_id, cor_info, cor_and_ids)
 		
 		id_and_info = update_id_and_info(child_id, anot_info, id_and_info)
 	
@@ -239,10 +242,10 @@ if __name__ == '__main__':
 			cor_and_ids[cor] = child_ids
 	
 	#generate table
-	header = 'chromosome_id\tstart_position\tend_position\tseq_id\tscore\tstrand\tfeature\tfeature_id\tgene_id\ttranscript_id\tgene_type\tgene_name\tgene_strand\toverlap_number\tweight'
+	header = 'chromosome_id\tstart_position\tend_position\tseq_id\tscore\tstrand\toverlap_number\tweight\tfeature\tfeature_id\tgene_id\ttranscript_id\tgene_type\tgene_name\tgene_strand'
 	table = [header]
-	for cor, child_ids in cor_and_ids.items():
-		table = update_table(cor, child_ids, id_and_info, table)
+	for cor_info, child_ids in cor_and_ids.items():
+		table = update_table(cor_info, child_ids, id_and_info, table)
 		
 	
 	print "\n".join(table)
