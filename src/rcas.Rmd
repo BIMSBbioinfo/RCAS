@@ -1,0 +1,103 @@
+---
+output: html_document
+---
+# The RNA Centric Annotation System Analysis Report
+## Authors: DY, BU, AA
+The Berlin Institute for Medical Systems Biology (BIMSB)  
+Max Delbrueck Center (MDC) for Molecular Medicine  
+Robert-Roessle-Str. 10, 13125, Berlin, Germany  
+Building 87, Room 1.10  
+
+**`r date()`**
+
+**RCAS** is an RNA-centric annotation system for peaks discovered by CLIP-based high-throughput sequencing methods. The annotation pipeline takes as input [a 'bed' format file](https://genome.ucsc.edu/FAQ/FAQformat.html#format1) that contains the genomic coordinates of peak regions (which is the output of CLIP-based data analysis pipelines). These peaks are overlaid with genomic features that are publicly available (or provided by the user) for the corresponding species. Then, an html/pdf based report is generated including figures and graphics that summarize the annotations associated to the peak regions. 
+
+```{r echo=FALSE, message=FALSE}
+library('data.table')
+#require(devtools)
+#install_github("ramnathv/rCharts")
+library('rCharts')
+library('DT')
+
+```
+
+
+```{r, fig.width=24, fig.height=24, echo=FALSE}
+args <- commandArgs(TRUE)
+anot = args[1]
+
+mdata = fread(anot)
+
+```
+
+
+## Summary Figures
+
+-------------
+
+**Figure-1**: The distribution of peaks in genic and intergenic regions. X axis denotes the number of peaks and the Y axis denotes the types of genes (e.g. protein_coding) or intergenic regions ('unknown'). Each bar is further fragmented into gene features such as 'intron', 'exon', 'UTR' 'CDS' or 'intergenic' features.
+
+
+### Distribution of intervals across gene features
+```{r results='asis', echo=FALSE}
+p = nPlot(~ feature, data = mdata, type='pieChart')
+p$print(include_assets = TRUE)
+```
+
+### Distribution of intervals in the genome grouped by gene types 
+```{r results='asis', echo=FALSE}
+
+dt = mdata[,length(feature), by=gene_type]
+dt = dt[order(-V1)]
+p = nPlot( V1 ~ gene_type , data = dt, type='multiBarChart') #multiBarHorizontalChart
+p$chart(reduceXTicks = FALSE)
+p$xAxis(rotateLabels=-45)
+p$setTemplate(afterScript='<style> svg text {font-size: 11px;}</style>')
+p$chart(height=300)
+p$print(include_assets = TRUE)
+
+for (i in 1:3){
+  mygene_type =  dt$gene_type[i]
+  cat("Pie Chart for ",mygene_type,"genes\n")
+  mydt = mdata[gene_type==mygene_type, length(gene_type), by=feature]
+  p = nPlot(V1 ~ feature, data = mydt , type='pieChart')
+  p$print(include_assets = TRUE)
+}
+
+```
+
+### Distribution of intervals across the chromosomes grouped by gene features 
+```{r results='asis', }
+dt = mdata[,length(gene_type), by=c('chromosome_id', 'feature')]
+dt = dt[order(-V1),]
+p = nPlot( V1 ~ chromosome_id , data = dt, group= 'feature', type='multiBarChart') #multiBarHorizontalChart
+p$chart(reduceXTicks = FALSE)
+p$xAxis(rotateLabels=-45)
+p$setTemplate(afterScript='<style> svg text {font-size: 11px;}</style>')
+p$chart(height=300)
+p$print(include_assets = TRUE)
+
+```
+
+
+
+```{r, eval=FALSE, echo=FALSE}
+### Top genes with the most number of interval overlaps in introns, exons, UTRs, etc. 
+
+library(DT)
+
+features=unique(mdata$feature)
+
+mytable = mdata[feature==features[1],length(feature),by=gene_id]
+colnames(mytable) = c('gene_id', features[1])
+for (i in 2:length(features)){
+  f = features[i]
+  dt = mdata[feature==f,length(feature),by=gene_id]
+  colnames(dt) = c('gene_id', f)
+  mytable = merge(mytable, dt, by='gene_id', all=TRUE)
+}
+
+datatable(mytable, filter = 'top' )
+```
+
+
