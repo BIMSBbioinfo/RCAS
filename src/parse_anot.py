@@ -131,7 +131,6 @@ def substract_parent_exon(child_ids):
 				exon_features[exon_id] = [child_id]
 	
 	#collect exon_ids that are co-present with UTR and CDS
-	#also collect start/stop_codon ids
 	exon_start_stop = []
 	for feature_ids in exon_features.values():
 		# example of feature_ids
@@ -142,14 +141,12 @@ def substract_parent_exon(child_ids):
 		if len(feature_ids) > 1:
 			for child_id in feature_ids:
 				feature = child_id.split(":")[0]
-				if feature in ('exon', 'start_codon', 'stop_codon'):
+				if feature in ('exon'):
 					exon_start_stop.append(child_id)
 					
 	child_ids = child_ids - set(exon_start_stop)
 	
 	return child_ids
-
-
 
 def extract_feature(anot_info):
 	
@@ -180,7 +177,6 @@ def extract_feature(anot_info):
 			feature = feature_id.split(":")[0]
 	
 	return  "\t".join([feature, feature_id, gene_id, transcript_id, gene_type, gene_name, strand])
-		
 
 def update_table(cor_info, child_ids, id_and_info, table):
 	weight = 1. / len(child_ids)
@@ -193,7 +189,6 @@ def update_table(cor_info, child_ids, id_and_info, table):
 		table.append("%s\t%f\t%s" % (cor_info, weight, feature_info))
 	
 	return table	
-		
 		
 if __name__ == '__main__':
 	import sys, getopt
@@ -225,10 +220,10 @@ if __name__ == '__main__':
 		cor_and_ids = update_cor_and_ids(child_id, cor_info, cor_and_ids)
 		
 		id_and_info = update_id_and_info(child_id, anot_info, id_and_info)
-	
+
 	#remove duplicate representation (gene:transcript:exon) in a gene model
 	for cor, child_ids in cor_and_ids.items():
-				
+
 		if child_ids != set(["None"]):
 			
 			#for each coordinate, substract associated parent ids defined in gene:transcript:exon
@@ -240,15 +235,12 @@ if __name__ == '__main__':
 			child_ids = substract_parent_exon(child_ids)
 			
 			cor_and_ids[cor] = child_ids
-	
+
 	#generate table
 	header = 'chromosome_id\tstart_position\tend_position\tseq_id\tscore\tstrand\toverlap_number\tweight\tfeature\tfeature_id\tgene_id\ttranscript_id\tgene_type\tgene_name\tgene_strand'
 	table = [header]
 	for cor_info, child_ids in cor_and_ids.items():
 		table = update_table(cor_info, child_ids, id_and_info, table)
-		
-	
+
 	print "\n".join(table)
-	
-		
-	
+
