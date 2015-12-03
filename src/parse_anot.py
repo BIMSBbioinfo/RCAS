@@ -131,7 +131,7 @@ def substract_parent_exon(child_ids):
 				exon_features[exon_id] = [child_id]
 	
 	#collect exon_ids that are co-present with UTR and CDS
-	exon_start_stop = []
+	exon_set = []
 	for feature_ids in exon_features.values():
 		# example of feature_ids
 		# ['exon:ENST00000483335.1:3'], the case of no CDS or UTR documentation in reference
@@ -142,9 +142,9 @@ def substract_parent_exon(child_ids):
 			for child_id in feature_ids:
 				feature = child_id.split(":")[0]
 				if feature in ('exon'):
-					exon_start_stop.append(child_id)
+					exon_set.append(child_id)
 					
-	child_ids = child_ids - set(exon_start_stop)
+	child_ids = child_ids - set(exon_set)
 	
 	return child_ids
 
