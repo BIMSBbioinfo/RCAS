@@ -2,7 +2,7 @@
 args <- commandArgs(TRUE)
 
 ## Default setting when no arguments passed
-if(length(args) < 2) {
+if(length(args) < 3) {
   args <- c("--help")
 }
 
@@ -12,6 +12,7 @@ help_command = "
       Arguments:
       --gff3=<path to GENCODE Annotation File>  - e.g /data/akalin/Base/Annotation/GenomeAnnotation/hg19/gencode/gencode.v19.annotation.gff3
       --anot=<path to parse_anot.py output>  - e.g /home/buyar/projects/RCAS/test/PARCLIP_AGO1234_Hafner2010a_hg19_xaa.anot.tsv
+      --out=<output prefix>   -e.g Hafner2010.hg19
       --help              - print this text
       
       Example:
@@ -41,8 +42,15 @@ if(!("anot" %in% argsDF$V1)) {
   stop("provide the path to anot.bed file")
 }
 
+## Arg2 default
+if(!("out" %in% argsDF$V1)) {
+  cat(help_command, "\n")
+  stop("provide the output prefix to anot.bed file")
+}
+
 gff3_file = argsL$gff3
 anot_file = argsL$anot
+out_prefix = argsL$out
 
 ########################################################################################################################################
 suppressWarnings(suppressMessages(library('rtracklayer')))
@@ -85,16 +93,25 @@ names(all_genes) = gsub("\\..*$", "", gene_universe$gene_id) #ensembl gene ids d
 
 selection_function = function (x){ return(x == 1) }
 
-GOdata <- new("topGOdata", ontology = "BP", allGenes = all_genes, geneSel = selection_function, description = "Test", annot = annFUN.org, mapping="org.Hs.eg.db", ID="Ensembl")
-
-saveRDS(GOdata, file="godata.rds")
+calculate_go_enrichment = function (ontology){
+  
+GOdata <- new("topGOdata", ontology = ontology, allGenes = all_genes, geneSel = selection_function, description = "Test", annot = annFUN.org, mapping="org.Hs.eg.db", ID="Ensembl")
 
 resultFisher <- runTest(GOdata, algorithm = "classic", statistic = "fisher")
-mt = GenTable(GOdata, classicFisher = resultFisher, topNodes = 10)
+mt = GenTable(GOdata, classicFisher = resultFisher, topNodes = length(usedGO(GOdata)))
 
+#Do multiple-testing correction
+mt$classicFisher = gsub("<", "", mt$classicFisher) #some p-values have the "less than" sign ("<"), which causes the numeric column to be interpreted as character. 
+mt$bonferroni = p.adjust(mt$classicFisher, method="bonferroni")
+mt$bh = p.adjust(mt$classicFisher, method="BH")
 
+out_file = paste0(c(out_prefix, ontology, "GO.results.tsv"), collapse = '.')
+write.table(mt, file = out_file, sep='\t', quote = FALSE, row.names = FALSE)
+}
 
-
+calculate_go_enrichment('BP')
+calculate_go_enrichment('MF')
+calculate_go_enrichment('CC')
 
 
 
