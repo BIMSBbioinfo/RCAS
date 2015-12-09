@@ -6,15 +6,26 @@ body, td {
 
 body {
   max-width: 1000px;
-  margin: auto;
+  margin-left:250px;
+  line-height: 20px;
+  width: auto;
   padding: 1em;
-  line-height: 25px;
-  background-color: #ECECEA;
+  background-color: #cce5ff;
   text-align: justify;
+  overflow-y: auto;
 }
 
 tt, code, pre {
    font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+}
+
+h1, h2, h3, h4, h5, h6, #TOC {
+    font-family: 'Corben', Georgia, Times, serif;
+    padding-top: 30px
+}
+
+p, div {
+    font-family: 'Nobile', Helvetica, Arial, sans-serif;
 }
 
 h1 {
@@ -47,6 +58,7 @@ a:visited {
 
 pre, img {
   max-width: 1000px;
+  width: auto;
 }
 pre {
   overflow-x: auto;
@@ -64,14 +76,6 @@ code[class] {
   background-color: #F8F8F8;
 }
 
-table {
-    table-layout: auto;
-}
-
-table, td, th {
-  border: 1px solid black;
-}
-
 blockquote {
    color:#666666;
    margin:0;
@@ -87,54 +91,84 @@ hr {
    border-top-color: #999999;
 }
 
-@media print {
-   * {
-      background: transparent !important;
-      color: black !important;
-      filter:none !important;
-      -ms-filter: none !important;
-   }
-
-   body {
-      font-size:12pt;
-      max-width:100%;
-   }
-
-   a, a:visited {
-      text-decoration: underline;
-   }
-
-   hr {
-      visibility: hidden;
-      page-break-before: always;
-   }
-
-   pre, blockquote {
-      padding-right: 1em;
-      page-break-inside: avoid;
-   }
-
-   tr, img {
-      page-break-inside: avoid;
-   }
-
-   img {
-      max-width: 1000px !important;
-   }
-
-   @page :left {
-      margin: 15mm 20mm 15mm 10mm;
-   }
-
-   @page :right {
-      margin: 15mm 10mm 15mm 20mm;
-   }
-
-   p, h2, h3 {
-      orphans: 3; widows: 3;
-   }
-
-   h2, h3 {
-      page-break-after: avoid;
-   }
+.container {
+    max-width: 1000px;
+    width: auto
 }
+
+.jumbotron {
+    background-image: url("img/jumbotron_image.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+    color: white;
+    font-weight: bold;
+    text-shadow: black 0.3em 0.3em 0.3em;
+    max-width: 1000px;
+    width: auto;
+}
+.jumbotron h1,
+.jumbotron .h1 {
+  color: inherit;
+  text-align: left;
+  font-size: 28px
+}
+.jumbotron p {
+  margin-bottom: 15px;
+  font-size: 21px;
+  font-weight: 200;
+  text-align: left;
+}
+.jumbotron > hr {
+  border-top-color: #d5d5d5;
+}
+
+.col-xs-1, .col-sm-1, .col-md-1, .col-lg-1, .col-xs-2, .col-sm-2, .col-md-2, .col-lg-2, .col-xs-3, .col-sm-3, .col-md-3, .col-lg-3, .col-xs-4, .col-sm-4, .col-md-4, .col-lg-4, .col-xs-5, .col-sm-5, .col-md-5, .col-lg-5, .col-xs-6, .col-sm-6, .col-md-6, .col-lg-6, .col-xs-7, .col-sm-7, .col-md-7, .col-lg-7, .col-xs-8, .col-sm-8, .col-md-8, .col-lg-8, .col-xs-9, .col-sm-9, .col-md-9, .col-lg-9, .col-xs-10, .col-sm-10, .col-md-10, .col-lg-10, .col-xs-11, .col-sm-11, .col-md-11, .col-lg-11, .col-xs-12, .col-sm-12, .col-md-12, .col-lg-12 {
+  position: relative;
+  min-height: 1px;
+  padding-right: 15px;
+  padding-left: 15px;
+  text-align: left;
+  margin-bottom: 15px;
+  max-width: 1000px;
+}
+
+
+#TOC {
+    margin-right: -30px;
+    position: fixed;
+    float:left;
+    top:0;
+    left:0;
+    width: 250px;
+    height: 100%;
+    overflow:auto;
+    text-align: left;
+    font-size: 16px;
+    background: #99cbff;
+    z-index: 100;
+}
+
+#TOC li a {
+    display: block;
+    text-decoration: none;
+    color: black;
+}
+
+#TOC li a:hover {
+    text-decoration: none;
+    color: red;
+    background: rgb(255,255,255,0.2);
+}
+
+#TOC li a:active,
+#TOC li a:focus {
+    text-decoration: none;
+}
+
+
+
+
+
+
+
+
