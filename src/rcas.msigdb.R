@@ -61,7 +61,7 @@ if(!("out" %in% argsDF$V1)) {
 msigdb = argsL$gmt
 gff3_file = argsL$gff3
 anot_file = argsL$anot
-out_prefix = argsL$out
+out_file = argsL$out
 
 ########################################################################################################################################
 #2. Get the list of all protein-coding genes from the GTF file 
@@ -164,7 +164,7 @@ results = count_associations(treatment = treatment, background = background, gen
 results = results[order(pval)]
 
 #Write pathways with FDR < 0.001 to file
-write.table(results[bonferroni < 0.001], file = paste0(c(out_prefix, "msigdb.results.tsv"), collapse = "."), quote = FALSE, row.names = FALSE, sep="\t")
+write.table(results[bonferroni < 0.001], file = outfile, quote = FALSE, row.names = FALSE, sep="\t")
 
 
 
