@@ -5,7 +5,7 @@ genome_reference = config["genome"]
 
 infile = config["infile"]
 infile = glob.glob(infile)
-outfile = [out.split(".")[0] + ".msigdb.results.tsv" for out in infile]
+outfile = [out.split(".")[0] + ".rcas.html" for out in infile]
 
 rule target:
 	 #the report R script should be flexible with output name
@@ -48,4 +48,14 @@ rule report_msigd:
 	 input: TRACK_gff, "{sample}.anot.tsv"
 	 output: "{sample}.msigdb.results.tsv"
 	 shell: "Rscript ../src/rcas.msigdb.R --gmt=../src/c2.cp.v5.0.entrez.gmt  --gff3={input[0]} --anot={input[1]} --out={output}"
-	 
+
+rule report_GO:
+	 input: TRACK_gff, "{sample}.anot.tsv"
+	 output: "{sample}-GO-term"
+	 shell: "Rscript ../src/rcas.GO.R --gff3={input[0]} --anot={input[1]} --out={output}"
+
+rule html_report:
+	 input: "{sample}.anot.tsv", infile, "{sample}-GO-term/BP.GO.results.tsv", "{sample}-GO-term/MF.GO.results.tsv", "{sample}-GO-term/CC.GO.results.tsv", "{sample}.msigdb.results.tsv", "{sample}.anot-motif.tsv"
+	 output: "{sample}.rcas.html"
+	 shell: "Rscript make.R  {input[0]} {input[1]} ~/database/gencode.v19.annotation.gff3.rds {input[2]} {input[3]} {input[4]} {input[5]} {input[6]} --out={output}"
+
