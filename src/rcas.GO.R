@@ -105,7 +105,11 @@ mt$classicFisher = gsub("<", "", mt$classicFisher) #some p-values have the "less
 mt$bonferroni = p.adjust(mt$classicFisher, method="bonferroni")
 mt$bh = p.adjust(mt$classicFisher, method="BH")
 
+out_dir = paste0(out_prefix, "-GO-term")
+if (!dir.exists(out_dir)) {dir.create(out_dir)}
 out_file = paste0(c(out_prefix, ontology, "GO.results.tsv"), collapse = '.')
+out_file = paste0(out_dir, "/", out_file)
+
 write.table(mt, file = out_file, sep='\t', quote = FALSE, row.names = FALSE)
 }
 
