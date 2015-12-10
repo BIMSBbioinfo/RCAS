@@ -54,13 +54,13 @@ def check_argv(argv):
 def extract_motif_evalue_id_sites(line, motif_evalue_id_sites):
 	if line[0] == " ":
 		line = line.strip().split()
-		
+
 		motif_id, evalue, sites = line[1], line[3], line[9]
-		
+
 		evalue_id_sites  =  float(evalue), motif_id, sites
-		
+
 		motif_evalue_id_sites.add(evalue_id_sites)
-	
+
 	return motif_evalue_id_sites
 
 def extract_motif_data(line, on, motif_data):
@@ -122,12 +122,12 @@ def update_motif_info(motif, motif_info):
 	motif_id =  motif['id']
 	IUPAC_consensus = pwm2IUPAC(motif['pwm'])
 	matched_seq_ids = motif['seqs']
-	
+
 	#there can be duplicated motifs
 	#use set to remove duplications
 	if motif_id not in motif_info:
 		motif_info[motif_id] = IUPAC_consensus, matched_seq_ids
-	
+
 	return motif_info
 
 def update_mapped_coordinates(line, mapped_coordinates):
@@ -170,20 +170,20 @@ def update_anot_info(line, anot_info):
 def update_table(evalue_id_sites, motif_info, sequneces, mapped_coordinates, anot_info, table):
 	evalue, motif_id, sites = evalue_id_sites
 	IUPAC_consensus, matched_seq_ids = motif_info[motif_id]
-	
+
 	for seq_id in matched_seq_ids:
 		coordinates_flank = sequneces[seq_id]
 		coordinates_peak = mapped_coordinates[coordinates_flank]
-	
+
 		anot_features = anot_info[coordinates_peak]
-	
+
 		chromosome_id, rest = coordinates_peak.split(":")
 		coordinate, strand = rest[:-1].split("(")
 		start, end = coordinate.split("-")
-	
+
 		for feature in anot_features:
 			feature = "\t".join(feature)
-	
+
 			table.append("\t".join([chromosome_id, start, end, strand, feature, IUPAC_consensus, motif_id, sites]))
 
 	return table
@@ -195,25 +195,25 @@ if __name__ == '__main__':
 
 	#check commandline options
 	centrimo_html, centrimo_txt, coordinates_peak_flank, annotation, number_of_top_motifs = check_argv(argv)
-	
+
 	###########process for centrimo.txt, start
 	#obtain motif id, E-value, site_in_bin
 	#sort motif according to E-value and retian motifs according to number_of_top_motifs
-	
+
 	with open(centrimo_txt) as handle:
 		motif_evalue_id_sites = set([])
 
 		for line in handle:
 			motif_evalue_id_sites = extract_motif_evalue_id_sites(line, motif_evalue_id_sites)
-				
+
 	motif_evalue_id_sites = sorted(motif_evalue_id_sites)
-			
+
 	###########process for centrimo.txt, end
 
 	###########process for centrimo.html, start
 	#obtain motif id, pwm, seqs
 	#build consensus from pwm
-	
+
 	with open(centrimo_html) as handle:
 		on = False
 		motif_data = []
@@ -229,9 +229,9 @@ if __name__ == '__main__':
 	#data stucture of motif_data is following:
 	#[u'motif_dbs', u'cmd', u'seqlen', u'tested', u'program', u'motifs', u'sequences', u'release', u'sequence_db', u'options', u'revision']
 	#u'motifs': [u'peaks', u'score_threshold', u'total_sites', u'db', u'sites', u'len', u'motif_nsites', u'n_tested', u'seqs', u'alt', u'pwm', u'motif_evalue', u'id']
-	
+
 	sequneces = motif_data['sequences']
-	
+
 	motif_info ={}
 	for motif in motif_data['motifs']:
 		motif_info = update_motif_info(motif, motif_info)
@@ -265,4 +265,3 @@ if __name__ == '__main__':
 		table = update_table(evalue_id_sites, motif_info, sequneces, mapped_coordinates, anot_info, table)
 
 	print "\n".join(table) #_tmp
-
