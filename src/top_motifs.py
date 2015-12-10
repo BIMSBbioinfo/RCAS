@@ -10,20 +10,20 @@ def check_argv(argv):
 
 	Usage:
 
-	$ top_motifs.py -m centrimo.html -c cor_flank -a annotation_table -n number_of_top_motifs > annotation_motifs.tsv
+	$ top_motifs.py -m centrimo.html -e centrimo.txt -c cor_flank -a annotation_table -n number_of_top_motifs > annotation_motifs.tsv
 
-	Default number of top motifs: 10
+	Default number of top motifs according to E-value: 10
 
 	"""
 
 	try:
-		opts, args = getopt.getopt(argv,"m:c:a:h:n:",[""])
+		opts, args = getopt.getopt(argv,"m:e:c:a:h:n:",[""])
 
 	except getopt.GetoptError:
 		print usage
 		sys.exit(1)
 
-	if set([opt for opt, arg in opts]) not in [set(["-m", "-a", "-c"]), set(["-m", "-a", "-c", '-n'])]:
+	if set([opt for opt, arg in opts]) not in [set(["-m", "-e", "-a", "-c"]), set(["-m", "-e", "-a", "-c", '-n'])]:
 		print usage
 		sys.exit(1)
 
@@ -37,6 +37,9 @@ def check_argv(argv):
 		if opt == '-m':
 			centrimo_html = arg
 
+		if opt == '-e':
+			centrimo_txt = arg
+
 		if opt == "-c":
 			coordinates_original_flank = arg
 
@@ -46,7 +49,19 @@ def check_argv(argv):
 		if opt == '-n':
 			number_of_top_motifs = int(arg)
 
-	return 	centrimo_html, coordinates_original_flank, annotation, number_of_top_motifs
+	return 	centrimo_html, centrimo_txt, coordinates_original_flank, annotation, number_of_top_motifs
+
+def extract_motif_evalue_id_sites(line, motif_evalue_id_sites):
+	if line[0] == " ":
+		line = line.strip().split()
+		
+		motif_id, evalue, sites = line[1], line[3], line[9]
+		
+		evalue_id_sites  =  float(evalue), motif_id, sites
+		
+		motif_evalue_id_sites.add(evalue_id_sites)
+	
+	return motif_evalue_id_sites
 
 def extract_motif_data(line, on, motif_data):
 	if "//@JSON_VAR data" in line:
@@ -79,7 +94,7 @@ def show_nucleotides(pwm):
 
 def pwm2IUPAC(pwm):
 
-	IUPAC_consensus = {
+	IUPAC_nucleotide = {
 		('A',): 'A',
 		('C',): 'C',
 		('G',): 'G',
@@ -99,9 +114,21 @@ def pwm2IUPAC(pwm):
 
 	compositions = show_nucleotides(pwm)
 
-	consensus = [IUPAC_consensus[site_composition] for site_composition in compositions]
+	consensus = [IUPAC_nucleotide[site_composition] for site_composition in compositions]
 
 	return "".join(consensus)
+
+def update_motif_info(motif, motif_info):
+	motif_id =  motif['id']
+	IUPAC_consensus = pwm2IUPAC(motif['pwm'])
+	matched_seq_ids = motif['seqs']
+	
+	#there can be duplicated motifs
+	#use set to remove duplications
+	if motif_id not in motif_info:
+		motif_info[motif_id] = IUPAC_consensus, matched_seq_ids
+	
+	return motif_info
 
 def update_mapped_coordinates(line, mapped_coordinates):
 		line = line[:-1]
@@ -140,26 +167,24 @@ def update_anot_info(line, anot_info):
 
 		return anot_info
 
-def update_table(motif, sequneces, mapped_coordinates, anot_info, table):
-	matched_sites = "%.f" % motif[0]
-	motif_id = motif[1]
-	IUPAC_consensus = motif[2]
-	matched_seq_ids = motif[3]
-
+def update_table(evalue_id_sites, motif_info, sequneces, mapped_coordinates, anot_info, table):
+	evalue, motif_id, sites = evalue_id_sites
+	IUPAC_consensus, matched_seq_ids = motif_info[motif_id]
+	
 	for seq_id in matched_seq_ids:
 		coordinates_flank = sequneces[seq_id]
 		coordinates_peak = mapped_coordinates[coordinates_flank]
-
+	
 		anot_features = anot_info[coordinates_peak]
-
+	
 		chromosome_id, rest = coordinates_peak.split(":")
 		coordinate, strand = rest[:-1].split("(")
 		start, end = coordinate.split("-")
-
+	
 		for feature in anot_features:
 			feature = "\t".join(feature)
-
-			table.append("\t".join([chromosome_id, start, end, strand, feature, IUPAC_consensus, motif_id, matched_sites]))
+	
+			table.append("\t".join([chromosome_id, start, end, strand, feature, IUPAC_consensus, motif_id, sites]))
 
 	return table
 
@@ -169,10 +194,26 @@ if __name__ == '__main__':
 	argv = sys.argv[1:]
 
 	#check commandline options
-	centrimo_html, coordinates_peak_flank, annotation, number_of_top_motifs = check_argv(argv)
+	centrimo_html, centrimo_txt, coordinates_peak_flank, annotation, number_of_top_motifs = check_argv(argv)
+	
+	###########process for centrimo.txt, start
+	#obtain motif id, E-value, site_in_bin
+	#sort motif according to E-value and retian motifs according to number_of_top_motifs
+	
+	with open(centrimo_txt) as handle:
+		motif_evalue_id_sites = set([])
 
-	###########process for motif info, start
-	#extract motif data
+		for line in handle:
+			motif_evalue_id_sites = extract_motif_evalue_id_sites(line, motif_evalue_id_sites)
+				
+	motif_evalue_id_sites = sorted(motif_evalue_id_sites)
+			
+	###########process for centrimo.txt, end
+
+	###########process for centrimo.html, start
+	#obtain motif id, pwm, seqs
+	#build consensus from pwm
+	
 	with open(centrimo_html) as handle:
 		on = False
 		motif_data = []
@@ -188,15 +229,13 @@ if __name__ == '__main__':
 	#data stucture of motif_data is following:
 	#[u'motif_dbs', u'cmd', u'seqlen', u'tested', u'program', u'motifs', u'sequences', u'release', u'sequence_db', u'options', u'revision']
 	#u'motifs': [u'peaks', u'score_threshold', u'total_sites', u'db', u'sites', u'len', u'motif_nsites', u'n_tested', u'seqs', u'alt', u'pwm', u'motif_evalue', u'id']
-
-	#there can be duplicated motifs
-	#use set to remove duplications
-	motif_info = set([(motif['peaks'][0]['sites'], motif['id'],  pwm2IUPAC(motif['pwm']), tuple(motif['seqs'])) for motif in motif_data['motifs']])
-	motif_info = sorted(motif_info, reverse=True)
-
-
+	
 	sequneces = motif_data['sequences']
-	###########process for motif info, end
+	
+	motif_info ={}
+	for motif in motif_data['motifs']:
+		motif_info = update_motif_info(motif, motif_info)
+	###########process for centrimo.html, end
 
 	###########coordinate mapping, start
 	#map original coordinates and 100-nt coordinates
@@ -219,11 +258,11 @@ if __name__ == '__main__':
 	###########extract annotation information, end
 
 	#generate table
-	header = 'chromosome_id\tstart_position\tend_position\tstrand\tfeature\tfeature_id\tgene_id\ttranscript_id\tgene_type\tgene_name\tgene_strand\tmotif\tmotif_id\tmatched_sites'
+	header = 'chromosome_id\tstart_position\tend_position\tstrand\tfeature\tfeature_id\tgene_id\ttranscript_id\tgene_type\tgene_name\tgene_strand\tmotif\tmotif_id\tsites'
 	table = [header]
 
-	for motif in motif_info[:number_of_top_motifs]:
-		table = update_table(motif, sequneces, mapped_coordinates, anot_info, table)
+	for evalue_id_sites in motif_evalue_id_sites[:number_of_top_motifs]:
+		table = update_table(evalue_id_sites, motif_info, sequneces, mapped_coordinates, anot_info, table)
 
-	print "\n".join(table)
+	print "\n".join(table) #_tmp
 

@@ -42,7 +42,7 @@ rule run_meme_chip:
 rule profile_top_motifs:
 	 input: "{sample}_memechip_output", "{sample}-summit-100bp.bed", "{sample}.anot.tsv"
 	 output: "{sample}.anot-motif.tsv"
-	 shell: "top_motifs.py  -m {input[0]}/centrimo_out/centrimo.html -c {input[1]} -a {input[2]} > {output}"
+	 shell: "top_motifs.py  -m {input[0]}/centrimo_out/centrimo.html -e {input[0]}/centrimo_out/centrimo.txt -c {input[1]} -a {input[2]} > {output}"
 	 
 rule report_msigd:
 	 input: TRACK_gff, "{sample}.anot.tsv"
