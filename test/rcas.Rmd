@@ -125,7 +125,7 @@ datatable(mytable[order(sum, decreasing = TRUE)][1:500], caption = 'Table 1: Int
 ------
 
 # Coverage Profiles
-```{r coverage, echo=FALSE, warning=FALSE, message=FALSE}
+```{r coverage, echo=FALSE, warning=FALSE, message=FALSE, eval=FALSE}
 txdb <- makeTxDbFromGFF(gff_file, format="gff3")
 peaks = import(peaks, format = "bed")
 
@@ -145,14 +145,14 @@ figure_count = figure_count + 1
 
 ## Coverage profile of query regions across the length of transcripts
 **Figure `r figure_count`:** The query regions are overlaid with the genomic coordinates of transcripts. The transcripts are divided into 100 bins of equal length and for each bin the number of query regions that cover the corresponding bin is counted. Transcripts shorter than 100bp are excluded. Thus, a coverage profile of the transcripts is obtained based on the distribution of the query regions. The strandedness of the transcripts are taken into account. The coverage profile is plotted in the 5' to 3' direction. 
-```{r coverage_transcript, echo=FALSE, warning=FALSE, message=FALSE}
+```{r coverage_transcript, echo=FALSE, warning=FALSE, message=FALSE, eval=FALSE}
 calculate_coverage (peaks, windows = transcripts(txdb), "transcripts") 
 figure_count = figure_count + 1
 ```
 
 ## Coverage profile of query regions across the length of Exons
 **Figure `r figure_count`:** The query regions are overlaid with the genomic coordinates of each exon of each transcript. The exons are divided into 100 bins of equal length and for each bin the number of query regions that cover the corresponding bin is counted. Exons shorter than 100bp are excluded. Thus, a coverage profile of the exons is obtained based on the distribution of the query regions. The strandedness of the exons are taken into account. The coverage profile is plotted in the 5' to 3' direction. 
-```{r coverage_exon, echo=FALSE, warning=FALSE, message=FALSE}
+```{r coverage_exon, echo=FALSE, warning=FALSE, message=FALSE, eval=FALSE}
 exons = unlist(exonsBy(txdb, by="tx"))
 calculate_coverage (peaks, windows = exons, "exons")
 figure_count = figure_count + 1
@@ -160,7 +160,7 @@ figure_count = figure_count + 1
 
 ## Coverage profile of query regions across the 100 bp region centered on exon-intron junctions
 **Figure `r figure_count`:** The query regions are overlaid with the genomic coordinates of each exon-intron junction of each transcript. The junction comprises of a 50 bp region of an exon and 50 bp region of its neighboring intron. Exon-intron junctions are divided into 100 bins of equal length and for each bin the number of query regions that cover the corresponding bin is counted. Exons shorter than 100bp are excluded. Thus, a coverage profile of the exon-intron junctions is obtained based on the distribution of the query regions. The strandedness of the exons are taken into account. The coverage profile is plotted in the 5' to 3' direction. 
-```{r coverage_exon-intron, echo=FALSE, warning=FALSE, message=FALSE}
+```{r coverage_exon-intron, echo=FALSE, warning=FALSE, message=FALSE, eval=FALSE}
 myexons = exons[width(exons) > 100] #remove exons that are shorter than 100 bp
 up_exon = flank(myexons, 50, start=TRUE, both=TRUE) #50 bp from upstream intron 50 bp from exon 
 down_exon = flank(myexons, 50, start=FALSE, both=TRUE) #50 bp from downstream intron, 50 bp from exon
@@ -171,7 +171,7 @@ figure_count = figure_count + 1
 
 ## Coverage profile of query regions across the length of introns
 **Figure `r figure_count`:** The query regions are overlaid with the genomic coordinates of each intron of each transcript. The introns are divided into 100 bins of equal length and for each bin the number of query regions that cover the corresponding bin is counted. Introns shorter than 100bp are excluded. Thus, a coverage profile of the introns is obtained based on the distribution of the query regions. The strandedness of the introns are taken into account. The coverage profile is plotted in the 5' to 3' direction. 
-```{r coverage_intron, echo=FALSE, warning=FALSE, message=FALSE}
+```{r coverage_intron, echo=FALSE, warning=FALSE, message=FALSE, eval=FALSE}
 introns = unlist(intronsByTranscript(txdb))
 calculate_coverage (peaks, windows = introns, "introns")
 figure_count = figure_count + 1
@@ -179,7 +179,7 @@ figure_count = figure_count + 1
 
 ## Coverage profile of query regions across the promoter regions
 **Figure `r figure_count`:** The query regions are overlaid with the genomic coordinates of each promoter region of each transcript. The promoter region is defined as the region spanning from 2000bp upstream of the transcription start site and the first 200bp region after the transcription start site. The promoters are divided into 100 bins of equal length and for each bin the number of query regions that cover the corresponding bin is counted. Thus, a coverage profile of the promoters is obtained based on the distribution of the query regions. The strandedness of the promoters are taken into account. The coverage profile is plotted in the 5' to 3' direction. 
-```{r coverage_promoter, echo=FALSE, warning=FALSE, message=FALSE}
+```{r coverage_promoter, echo=FALSE, warning=FALSE, message=FALSE, eval=FALSE}
 promoters = promoters(txdb)
 calculate_coverage (peaks, windows = promoters, "promoters")
 figure_count = figure_count + 1
@@ -187,7 +187,7 @@ figure_count = figure_count + 1
 
 ## Coverage profile of query regions across the length of 5' UTRs
 **Figure `r figure_count`:** The query regions are overlaid with the genomic coordinates of each 5' UTR region of each transcript. The 5' UTR regions are divided into 100 bins of equal length and for each bin the number of query regions that cover the corresponding bin is counted. Thus, a coverage profile of the 5' UTR regions is obtained based on the distribution of the query regions. The strandedness of the promoters are taken into account. The coverage profile is plotted in the 5' to 3' direction. 
-```{r coverage_UTR5, echo=FALSE, warning=FALSE, message=FALSE}
+```{r coverage_UTR5, echo=FALSE, warning=FALSE, message=FALSE, eval=FALSE}
 five_UTRs = unlist(fiveUTRsByTranscript(txdb))
 calculate_coverage (peaks, windows = five_UTRs, "5' UTRs")
 figure_count = figure_count + 1
@@ -195,7 +195,7 @@ figure_count = figure_count + 1
 
 ## Coverage profile of query regions across the length of 3' UTRs
 **Figure `r figure_count`:** The query regions are overlaid with the genomic coordinates of each 3' UTR region of each transcript. The 3' UTR regions are divided into 100 bins of equal length and for each bin the number of query regions that cover the corresponding bin is counted. Thus, a coverage profile of the 3' UTR regions is obtained based on the distribution of the query regions. The strandedness of the promoters are taken into account. The coverage profile is plotted in the 5' to 3' direction. 
-```{r coverage_UTR3, echo=FALSE, warning=FALSE, message=FALSE}
+```{r coverage_UTR3, echo=FALSE, warning=FALSE, message=FALSE, eval=FALSE}
 three_UTRs = unlist(threeUTRsByTranscript(txdb))
 calculate_coverage (peaks, windows = three_UTRs, "3' UTRs")
 figure_count = figure_count + 1
