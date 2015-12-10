@@ -11,7 +11,7 @@ output:
       before_body: "header.html"
 ---
 
-```{r message=FALSE, warning=FALSE, echo=FALSE}
+```{r load_package, message=FALSE, warning=FALSE, echo=FALSE}
 library('data.table')
 library('DT')
 library('plotly')
@@ -22,7 +22,7 @@ library('GenomicFeatures')
 ```
 
 
-```{r, echo=FALSE}
+```{r set_arguments, echo=FALSE}
 args <- commandArgs(TRUE)
 anot = args[1] #/home/buyar/projects/RCAS/test/PARCLIP_AGO1234_Hafner2010a_hg19_xaa.anot.tsv
 peaks = args[2] #'/home/buyar/projects/RCAS/test/PARCLIP_AGO1234_Hafner2010a_hg19_xaa.bed'
@@ -49,7 +49,7 @@ figure_count = 1
 
 ## Distribution of query regions across gene features
 **Figure `r figure_count`:** The number of query regions that overlap different kinds of gene features are counted. The 'y' axis denotes the types of gene features included in the analysis and the 'x' axis denotes the percentage of query regions (out of total number of query regions denoted with "n") that overlap at least one genomic interval that host the corresponding feature. Notice that the sum of the percentage values for different features don't add up to 100%, because some query regions may overlap multiple kinds of features. If the query regions don't overlap any gene features, they are classified as "intergenic". 
-```{r echo=FALSE, warning=FALSE, message=FALSE}
+```{r distri_gene_features, echo=FALSE, warning=FALSE, message=FALSE}
 dt = mdata
 df = dt[,length(unique(peak_id)), by=feature]
 colnames(df) = c("feature", "count")
@@ -64,7 +64,7 @@ figure_count = figure_count + 1
 ## Distribution of query regions across RNA genes
 
 **Figure `r figure_count`:** The number of query regions that overlap different kinds of RNA genes are counted. The 'y' axis denotes the types of gene features included in the analysis and the 'x' axis denotes the percentage of query regions (out of total number of query regions denoted with "n") that overlap at least one genomic interval that host the corresponding RNA gene type. Notice that the sum of the percentage values for different RNA genes don't add up to 100%, because some query regions may overlap multiple kinds of RNA genes. 
-```{r echo=FALSE, warning=FALSE, message=FALSE}
+```{r distri_RNA_genes, echo=FALSE, warning=FALSE, message=FALSE}
 m = grepl("RNA", mdata$gene_type)
 dt = mdata[m]
 df = dt[,length(unique(peak_id)), by=gene_type]
@@ -78,7 +78,7 @@ figure_count = figure_count + 1
 
 ## Distribution of query regions in the genome grouped by gene types 
 **Figure `r figure_count`:** The number of query regions that overlap different kinds of gene types are counted. The 'x' axis denotes the types of genes included in the analysis and the 'y' axis denotes the percentage of query regions (out of total number of query regions denoted with "n") that overlap at least one genomic interval that host the corresponding gene type. If the query regions don't overlap any known genes, they are classified as "Unknown". 
-```{r echo=FALSE, warning=FALSE, message=FALSE}
+```{r distri_gene_types, echo=FALSE, warning=FALSE, message=FALSE}
 dt = mdata
 df = dt[,length(unique(peak_id)), by=gene_type]
 colnames(df) = c("feature", "count")
@@ -91,7 +91,7 @@ figure_count = figure_count + 1
 
 ## Distribution of query regions across the chromosomes grouped by gene features 
 **Figure `r figure_count`:** The number of query regions that overlap different chromosomes are counted. For each chromosome, the frequency of query regions are further split into groups based on the gene features the query overlaps with. The 'x' axis denotes the chromosomes included in the analysis and the 'y' axis denotes the frequency of overlaps. 
-```{r echo=FALSE, warning=FALSE, message=FALSE}
+```{r  distri_chromosomes, echo=FALSE, warning=FALSE, message=FALSE}
 p = mdata %>% count(chromosome_id, feature) %>%
   plot_ly(x = chromosome_id, y = n, type = "bar", color = feature) %>%
   layout(xaxis = list(tickangle = 90), margin = list(l = 80, r = 80, b=150, t=20))
@@ -103,7 +103,7 @@ figure_count = figure_count + 1
 ------
 
 ## Interactive table of genes that overlap query regions 
-```{r, echo=FALSE}
+```{r overlap_query, echo=FALSE}
 features=unique(mdata$feature)
 mytable = mdata[feature==features[1],length(feature),by=c('gene_name')]
 colnames(mytable) = c('gene_name', features[1])
@@ -125,7 +125,7 @@ datatable(mytable[order(sum, decreasing = TRUE)][1:500], caption = 'Table 1: Int
 ------
 
 # Coverage Profiles
-```{r echo=FALSE, warning=FALSE, message=FALSE}
+```{r coverage, echo=FALSE, warning=FALSE, message=FALSE}
 txdb <- makeTxDbFromGFF(gff_file, format="gff3")
 peaks = import(peaks, format = "bed")
 
@@ -145,14 +145,14 @@ figure_count = figure_count + 1
 
 ## Coverage profile of query regions across the length of transcripts
 **Figure `r figure_count`:** The query regions are overlaid with the genomic coordinates of transcripts. The transcripts are divided into 100 bins of equal length and for each bin the number of query regions that cover the corresponding bin is counted. Transcripts shorter than 100bp are excluded. Thus, a coverage profile of the transcripts is obtained based on the distribution of the query regions. The strandedness of the transcripts are taken into account. The coverage profile is plotted in the 5' to 3' direction. 
-```{r echo=FALSE, warning=FALSE, message=FALSE}
+```{r coverage_transcript, echo=FALSE, warning=FALSE, message=FALSE}
 calculate_coverage (peaks, windows = transcripts(txdb), "transcripts") 
 figure_count = figure_count + 1
 ```
 
 ## Coverage profile of query regions across the length of Exons
 **Figure `r figure_count`:** The query regions are overlaid with the genomic coordinates of each exon of each transcript. The exons are divided into 100 bins of equal length and for each bin the number of query regions that cover the corresponding bin is counted. Exons shorter than 100bp are excluded. Thus, a coverage profile of the exons is obtained based on the distribution of the query regions. The strandedness of the exons are taken into account. The coverage profile is plotted in the 5' to 3' direction. 
-```{r echo=FALSE, warning=FALSE, message=FALSE}
+```{r coverage_exon, echo=FALSE, warning=FALSE, message=FALSE}
 exons = unlist(exonsBy(txdb, by="tx"))
 calculate_coverage (peaks, windows = exons, "exons")
 figure_count = figure_count + 1
@@ -160,7 +160,7 @@ figure_count = figure_count + 1
 
 ## Coverage profile of query regions across the 100 bp region centered on exon-intron junctions
 **Figure `r figure_count`:** The query regions are overlaid with the genomic coordinates of each exon-intron junction of each transcript. The junction comprises of a 50 bp region of an exon and 50 bp region of its neighboring intron. Exon-intron junctions are divided into 100 bins of equal length and for each bin the number of query regions that cover the corresponding bin is counted. Exons shorter than 100bp are excluded. Thus, a coverage profile of the exon-intron junctions is obtained based on the distribution of the query regions. The strandedness of the exons are taken into account. The coverage profile is plotted in the 5' to 3' direction. 
-```{r echo=FALSE, warning=FALSE, message=FALSE}
+```{r coverage_exon-intron, echo=FALSE, warning=FALSE, message=FALSE}
 myexons = exons[width(exons) > 100] #remove exons that are shorter than 100 bp
 up_exon = flank(myexons, 50, start=TRUE, both=TRUE) #50 bp from upstream intron 50 bp from exon 
 down_exon = flank(myexons, 50, start=FALSE, both=TRUE) #50 bp from downstream intron, 50 bp from exon
@@ -171,7 +171,7 @@ figure_count = figure_count + 1
 
 ## Coverage profile of query regions across the length of introns
 **Figure `r figure_count`:** The query regions are overlaid with the genomic coordinates of each intron of each transcript. The introns are divided into 100 bins of equal length and for each bin the number of query regions that cover the corresponding bin is counted. Introns shorter than 100bp are excluded. Thus, a coverage profile of the introns is obtained based on the distribution of the query regions. The strandedness of the introns are taken into account. The coverage profile is plotted in the 5' to 3' direction. 
-```{r echo=FALSE, warning=FALSE, message=FALSE}
+```{r coverage_intron, echo=FALSE, warning=FALSE, message=FALSE}
 introns = unlist(intronsByTranscript(txdb))
 calculate_coverage (peaks, windows = introns, "introns")
 figure_count = figure_count + 1
@@ -179,7 +179,7 @@ figure_count = figure_count + 1
 
 ## Coverage profile of query regions across the promoter regions
 **Figure `r figure_count`:** The query regions are overlaid with the genomic coordinates of each promoter region of each transcript. The promoter region is defined as the region spanning from 2000bp upstream of the transcription start site and the first 200bp region after the transcription start site. The promoters are divided into 100 bins of equal length and for each bin the number of query regions that cover the corresponding bin is counted. Thus, a coverage profile of the promoters is obtained based on the distribution of the query regions. The strandedness of the promoters are taken into account. The coverage profile is plotted in the 5' to 3' direction. 
-```{r echo=FALSE, warning=FALSE, message=FALSE}
+```{r coverage_promoter, echo=FALSE, warning=FALSE, message=FALSE}
 promoters = promoters(txdb)
 calculate_coverage (peaks, windows = promoters, "promoters")
 figure_count = figure_count + 1
@@ -187,7 +187,7 @@ figure_count = figure_count + 1
 
 ## Coverage profile of query regions across the length of 5' UTRs
 **Figure `r figure_count`:** The query regions are overlaid with the genomic coordinates of each 5' UTR region of each transcript. The 5' UTR regions are divided into 100 bins of equal length and for each bin the number of query regions that cover the corresponding bin is counted. Thus, a coverage profile of the 5' UTR regions is obtained based on the distribution of the query regions. The strandedness of the promoters are taken into account. The coverage profile is plotted in the 5' to 3' direction. 
-```{r echo=FALSE, warning=FALSE, message=FALSE}
+```{r coverage_UTR5, echo=FALSE, warning=FALSE, message=FALSE}
 five_UTRs = unlist(fiveUTRsByTranscript(txdb))
 calculate_coverage (peaks, windows = five_UTRs, "5' UTRs")
 figure_count = figure_count + 1
@@ -195,7 +195,7 @@ figure_count = figure_count + 1
 
 ## Coverage profile of query regions across the length of 3' UTRs
 **Figure `r figure_count`:** The query regions are overlaid with the genomic coordinates of each 3' UTR region of each transcript. The 3' UTR regions are divided into 100 bins of equal length and for each bin the number of query regions that cover the corresponding bin is counted. Thus, a coverage profile of the 3' UTR regions is obtained based on the distribution of the query regions. The strandedness of the promoters are taken into account. The coverage profile is plotted in the 5' to 3' direction. 
-```{r echo=FALSE, warning=FALSE, message=FALSE}
+```{r coverage_UTR3, echo=FALSE, warning=FALSE, message=FALSE}
 three_UTRs = unlist(threeUTRsByTranscript(txdb))
 calculate_coverage (peaks, windows = three_UTRs, "3' UTRs")
 figure_count = figure_count + 1
@@ -207,26 +207,26 @@ figure_count = figure_count + 1
 # GO term and Pathway Enrichment Results
 
 ## GO Term Enrichment Results for Biological Processes
-```{r echo=FALSE}
+```{r GO_term, echo=FALSE}
 go = fread(go_bp)
 datatable(go[bonferroni < 0.001], caption = 'Table 2: Significant Biological Process GO terms (FDR < 0.001) enriched for genes that overlap query regions',  filter = 'top')
 ```
 
 ## GO Term Enrichment Results for Molecular Functions
-```{r echo=FALSE}
+```{r GO_term_mf, echo=FALSE}
 go = fread(go_mf)
 
 datatable(go[bonferroni < 0.001], caption = 'Table 3: Significant Molecular Function GO terms (FDR < 0.001) enriched for genes that overlap query regions',  filter = 'top')
 ```
 
 ## GO Term Enrichment Results for Cellular Compartments
-```{r echo=FALSE}
+```{r GO_term_cc, echo=FALSE}
 go = fread(go_cc)
 datatable(go[bonferroni < 0.001], caption = 'Table 4: Significant Cellular Compartment GO terms (FDR < 0.001) enriched for genes that overlap query regions',  filter = 'top')
 ```
 
 ## Gene Set Enrichment Results based on MSigDB
-```{r echo=FALSE}
+```{r GO_term_msigb, echo=FALSE}
 msigdb = fread(msigdb)
 datatable(msigdb, caption='Table 5: Significant MSigDB Gene Sets (FDR < 0.001) enriched for genes that overlap query regions', filter='top')
 ```
@@ -235,7 +235,7 @@ datatable(msigdb, caption='Table 5: Significant MSigDB Gene Sets (FDR < 0.001) e
 **Figure `r figure_count`:** The genomic sequences of the regions that are covered by each query region is extracted from the fasta file of the genome. Then, [MEME](http://meme-suite.org/tools/meme) was run to find enriched motif patterns in the list of query regions. The logos of the discovered motif patterns and the corresponding statistical test results are provided below.
 
 
-```{r, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
+```{r top_meme, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
 
 logos = dir(meme_outdir, "^logo[0-9]*.png$", full.names=TRUE )
 #get motif data:
@@ -253,7 +253,7 @@ figure_count = figure_count + 1
 
 ## Discovered consensus motifs and their frequency in the target transcriptome 
 **Figure `r figure_count`:** The frequency of the top 10 discovered motifs in the transcriptome is plotted. 
-```{r echo=FALSE, warning=FALSE, message=FALSE}
+```{r top_motif, echo=FALSE, warning=FALSE, message=FALSE}
 dt = motif_data
 df = dt[,length(unique(motif_instance_id)), by=c('motif')]
 colnames(df) = c('motif', 'motif_instance_count')
@@ -263,7 +263,7 @@ figure_count = figure_count + 1
 ```
 
 ## Top genes with most discovered types of motifs
-```{r echo=FALSE, warning=FALSE, message=FALSE}
+```{r motif_genes, echo=FALSE, warning=FALSE, message=FALSE}
 dt = motif_data
 df = unique(dt[,c("gene_name", "motif"), with=FALSE])
 df = df[,length(motif),by=gene_name]
@@ -278,7 +278,7 @@ datatable(df[motif_diversity > quantile(df$motif_diversity, c(0.95))],
 
 ## Distribution of discovered motifs in gene types 
 **Figure `r figure_count`:** The frequency of the top 10 discovered motifs in the transcriptome is plotted with respect to different types of genes. 
-```{r echo=FALSE, warning=FALSE, message=FALSE}
+```{r motif_genetypes, echo=FALSE, warning=FALSE, message=FALSE}
 dt = motif_data
 df = dt[,length(unique(motif_instance_id)), by=c('motif', 'gene_type')]
 colnames(df) = c("motif", "gene_type", "motif_instance_count")
@@ -289,7 +289,7 @@ figure_count = figure_count + 1
 
 ## Distribution of discovered motifs in gene features 
 **Figure `r figure_count`:** The frequency of the top 10 discovered motifs in the transcriptome is plotted with respect to different types of gene features.  
-```{r echo=FALSE, warning=FALSE, message=FALSE}
+```{r  motif_genefeatures, echo=FALSE, warning=FALSE, message=FALSE}
 dt = motif_data
 df = dt[,length(unique(motif_instance_id)), by=c('motif', 'feature')]
 colnames(df) = c("motif", "feature", "motif_instance_count")
