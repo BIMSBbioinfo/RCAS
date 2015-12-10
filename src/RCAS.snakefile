@@ -55,7 +55,7 @@ rule report_GO:
 	 shell: "Rscript ../src/rcas.GO.R --gff3={input[0]} --anot={input[1]} --out={output}"
 
 rule html_report:
-	 input: "{sample}.anot.tsv", infile, "{sample}-GO-term", "{sample}.msigdb.results.tsv", "{sample}.anot-motif.tsv"
+	 input: "{sample}.anot.tsv", infile, {TRACK_gff}, "{sample}-GO-term", "{sample}.msigdb.results.tsv", "{sample}_memechip_output/", "{sample}.anot-motif.tsv"
 	 output: "{sample}.rcas.html"
-	 shell: "Rscript make.R  {input[0]} {input[1]} ~/database/gencode.v19.annotation.gff3.rds {input[2]}/BP.GO.results.tsv {input[2]}/MF.GO.results.tsv {input[2]}/CC.GO.results.tsv {input[3]} {input[4]} --out={output}"
+	 shell: "Rscript make.R  {input[0]} {input[1]} {input[2]} {input[3]}/BP.GO.results.tsv {input[3]}/MF.GO.results.tsv {input[3]}/CC.GO.results.tsv {input[4]} {input[5]}/meme_out/ {input[6]} --out={output}"
 
