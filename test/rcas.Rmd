@@ -231,10 +231,10 @@ msigdb = fread(msigdb)
 datatable(msigdb, caption='Table 5: Significant MSigDB Gene Sets (FDR < 0.001) enriched for genes that overlap query regions', filter='top')
 ```
 
-# TOP MEME motifs discovered in the query regions 
+# TOP MEME motifs discovered in the query regions
+
+<!---
 **Figure `r figure_count`:** The genomic sequences of the regions that are covered by each query region is extracted from the fasta file of the genome. Then, [MEME](http://meme-suite.org/tools/meme) was run to find enriched motif patterns in the list of query regions. The logos of the discovered motif patterns and the corresponding statistical test results are provided below.
-
-
 ```{r top_meme, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
 
 logos = dir(meme_outdir, "^logo[0-9]*.png$", full.names=TRUE )
@@ -250,6 +250,7 @@ for (i in 1:length(logos)){
 }
 figure_count = figure_count + 1
 ```
+-->
 
 ## Discovered consensus motifs and their frequency in the target transcriptome 
 **Figure `r figure_count`:** The frequency of the top 10 discovered motifs in the transcriptome is plotted. 
