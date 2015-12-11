@@ -42,7 +42,7 @@ http://meme-suite.org/meme-software/4.10.2/meme_4.10.2.tar.gz
 
 -**gff track** e.g.  wget -qO- ftp://ftp.sanger.ac.uk/pub/gencode/Gencode_human/release_19/gencode.v19.annotation.gff3.gz | gunzip > gencode.v19.annotation.gff3
 
--**genome reference** e.g. wget -qO- http://hgdownload.cse.ucsc.edu/goldenPath/hg19/bigZips/chromFa.tar.gz | gunzip > hg19.fa
+-**genome reference** e.g. http://hgdownload.cse.ucsc.edu/goldenPath/hg19/bigZips/chromFa.tar.gz 
 
 -**c2.cp.v5.0.entrez.gmt**:
 http://software.broadinstitute.org/gsea/msigdb/download_file.jsp?filePath=/resources/msigdb/5.0/c2.cp.v5.0.entrez.gmt
