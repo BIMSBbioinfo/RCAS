@@ -11,30 +11,79 @@ Make a standalone RNA Centric Annotation System that provides intuitive reports 
 -**bedtools**:
 http://bedtools.readthedocs.org/en/latest/content/installation.html
 
--**parse_anot.py**: src/parse_anot.py
+--**fastaFromBed** (from bedtools)
 
--**gff track** e.g.  wget -qO- ftp://ftp.sanger.ac.uk/pub/gencode/Gencode_human/release_23/gencode.v23.annotation.gff3.gz     | gunzip > gencode.v23.annotation.gff3
+-**MEME-chip**:
+http://meme-suite.org/meme-software/4.10.2/meme_4.10.2.tar.gz
+
+-**pandoc (>= 1.12.3)**
+
+-**rmarkdown**
+
+-**rtracklayer**
+
+-**data.table**
+
+-**biomaRt**
+
+-**org.Hs.eg.db**
+
+-**topGO**
+
+-**DT**
+
+-**plotly**
+
+-**dplyr**
+
+-**genomation**
+
+-**GenomicFeatures**
+
+-**gff track** e.g.  wget -qO- ftp://ftp.sanger.ac.uk/pub/gencode/Gencode_human/release_19/gencode.v19.annotation.gff3.gz | gunzip > gencode.v19.annotation.gff3
+
+-**genome reference** e.g. wget -qO- http://hgdownload.cse.ucsc.edu/goldenPath/hg19/bigZips/chromFa.tar.gz | gunzip > hg19.fa
+
+-**c2.cp.v5.0.entrez.gmt**:
+http://software.broadinstitute.org/gsea/msigdb/download_file.jsp?filePath=/resources/msigdb/5.0/c2.cp.v5.0.entrez.gmt
 
 ###RCAS workflow is built with snakemake:
 
--rules: src/RCAS.snakefile
+-rules of snakemake in src:
+    RCAS.snakefile
 
--visualization: RCAS_dag.pdf
+-In-house scripts in src:
+    parse_anot.py
+    top_motifs.py 
+    rcas.GO.R
+    rcas.msigdb.R
+    rcas.Rmd
+    make.R
+
+-Other dependencies in src:
+    Homo_sapiens-U2T.meme
+    Mus_musculus-U2T.meme
+    Caenorhabditis_elegans-U2T.meme
+    Drosophila_melanogaster-U2T.meme
+    c2.cp.v5.0.entrez.gmt
+    custom.css
+    header.html
+    img folder
 
 ###Test case
-####Aim: **generate annotation** for coordinates in the target bed files
+####Aim: **generate analysis report** for coordinates in the target bed files
 
 1. clone the source: **git clone https://github.com/BIMSBbioinfo/RCAS**
 
-2. make dependency tools system wise executable, e.g. **ln -s path_to/RCAS/src/parse_anot.py ~/bin/.**
+2. make dependency tools system wise executable, e.g. **ln -s path_to/RCAS/src/*.py ~/bin/.**
 
 3. cd path_to/RCAS/test
 
 4. tartget files in path_to/RCAS/test: **PARCLIP_AGO1234_Hafner2010a_hg19_xaa.bed  PARCLIP_AGO1234_Hafner2010a_hg19_xab.bed  PARCLIP_AGO1234_Hafner2010a_hg19_xac.bed** 
 
-5. command: **snakemake -s ../src/RCAS.snakefile -p --config ref=path_to/gencode.v23.annotation.gff3 infile=PAR*bed**
+5. sample command: **snakemake -s ../src/RCAS.snakefile -p --config gff3=path_to/gencode.v19.annotation.gff3 genome=path_to/hg19.fa  infile=PARCLIP_AGO1234_Hafner2010a_hg19_xaa.bed**
 
-6. output: **PARCLIP_AGO1234_Hafner2010a_hg19_xaa.anot.tsv  PARCLIP_AGO1234_Hafner2010a_hg19_xab.anot.tsv  PARCLIP_AGO1234_Hafner2010a_hg19_xac.anot.tsv**
+6. output: **PARCLIP_AGO1234_Hafner2010a_hg19_xaa.rcas.html**
 
 
 
