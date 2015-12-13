@@ -90,13 +90,11 @@ http://software.broadinstitute.org/gsea/msigdb/download_file.jsp?filePath=/resou
 
 1. clone the source: **git clone https://github.com/BIMSBbioinfo/RCAS**
 
-2. make dependency tools system wise executable, e.g. **ln -s path_to/RCAS/src/*.py ~/bin/.**
+2. cd path_to/RCAS/test
 
-3. cd path_to/RCAS/test
+3. tartget files in path_to/RCAS/test: **PARCLIP_AGO1234_Hafner2010a_hg19_xaa.bed  PARCLIP_AGO1234_Hafner2010a_hg19_xab.bed  PARCLIP_AGO1234_Hafner2010a_hg19_xac.bed** 
 
-4. tartget files in path_to/RCAS/test: **PARCLIP_AGO1234_Hafner2010a_hg19_xaa.bed  PARCLIP_AGO1234_Hafner2010a_hg19_xab.bed  PARCLIP_AGO1234_Hafner2010a_hg19_xac.bed** 
+4. sample command: **snakemake -s ../src/RCAS.snakefile -p --config gff3=path_to/gencode.v19.annotation.gff3 genome=path_to/hg19.fa RCAS_path=../ infile=PARCLIP_AGO1234_Hafner2010a_hg19_xaa.bed**
 
-5. sample command: **snakemake -s ../src/RCAS.snakefile -p --config gff3=path_to/gencode.v19.annotation.gff3 genome=path_to/hg19.fa RCAS_path=../ infile=PARCLIP_AGO1234_Hafner2010a_hg19_xaa.bed**
-
-6. output: **PARCLIP_AGO1234_Hafner2010a_hg19_xaa.rcas.html**
+5. output: **PARCLIP_AGO1234_Hafner2010a_hg19_xaa.rcas.html**
 
