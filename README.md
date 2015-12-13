@@ -42,7 +42,7 @@ http://meme-suite.org/meme-software/4.10.2/meme_4.10.2.tar.gz
 
 -**gff track** e.g.  wget -qO- ftp://ftp.sanger.ac.uk/pub/gencode/Gencode_human/release_19/gencode.v19.annotation.gff3.gz | gunzip > gencode.v19.annotation.gff3
 
--**genome reference** e.g. http://hgdownload.cse.ucsc.edu/goldenPath/hg19/bigZips/chromFa.tar.gz 
+-**genome reference** e.g. http://hgdownload.cse.ucsc.edu/goldenPath/hg19/bigZips/chromFa.tar.gz
 
 -**c2.cp.v5.0.entrez.gmt**:
 http://software.broadinstitute.org/gsea/msigdb/download_file.jsp?filePath=/resources/msigdb/5.0/c2.cp.v5.0.entrez.gmt
@@ -50,24 +50,39 @@ http://software.broadinstitute.org/gsea/msigdb/download_file.jsp?filePath=/resou
 ###RCAS workflow is built with snakemake:
 
 -rules of snakemake in src:
+
     RCAS.snakefile
 
 -In-house scripts in src:
+
     parse_anot.py
-    top_motifs.py 
+
+    top_motifs.py
+
     rcas.GO.R
+
     rcas.msigdb.R
+
     rcas.Rmd
+
     make.R
 
--Other dependencies in src:
+-Other dependencies in base:
+
     Homo_sapiens-U2T.meme
+
     Mus_musculus-U2T.meme
+
     Caenorhabditis_elegans-U2T.meme
+
     Drosophila_melanogaster-U2T.meme
+
     c2.cp.v5.0.entrez.gmt
+
     custom.css
+
     header.html
+
     img folder
 
 ###Test case
@@ -81,12 +96,7 @@ http://software.broadinstitute.org/gsea/msigdb/download_file.jsp?filePath=/resou
 
 4. tartget files in path_to/RCAS/test: **PARCLIP_AGO1234_Hafner2010a_hg19_xaa.bed  PARCLIP_AGO1234_Hafner2010a_hg19_xab.bed  PARCLIP_AGO1234_Hafner2010a_hg19_xac.bed** 
 
-5. sample command: **snakemake -s ../src/RCAS.snakefile -p --config gff3=path_to/gencode.v19.annotation.gff3 genome=path_to/hg19.fa  infile=PARCLIP_AGO1234_Hafner2010a_hg19_xaa.bed**
+5. sample command: **snakemake -s ../src/RCAS.snakefile -p --config gff3=path_to/gencode.v19.annotation.gff3 genome=path_to/hg19.fa RCAS_path=../ infile=PARCLIP_AGO1234_Hafner2010a_hg19_xaa.bed**
 
 6. output: **PARCLIP_AGO1234_Hafner2010a_hg19_xaa.rcas.html**
 
-
-
-
-
-    
