@@ -1,5 +1,7 @@
 import glob, os
 
+RCAS_path = config["RCAS_path"]
+
 TRACK_gff = config["gff3"]
 genome_reference = config["genome"]
 
@@ -21,7 +23,7 @@ rule anot_cor:
 	 #annotate coordinates with features
 	 input: "{sample}.intersect.bed"
 	 output: "{sample}.anot.tsv"
-	 shell: "parse_anot.py < {input}  > {output}"
+	 shell: "python {RCAS_path}/src/parse_anot.py < {input}  > {output}"
 
 rule get_flanking_coordinates:
 	 #prepare flanking coordinates centering on binding site
@@ -37,7 +39,7 @@ rule get_fasta:
 rule run_meme_chip:
 	 input: "{sample}-summit-100bp.fa"
 	 output: "{sample}_memechip_output"
-	 shell: "meme-chip -meme-maxw 8 -norc -oc {output} -db  ../src/Homo_sapiens-U2T.meme -db ../src/Mus_musculus-U2T.meme -db ../src/Drosophila_melanogaster-U2T.meme -db ../src/Caenorhabditis_elegans-U2T.meme {input}"
+	 shell: "meme-chip -meme-maxw 8 -norc -oc {output} -db  {RCAS_path}/src/Homo_sapiens-U2T.meme -db {RCAS_path}/src/Mus_musculus-U2T.meme -db {RCAS_path}/src/Drosophila_melanogaster-U2T.meme -db {RCAS_path}/src/Caenorhabditis_elegans-U2T.meme {input}"
 
 rule profile_top_motifs:
 	 input: "{sample}_memechip_output", "{sample}-summit-100bp.bed", "{sample}.anot.tsv"
@@ -47,12 +49,12 @@ rule profile_top_motifs:
 rule report_msigd:
 	 input: TRACK_gff, "{sample}.anot.tsv"
 	 output: "{sample}.msigdb.results.tsv"
-	 shell: "Rscript ../src/rcas.msigdb.R --gmt=../src/c2.cp.v5.0.entrez.gmt  --gff3={input[0]} --anot={input[1]} --out={output}"
+	 shell: "Rscript {RCAS_path}/src/rcas.msigdb.R --gmt={RCAS_path}/src/c2.cp.v5.0.entrez.gmt  --gff3={input[0]} --anot={input[1]} --out={output}"
 
 rule report_GO:
 	 input: TRACK_gff, "{sample}.anot.tsv"
 	 output: "{sample}-GO-term"
-	 shell: "Rscript ../src/rcas.GO.R --gff3={input[0]} --anot={input[1]} --out={output}"
+	 shell: "Rscript {RCAS_path}/src/rcas.GO.R --gff3={input[0]} --anot={input[1]} --out={output}"
 
 rule html_report:
 	 input: "{sample}.anot.tsv", infile, {TRACK_gff}, "{sample}-GO-term", "{sample}.msigdb.results.tsv", "{sample}_memechip_output", "{sample}.anot-motif.tsv"
