@@ -59,5 +59,5 @@ rule report_GO:
 rule html_report:
 	 input: "{sample}.anot.tsv", infile, {TRACK_gff}, "{sample}-GO-term", "{sample}.msigdb.results.tsv", "{sample}_memechip_output", "{sample}.anot-motif.tsv"
 	 output: "{sample}.rcas.html"
-	 shell: "Rscript make.R  {input[0]} {input[1]} {input[2]} {input[3]}/BP.GO.results.tsv {input[3]}/MF.GO.results.tsv {input[3]}/CC.GO.results.tsv {input[4]} {input[5]}/meme_out/ {input[6]} --out={output}"
+	 shell: "bash {RCAS_path}/src/generate_report.sh {output} {input[0]} {input[1]} {input[2]} {input[3]}/BP.GO.results.tsv {input[3]}/MF.GO.results.tsv {input[3]}/CC.GO.results.tsv {input[4]} {input[5]}/meme_out/ {input[6]}"
 
