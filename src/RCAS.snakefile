@@ -39,7 +39,7 @@ rule get_fasta:
 rule run_meme_chip:
 	 input: "{sample}-summit-100bp.fa"
 	 output: "{sample}_memechip_output"
-	 shell: "meme-chip -meme-maxw 8 -norc -oc {output} -db  {RCAS_path}/base/Homo_sapiens-U2T.meme -db {RCAS_path}/base/Mus_musculus-U2T.meme -db {RCAS_path}/base/Drosophila_melanogaster-U2T.meme -db {RCAS_path}/base/Caenorhabditis_elegans-U2T.meme {input}"
+	 shell: "meme-chip -meme-maxw 8 -norc -oc {output} -db  {RCAS_path}/src/base/Homo_sapiens-U2T.meme -db {RCAS_path}/src/base/Mus_musculus-U2T.meme -db {RCAS_path}/src/base/Drosophila_melanogaster-U2T.meme -db {RCAS_path}/src/base/Caenorhabditis_elegans-U2T.meme {input}"
 
 rule profile_top_motifs:
 	 input: "{sample}_memechip_output", "{sample}-summit-100bp.bed", "{sample}.anot.tsv"
@@ -49,7 +49,7 @@ rule profile_top_motifs:
 rule report_msigd:
 	 input: TRACK_gff, "{sample}.anot.tsv"
 	 output: "{sample}.msigdb.results.tsv"
-	 shell: "Rscript {RCAS_path}/src/rcas.msigdb.R --gmt={RCAS_path}/base/c2.cp.v5.0.entrez.gmt  --gff3={input[0]} --anot={input[1]} --out={output}"
+	 shell: "Rscript {RCAS_path}/src/rcas.msigdb.R --gmt={RCAS_path}/src/base/c2.cp.v5.0.entrez.gmt  --gff3={input[0]} --anot={input[1]} --out={output}"
 
 rule report_GO:
 	 input: TRACK_gff, "{sample}.anot.tsv"
