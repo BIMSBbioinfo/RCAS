@@ -1,17 +1,8 @@
-
 ---
 date: "30 Nov 2015"
-output: 
-  html_document:
-    theme: cerulean
-    css: custom.css
-    toc: true
-    number_sections: true
-    includes: 
-      before_body: "header.html"
 ---
 
-```{r message=FALSE, warning=FALSE, echo=FALSE}
+```{r load_libraries, message=FALSE, warning=FALSE, echo=FALSE}
 library('data.table')
 library('DT')
 library('plotly')
@@ -19,37 +10,118 @@ library('dplyr')
 library('genomation')
 library('rtracklayer')
 library('GenomicFeatures')
+library('knitr')
 ```
 
 
-```{r, echo=FALSE}
+```{r get_inputs, echo=FALSE}
 args <- commandArgs(TRUE)
-anot = args[1] #/home/buyar/projects/RCAS/test/PARCLIP_AGO1234_Hafner2010a_hg19_xaa.anot.tsv
-peaks = args[2] #'/home/buyar/projects/RCAS/test/PARCLIP_AGO1234_Hafner2010a_hg19_xaa.bed'
-gff_file = args[3] #'/data/akalin/Base/Annotation/GenomeAnnotation/hg19/gencode/gencode.v19.annotation.gff3'
-go_bp = args[4] ##go enrichment results for biological processes
-go_mf = args[5] ##go enrichment results for molecular functions
-go_cc = args[6] ##go enrichment results for sub-cellular locations
-msigdb = args[7] ##msigdb enrichment results 
-meme_outdir = args[8] ##output directory of meme results that contains the logos and meme.txt file 
-motifs = args[9] ##'../test/PARCLIP_AGO1234_Hafner2010a_hg19_xaa.anot-motif.tsv' #motif annotation output from top_motifs.py script of Dilmurat
+work_dir = args[1] #path to working directory - necessary to set root.dir
+anot = args[2] #/home/buyar/projects/RCAS/test/PARCLIP_AGO1234_Hafner2010a_hg19_xaa.anot.tsv
+peaks = args[3] #'/home/buyar/projects/RCAS/test/PARCLIP_AGO1234_Hafner2010a_hg19_xaa.bed'
+gff_file = args[4] #'/data/akalin/Base/Annotation/GenomeAnnotation/hg19/gencode/gencode.v19.annotation.gff3.rds' #RDS session file as output from import gff function of rtracklayer library
+go_bp = args[5] ##go enrichment results for biological processes
+go_mf = args[6] ##go enrichment results for molecular functions
+go_cc = args[7] ##go enrichment results for sub-cellular locations
+msigdb = args[8] ##msigdb enrichment results 
+meme_outdir = args[9] ##output directory of meme results that contains the logos and meme.txt file 
+motifs = args[10] ##'../test/PARCLIP_AGO1234_Hafner2010a_hg19_xaa.anot-motif.tsv' #motif annotation output from top_motifs.py script of Dilmurat
+figure_count = 1
+```
 
+`r cat('arguments',args, "\n")` 
+
+```{r setup, echo=FALSE}
+opts_knit$set(root.dir=work_dir)
+```
+
+
+```{r read_input_data, echo=FALSE, eval=TRUE}
 mdata = fread(anot)
 mdata$peak_id = paste(mdata$chromosome_id, mdata$start_position, mdata$end_position, mdata$strand, sep=":")
 
 motif_data = fread(motifs)
 motif_data$motif_instance_id = paste(motif_data$motif, motif_data$chromosome_id, motif_data$start_position, motif_data$end_position, motif_data$strand, sep=":")
-
-figure_count = 1
 ```
 
 # Summary Figures
+
+# TOP MEME motifs discovered in the query regions 
+**Figure `r figure_count`:** The genomic sequences of the regions that are covered by each query region is extracted from the fasta file of the genome. Then, [MEME](http://meme-suite.org/tools/meme) was run to find enriched motif patterns in the list of query regions. The logos of the discovered motif patterns and the corresponding statistical test results are provided below.
+
+```{r MEME_top_motifs, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=TRUE}
+
+logos = dir(meme_outdir, "^logo[0-9]*.png$", full.names=TRUE )
+#get motif data:
+
+logos = normalizePath(logos)
+
+mylines = readLines(paste(meme_outdir, "meme.txt", sep="/"))
+motifs = grep("^MOTIF", mylines, value = TRUE)
+
+for (i in 1:length(logos)){
+  #cat(logos[i], motifs[i], "\n")
+  cat(paste("**",motifs[i],"** \n\n", sep=""),"\n")
+  cat(paste("![alt text](", logos[i], ")", sep = ""), "\n")
+  cat("\n")
+}
+figure_count = figure_count + 1
+```
+
+
+## Discovered consensus motifs and their frequency in the target transcriptome 
+**Figure `r figure_count`:** The frequency of the top 10 discovered motifs in the transcriptome is plotted. 
+```{r MEME_motif_frequency, echo=FALSE, warning=FALSE, message=FALSE, eval=TRUE}
+dt = motif_data
+df = dt[,length(unique(motif_instance_id)), by=c('motif')]
+colnames(df) = c('motif', 'motif_instance_count')
+p = plot_ly(df, x=motif_instance_count, y=motif, mode="markers", size=motif_instance_count, color=motif_instance_count)
+layout(p, yaxis = list(title="Consensus Motifs"), margin = list(l=150))
+figure_count = figure_count + 1
+```
+
+## Top genes with most discovered types of motifs
+```{r MEME_top_genes, echo=FALSE, warning=FALSE, message=FALSE, eval=TRUE}
+dt = motif_data
+df = unique(dt[,c("gene_name", "motif"), with=FALSE])
+df = df[,length(motif),by=gene_name]
+colnames(df) = c("gene_name", "motif_diversity")
+df = df[order(motif_diversity, decreasing=TRUE)]
+df$motif_diversity = round(df$motif_diversity/length(unique(df$motif_diversity)),2)*100
+#get top 90% of genes with highest motif diversity
+datatable(df[motif_diversity > quantile(df$motif_diversity, c(0.95))], 
+          caption = 'Table 6: Genes with highest motif diversity (100: highest)', filter = 'top')
+```
+
+
+## Distribution of discovered motifs in gene types 
+**Figure `r figure_count`:** The frequency of the top 10 discovered motifs in the transcriptome is plotted with respect to different types of genes. 
+```{r MEME_gene_types, echo=FALSE, warning=FALSE, message=FALSE, eval=TRUE}
+dt = motif_data
+df = dt[,length(unique(motif_instance_id)), by=c('motif', 'gene_type')]
+colnames(df) = c("motif", "gene_type", "motif_instance_count")
+p = plot_ly(df, x=motif_instance_count, y=motif, color = gene_type, mode="markers", size=motif_instance_count, text=gene_type)
+layout(p, margin=list(l=150, b=100))
+figure_count = figure_count + 1
+```
+
+## Distribution of discovered motifs in gene features 
+**Figure `r figure_count`:** The frequency of the top 10 discovered motifs in the transcriptome is plotted with respect to different types of gene features.  
+```{r MEME_gene_features, echo=FALSE, warning=FALSE, message=FALSE, eval=TRUE}
+dt = motif_data
+df = dt[,length(unique(motif_instance_id)), by=c('motif', 'feature')]
+colnames(df) = c("motif", "feature", "motif_instance_count")
+p = plot_ly(df, x=motif_instance_count, y=motif, color = feature, mode="markers", size=motif_instance_count, text=feature)
+layout(p, margin=list(l=150, b=100))
+figure_count = figure_count + 1
+```
 
 ------
 
 ## Distribution of query regions across gene features
 **Figure `r figure_count`:** The number of query regions that overlap different kinds of gene features are counted. The 'y' axis denotes the types of gene features included in the analysis and the 'x' axis denotes the percentage of query regions (out of total number of query regions denoted with "n") that overlap at least one genomic interval that host the corresponding feature. Notice that the sum of the percentage values for different features don't add up to 100%, because some query regions may overlap multiple kinds of features. If the query regions don't overlap any gene features, they are classified as "intergenic". 
-```{r echo=FALSE, warning=FALSE, message=FALSE}
+```{r query_gene_features, echo=FALSE, warning=FALSE, message=FALSE, eval=TRUE}
+
 dt = mdata
 df = dt[,length(unique(peak_id)), by=feature]
 colnames(df) = c("feature", "count")
@@ -64,7 +136,7 @@ figure_count = figure_count + 1
 ## Distribution of query regions across RNA genes
 
 **Figure `r figure_count`:** The number of query regions that overlap different kinds of RNA genes are counted. The 'y' axis denotes the types of gene features included in the analysis and the 'x' axis denotes the percentage of query regions (out of total number of query regions denoted with "n") that overlap at least one genomic interval that host the corresponding RNA gene type. Notice that the sum of the percentage values for different RNA genes don't add up to 100%, because some query regions may overlap multiple kinds of RNA genes. 
-```{r echo=FALSE, warning=FALSE, message=FALSE}
+```{r query_RNA_Genes, echo=FALSE, warning=FALSE, message=FALSE, eval=TRUE}
 m = grepl("RNA", mdata$gene_type)
 dt = mdata[m]
 df = dt[,length(unique(peak_id)), by=gene_type]
@@ -78,7 +150,7 @@ figure_count = figure_count + 1
 
 ## Distribution of query regions in the genome grouped by gene types 
 **Figure `r figure_count`:** The number of query regions that overlap different kinds of gene types are counted. The 'x' axis denotes the types of genes included in the analysis and the 'y' axis denotes the percentage of query regions (out of total number of query regions denoted with "n") that overlap at least one genomic interval that host the corresponding gene type. If the query regions don't overlap any known genes, they are classified as "Unknown". 
-```{r echo=FALSE, warning=FALSE, message=FALSE}
+```{r query_gene_types, echo=FALSE, warning=FALSE, message=FALSE, eval=TRUE}
 dt = mdata
 df = dt[,length(unique(peak_id)), by=gene_type]
 colnames(df) = c("feature", "count")
@@ -91,7 +163,7 @@ figure_count = figure_count + 1
 
 ## Distribution of query regions across the chromosomes grouped by gene features 
 **Figure `r figure_count`:** The number of query regions that overlap different chromosomes are counted. For each chromosome, the frequency of query regions are further split into groups based on the gene features the query overlaps with. The 'x' axis denotes the chromosomes included in the analysis and the 'y' axis denotes the frequency of overlaps. 
-```{r echo=FALSE, warning=FALSE, message=FALSE}
+```{r chromosomes_gene_features,  echo=FALSE, warning=FALSE, message=FALSE, eval=TRUE}
 p = mdata %>% count(chromosome_id, feature) %>%
   plot_ly(x = chromosome_id, y = n, type = "bar", color = feature) %>%
   layout(xaxis = list(tickangle = 90), margin = list(l = 80, r = 80, b=150, t=20))
@@ -103,7 +175,7 @@ figure_count = figure_count + 1
 ------
 
 ## Interactive table of genes that overlap query regions 
-```{r, echo=FALSE}
+```{r get_table_of_genes, echo=FALSE, eval=TRUE}
 features=unique(mdata$feature)
 mytable = mdata[feature==features[1],length(feature),by=c('gene_name')]
 colnames(mytable) = c('gene_name', features[1])
@@ -125,8 +197,20 @@ datatable(mytable[order(sum, decreasing = TRUE)][1:500], caption = 'Table 1: Int
 ------
 
 # Coverage Profiles
-```{r echo=FALSE, warning=FALSE, message=FALSE}
-txdb <- makeTxDbFromGFF(gff_file, format="gff3")
+```{r coverage_profiles_read_input, echo=FALSE, warning=FALSE, message=FALSE, eval=TRUE}
+if(file.exists(paste0(gff_file, ".rds")))
+{
+  gff = readRDS(paste0(gff_file, ".rds"))
+}else
+{
+  cat('WARNING! generating rtracklayer - import gff3. This may take a lot of memory (~9gb)')
+  gff = import.gff3(gff_file)
+  saveRDS(gff, file=paste0(gff_file, ".rds"))
+}
+
+chr1 = unique(as.vector(seqnames(gff)))[1] #first chromosome in the gff data 
+chr1_data = gff[seqnames(gff) == chr1]
+txdb <- makeTxDbFromGRanges(chr1_data)
 peaks = import(peaks, format = "bed")
 
 calculate_coverage = function (peaks, windows, type){
@@ -138,21 +222,21 @@ calculate_coverage = function (peaks, windows, type){
   p = plot_ly(mdata, x = bins, y = coverage)
   p %>%  
   add_trace(y = fitted(loess(coverage ~ as.numeric(bins)))) %>%
-  layout(title = paste("Coverage along", type, " (5' -> 3' direction)", sep=" "), showlegend = FALSE, margin = list(l= 50, r=50, b=50, t=50))
+  layout(title = paste("Coverage along", type, " (5' -> 3' direction) on chromosome", chr1, sep=" "), showlegend = FALSE, margin = list(l= 50, r=50, b=50, t=50))
 }
 figure_count = figure_count + 1
 ```
 
 ## Coverage profile of query regions across the length of transcripts
 **Figure `r figure_count`:** The query regions are overlaid with the genomic coordinates of transcripts. The transcripts are divided into 100 bins of equal length and for each bin the number of query regions that cover the corresponding bin is counted. Transcripts shorter than 100bp are excluded. Thus, a coverage profile of the transcripts is obtained based on the distribution of the query regions. The strandedness of the transcripts are taken into account. The coverage profile is plotted in the 5' to 3' direction. 
-```{r echo=FALSE, warning=FALSE, message=FALSE}
+```{r coverage_profiles_transcripts, echo=FALSE, warning=FALSE, message=FALSE, eval=TRUE}
 calculate_coverage (peaks, windows = transcripts(txdb), "transcripts") 
 figure_count = figure_count + 1
 ```
 
 ## Coverage profile of query regions across the length of Exons
 **Figure `r figure_count`:** The query regions are overlaid with the genomic coordinates of each exon of each transcript. The exons are divided into 100 bins of equal length and for each bin the number of query regions that cover the corresponding bin is counted. Exons shorter than 100bp are excluded. Thus, a coverage profile of the exons is obtained based on the distribution of the query regions. The strandedness of the exons are taken into account. The coverage profile is plotted in the 5' to 3' direction. 
-```{r echo=FALSE, warning=FALSE, message=FALSE}
+```{r coverage_profiles_exons, echo=FALSE, warning=FALSE, message=FALSE, eval=TRUE}
 exons = unlist(exonsBy(txdb, by="tx"))
 calculate_coverage (peaks, windows = exons, "exons")
 figure_count = figure_count + 1
@@ -160,7 +244,7 @@ figure_count = figure_count + 1
 
 ## Coverage profile of query regions across the 100 bp region centered on exon-intron junctions
 **Figure `r figure_count`:** The query regions are overlaid with the genomic coordinates of each exon-intron junction of each transcript. The junction comprises of a 50 bp region of an exon and 50 bp region of its neighboring intron. Exon-intron junctions are divided into 100 bins of equal length and for each bin the number of query regions that cover the corresponding bin is counted. Exons shorter than 100bp are excluded. Thus, a coverage profile of the exon-intron junctions is obtained based on the distribution of the query regions. The strandedness of the exons are taken into account. The coverage profile is plotted in the 5' to 3' direction. 
-```{r echo=FALSE, warning=FALSE, message=FALSE}
+```{r coverage_profiles_exon-introns, echo=FALSE, warning=FALSE, message=FALSE, eval=TRUE}
 myexons = exons[width(exons) > 100] #remove exons that are shorter than 100 bp
 up_exon = flank(myexons, 50, start=TRUE, both=TRUE) #50 bp from upstream intron 50 bp from exon 
 down_exon = flank(myexons, 50, start=FALSE, both=TRUE) #50 bp from downstream intron, 50 bp from exon
@@ -171,7 +255,7 @@ figure_count = figure_count + 1
 
 ## Coverage profile of query regions across the length of introns
 **Figure `r figure_count`:** The query regions are overlaid with the genomic coordinates of each intron of each transcript. The introns are divided into 100 bins of equal length and for each bin the number of query regions that cover the corresponding bin is counted. Introns shorter than 100bp are excluded. Thus, a coverage profile of the introns is obtained based on the distribution of the query regions. The strandedness of the introns are taken into account. The coverage profile is plotted in the 5' to 3' direction. 
-```{r echo=FALSE, warning=FALSE, message=FALSE}
+```{r coverage_profiles_introns, echo=FALSE, warning=FALSE, message=FALSE, eval=TRUE}
 introns = unlist(intronsByTranscript(txdb))
 calculate_coverage (peaks, windows = introns, "introns")
 figure_count = figure_count + 1
@@ -179,7 +263,7 @@ figure_count = figure_count + 1
 
 ## Coverage profile of query regions across the promoter regions
 **Figure `r figure_count`:** The query regions are overlaid with the genomic coordinates of each promoter region of each transcript. The promoter region is defined as the region spanning from 2000bp upstream of the transcription start site and the first 200bp region after the transcription start site. The promoters are divided into 100 bins of equal length and for each bin the number of query regions that cover the corresponding bin is counted. Thus, a coverage profile of the promoters is obtained based on the distribution of the query regions. The strandedness of the promoters are taken into account. The coverage profile is plotted in the 5' to 3' direction. 
-```{r echo=FALSE, warning=FALSE, message=FALSE}
+```{r coverage_profiles_promoters, echo=FALSE, warning=FALSE, message=FALSE, eval=TRUE}
 promoters = promoters(txdb)
 calculate_coverage (peaks, windows = promoters, "promoters")
 figure_count = figure_count + 1
@@ -187,7 +271,7 @@ figure_count = figure_count + 1
 
 ## Coverage profile of query regions across the length of 5' UTRs
 **Figure `r figure_count`:** The query regions are overlaid with the genomic coordinates of each 5' UTR region of each transcript. The 5' UTR regions are divided into 100 bins of equal length and for each bin the number of query regions that cover the corresponding bin is counted. Thus, a coverage profile of the 5' UTR regions is obtained based on the distribution of the query regions. The strandedness of the promoters are taken into account. The coverage profile is plotted in the 5' to 3' direction. 
-```{r echo=FALSE, warning=FALSE, message=FALSE}
+```{r coverage_profiles_fiveUTRs, echo=FALSE, warning=FALSE, message=FALSE, eval=TRUE}
 five_UTRs = unlist(fiveUTRsByTranscript(txdb))
 calculate_coverage (peaks, windows = five_UTRs, "5' UTRs")
 figure_count = figure_count + 1
@@ -195,7 +279,7 @@ figure_count = figure_count + 1
 
 ## Coverage profile of query regions across the length of 3' UTRs
 **Figure `r figure_count`:** The query regions are overlaid with the genomic coordinates of each 3' UTR region of each transcript. The 3' UTR regions are divided into 100 bins of equal length and for each bin the number of query regions that cover the corresponding bin is counted. Thus, a coverage profile of the 3' UTR regions is obtained based on the distribution of the query regions. The strandedness of the promoters are taken into account. The coverage profile is plotted in the 5' to 3' direction. 
-```{r echo=FALSE, warning=FALSE, message=FALSE}
+```{r coverage_profiles_threeUTRs, echo=FALSE, warning=FALSE, message=FALSE, eval=TRUE}
 three_UTRs = unlist(threeUTRsByTranscript(txdb))
 calculate_coverage (peaks, windows = three_UTRs, "3' UTRs")
 figure_count = figure_count + 1
@@ -207,100 +291,33 @@ figure_count = figure_count + 1
 # GO term and Pathway Enrichment Results
 
 ## GO Term Enrichment Results for Biological Processes
-```{r echo=FALSE}
+```{r GO_BP,  echo=FALSE, eval=TRUE}
 go = fread(go_bp)
 datatable(go[bonferroni < 0.001], caption = 'Table 2: Significant Biological Process GO terms (FDR < 0.001) enriched for genes that overlap query regions',  filter = 'top')
 ```
 
 ## GO Term Enrichment Results for Molecular Functions
-```{r echo=FALSE}
+```{r GO_MF,  echo=FALSE, eval=TRUE}
 go = fread(go_mf)
 
 datatable(go[bonferroni < 0.001], caption = 'Table 3: Significant Molecular Function GO terms (FDR < 0.001) enriched for genes that overlap query regions',  filter = 'top')
 ```
 
 ## GO Term Enrichment Results for Cellular Compartments
-```{r echo=FALSE}
+```{r GO_CC,   echo=FALSE, eval=TRUE}
 go = fread(go_cc)
 datatable(go[bonferroni < 0.001], caption = 'Table 4: Significant Cellular Compartment GO terms (FDR < 0.001) enriched for genes that overlap query regions',  filter = 'top')
 ```
 
 ## Gene Set Enrichment Results based on MSigDB
-```{r echo=FALSE}
+```{r GSEA_msigdb,  echo=FALSE, eval=TRUE}
 msigdb = fread(msigdb)
 datatable(msigdb, caption='Table 5: Significant MSigDB Gene Sets (FDR < 0.001) enriched for genes that overlap query regions', filter='top')
 ```
 
-# TOP MEME motifs discovered in the query regions 
-**Figure `r figure_count`:** The genomic sequences of the regions that are covered by each query region is extracted from the fasta file of the genome. Then, [MEME](http://meme-suite.org/tools/meme) was run to find enriched motif patterns in the list of query regions. The logos of the discovered motif patterns and the corresponding statistical test results are provided below.
-
-
-```{r, results='asis', echo=FALSE, warning=FALSE, message=FALSE}
-
-logos = dir(meme_outdir, "^logo[0-9]*.png$", full.names=TRUE )
-#get motif data:
-mylines = readLines(paste(meme_outdir, "meme.txt", sep="/"))
-motifs = grep("^MOTIF", mylines, value = TRUE)
-
-for (i in 1:length(logos)){
-  #cat(logos[i], motifs[i], "\n")
-  cat(paste("**",motifs[i],"** \n\n", sep=""),"\n")
-  cat(paste("![alt text](", logos[i], ")", sep = ""), "\n")
-  cat("\n")
-}
-figure_count = figure_count + 1
-```
-
-## Discovered consensus motifs and their frequency in the target transcriptome 
-**Figure `r figure_count`:** The frequency of the top 10 discovered motifs in the transcriptome is plotted. 
-```{r echo=FALSE, warning=FALSE, message=FALSE}
-dt = motif_data
-df = dt[,length(unique(motif_instance_id)), by=c('motif')]
-colnames(df) = c('motif', 'motif_instance_count')
-p = plot_ly(df, x=motif_instance_count, y=motif, mode="markers", size=motif_instance_count, color=motif_instance_count)
-layout(p, yaxis = list(title="Consensus Motifs"), margin = list(l=150))
-figure_count = figure_count + 1
-```
-
-## Top genes with most discovered types of motifs
-```{r echo=FALSE, warning=FALSE, message=FALSE}
-dt = motif_data
-df = unique(dt[,c("gene_name", "motif"), with=FALSE])
-df = df[,length(motif),by=gene_name]
-colnames(df) = c("gene_name", "motif_diversity")
-df = df[order(motif_diversity, decreasing=TRUE)]
-df$motif_diversity = round(df$motif_diversity/length(unique(df$motif_diversity)),2)*100
-#get top 90% of genes with highest motif diversity
-datatable(df[motif_diversity > quantile(df$motif_diversity, c(0.95))], 
-          caption = 'Table 6: Genes with highest motif diversity (100: highest)', filter = 'top')
-```
-
-
-## Distribution of discovered motifs in gene types 
-**Figure `r figure_count`:** The frequency of the top 10 discovered motifs in the transcriptome is plotted with respect to different types of genes. 
-```{r echo=FALSE, warning=FALSE, message=FALSE}
-dt = motif_data
-df = dt[,length(unique(motif_instance_id)), by=c('motif', 'gene_type')]
-colnames(df) = c("motif", "gene_type", "motif_instance_count")
-p = plot_ly(df, x=motif_instance_count, y=motif, color = gene_type, mode="markers", size=motif_instance_count, text=gene_type)
-layout(p, margin=list(l=150, b=100))
-figure_count = figure_count + 1
-```
-
-## Distribution of discovered motifs in gene features 
-**Figure `r figure_count`:** The frequency of the top 10 discovered motifs in the transcriptome is plotted with respect to different types of gene features.  
-```{r echo=FALSE, warning=FALSE, message=FALSE}
-dt = motif_data
-df = dt[,length(unique(motif_instance_id)), by=c('motif', 'feature')]
-colnames(df) = c("motif", "feature", "motif_instance_count")
-p = plot_ly(df, x=motif_instance_count, y=motif, color = feature, mode="markers", size=motif_instance_count, text=feature)
-layout(p, margin=list(l=150, b=100))
-figure_count = figure_count + 1
-```
-
 # Acknowledgements
 
-RCAS is developed by [Dr. Altuna Akalin](http://bioinformatics.mdc-berlin.de/team.html#altuna-akalin-phd) (head of the Scientific Bioinformatics Platform), [Dr. Dilmurat Yusuf](http://bioinformatics.mdc-berlin.de/team.html#dilmurat-yusuf-phd) (Bioinformatics Scientist), and [Dr. Bora Uyar](http://bioinformatics.mdc-berlin.de/team.html#bora-uyar-phd)  (Bioinformatics Scientist) at the Berlin Institute of Medical Systems Biology ([BIMSB](https://www.mdc-berlin.de/13800178/en/bimsb)) at the Max-Delbrueck-Center for Molecular Medicine ([MDC](https://www.mdc-berlin.de)) in Berlin. 
+RCAS is developed by [Dr. Altuna Akalin](http://bioinformatics.mdc-berlin.de/team.html#altuna-akalin-phd) (head of the Scientific Bioinformatics Platform), [Dr. Dilmurat Yusuf](http://bioinformatics.mdc-berlin.de/team.html#dilmurat-yusuf-phd) (Bioinformatics Scientist), [Dr. Bora Uyar](http://bioinformatics.mdc-berlin.de/team.html#bora-uyar-phd)  (Bioinformatics Scientist), and [Ricardo Wurmus](http://bioinformatics.mdc-berlin.de/team.html#ricardo-wurmus) (System Administrator) at the Berlin Institute of Medical Systems Biology ([BIMSB](https://www.mdc-berlin.de/13800178/en/bimsb)) at the Max-Delbrueck-Center for Molecular Medicine ([MDC](https://www.mdc-berlin.de)) in Berlin. 
 
 RCAS is developed as a bioinformatics service as part of the [RNA Bioinformatics Center](http://www.denbi.de/index.php/rbc), which is one of the eight centers of the German Network for Bioinformatics Infrastructure ([de.NBI](http://www.denbi.de/)).  
 
