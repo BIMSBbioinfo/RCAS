@@ -109,7 +109,7 @@ rule html_report:
 		  "{sample}.rcas.html"
 	 shell:
 		  "bash {RCAS_path}/src/generate_report.sh"
-		  " -o={output} -a={input[0]} -p={input[1]} -g={input[2]}"
-		  " -b={input[3]}/BP.GO.results.tsv -m={input[3]}/MF.GO.results.tsv"
-		  " -c={input[3]}/CC.GO.results.tsv -s={input[4]}"
-		  " -e={input[5]}/meme_out/ -t={input[6]}"
+		  " --output_filename={output} --annot={input[0]} --peaks={input[1]} --gff3={input[2]}"
+		  " --go_bp={input[3]}/BP.GO.results.tsv --go_mf={input[3]}/MF.GO.results.tsv"
+		  " --go_cc={input[3]}/CC.GO.results.tsv --msigdb={input[4]}"
+		  " --meme_out={input[5]}/meme_out/ --motif_annot={input[6]}"
