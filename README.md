@@ -78,6 +78,12 @@ http://software.broadinstitute.org/gsea/msigdb/download_file.jsp?filePath=/resou
     Drosophila_melanogaster-U2T.meme
 
     c2.cp.v5.0.entrez.gmt
+    
+    c2.cp.v5.0.entrez.dm3.gmt
+    
+    c2.cp.v5.0.entrez.mm9.gmt
+    
+    c2.cp.v5.0.entrez.ce10.gmt
 
     custom.css
 
