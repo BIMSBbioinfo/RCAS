@@ -23,7 +23,7 @@ rule anot_cor:
 	 #annotate coordinates with features
 	 input: "{sample}.intersect.bed"
 	 output: "{sample}.anot.tsv"
-	 shell: "python {RCAS_path}/src/parse_anot.py < {input}  > {output}"
+	 shell: "python2 {RCAS_path}/src/parse_anot.py < {input}  > {output}"
 
 rule get_flanking_coordinates:
 	 #prepare flanking coordinates centering on binding site
@@ -44,7 +44,7 @@ rule run_meme_chip:
 rule profile_top_motifs:
 	 input: "{sample}_memechip_output", "{sample}-summit-100bp.bed", "{sample}.anot.tsv"
 	 output: "{sample}.anot-motif.tsv"
-	 shell: "python {RCAS_path}/src/top_motifs.py  -m {input[0]}/centrimo_out/centrimo.html -e {input[0]}/centrimo_out/centrimo.txt -c {input[1]} -a {input[2]} > {output}"
+	 shell: "python2 {RCAS_path}/src/top_motifs.py  -m {input[0]}/centrimo_out/centrimo.html -e {input[0]}/centrimo_out/centrimo.txt -c {input[1]} -a {input[2]} > {output}"
 	 
 rule report_msigd:
 	 input: TRACK_gff, "{sample}.anot.tsv"
