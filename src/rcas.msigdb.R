@@ -24,7 +24,7 @@ Arguments:
 --help              - print this text
 
 Example:
-Rscript rcas.GO.R --gmt=c2.cp.v5.0.entrez.gmt --gff3=gencode.v19.annotation.gff3 --anot=PARCLIP_AGO1234_Hafner2010a_hg19_xaa.anot.tsv --out=myproject.hg19"
+Rscript rcas.msigdb.R --gmt=c2.cp.v5.0.entrez.gmt --gff3=gencode.v19.annotation.gff3 --anot=PARCLIP_AGO1234_Hafner2010a_hg19_xaa.anot.tsv --out=myproject.hg19"
 
 ## Help section
 if("--help" %in% args) {
