@@ -17,14 +17,19 @@ rule target:
 	 input:
 		  outfile
 
+#default step
 include: anot
 
+#optionl step
 include: motif
 
+#optional step
 include: PATHrich
 
+#optional step
 include: GOrich
 
+#default step
 rule html_report:
 	 input:
 		  "{sample}.anot.tsv",
