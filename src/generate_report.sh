@@ -24,6 +24,7 @@ function usage()
 	echo "	-s --msigdb=<msigdb_file.tsv>			file containing MSIGDB gene set enrichment analysis results as output from rcas.msigdb.R"
 	echo "	-e --meme_out=</path/to/meme_out_dir>		path to the folder that contains the output of meme results (e.g. /path/to/meme_out/)"
 	echo "	-t --motif_annot=<motif_anot_file.tsv>		file containing the output of top_motifs.py scripts, which contains the annotations related to the detected motifs in the experiment" 
+	echo "	-i --coverage_profile_option=<option>		option to run or not run coverage profile calculations: choose 'NOT_RUN' in order to turn it off. choose 'RUN' to keep it on."
 	echo ""
 }
 
@@ -69,6 +70,9 @@ while [ "$1" != "" ]; do
 			;;	
 		-t | --motif_annot)
 			motif_annot_file=$VALUE
+			;;
+		-i | --coverage_profile_option)
+			coverage_profile_option=$VALUE
 			;;
         	*)
             		echo "ERROR: unknown parameter \"$PARAM\""
@@ -139,5 +143,10 @@ if [ -z "${motif_annot_file}" ]; then
 	usage
 	exit 1 
 fi
+if [ -z "${coverage_profile_option}" ]; then
+	echo "Error: missing option for coverage profile calculations"
+	usage
+	exit 1
+fi
 
-Rscript -e "library('rmarkdown'); rmarkdown::render('${report_script}', output_file = '${output_filename}', output_dir='${outdir}', html_document(toc=TRUE, theme='cerulean', number_sections=TRUE, css='${css}', includes=includes(before_body='${header}')))" ${outdir} ${annotation_file} ${peaks_file} ${gff3_file} ${go_bp_results} ${go_mf_results} ${go_cc_results} ${msigdb_results} ${meme_outdir} ${motif_annot_file}
+Rscript -e "library('rmarkdown'); rmarkdown::render('${report_script}', output_file = '${output_filename}', output_dir='${outdir}', html_document(toc=TRUE, theme='cerulean', number_sections=TRUE, css='${css}', includes=includes(before_body='${header}')))" ${outdir} ${annotation_file} ${peaks_file} ${gff3_file} ${go_bp_results} ${go_mf_results} ${go_cc_results} ${msigdb_results} ${meme_outdir} ${motif_annot_file} ${coverage_profile_option}
