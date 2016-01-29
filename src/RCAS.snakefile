@@ -1,6 +1,6 @@
 import glob, os
 
-def report_arguments(run_motif, run_PATHrich, run_GOrich):
+def report_arguments(run_motif, run_PATHrich, run_GOrich, run_coverage):
 	 if run_motif:
 		  meme_out = "{input[5]}/meme_out/"
 		  motif_annot = "{input[6]}"
@@ -30,13 +30,19 @@ def report_arguments(run_motif, run_PATHrich, run_GOrich):
 		  go_cc = "NOT_RUN"
 		  GO_term = None
 
+	 if run_coverage:
+		  coverage_profile = "RUN"
+	 else:
+		  coverage_profile = "NOT_RUN"
+
 	 cmd = ["bash {RCAS_path}/src/generate_report.sh",
 		  "--output_filename={output} --annot={input[0]} --peaks={input[1]} --gff3={input[2]}",
 		  "--go_bp=%s" % go_bp,
 		  "--go_mf=%s" % go_mf,
 		  "--go_cc=%s" % go_cc,
 		  "--msigdb=%s" % msigdb,
-		  "--meme_out=%s --motif_annot=%s" % (meme_out, motif_annot)]
+		  "--meme_out=%s --motif_annot=%s" % (meme_out, motif_annot),
+		  "--coverage_profile_option=%s" % coverage_profile]
 
 	 cmd = " ".join(cmd)
 	 imput_args = ["{sample}.anot.tsv",
@@ -65,11 +71,12 @@ infile = config["infile"]
 infile = glob.glob(infile)
 outfile = [out.split(".")[0] + ".rcas.html" for out in infile]
 
-run_motif = True
-run_PATHrich = True
-run_GOrich = True
+run_motif = False
+run_PATHrich = False
+run_GOrich = False
+run_coverage = True
 
-imput_args, cmd = report_arguments(run_motif, run_PATHrich, run_GOrich)
+imput_args, cmd = report_arguments(run_motif, run_PATHrich, run_GOrich, run_coverage)
 
 rule target:
 	 input:
