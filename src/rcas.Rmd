@@ -14,7 +14,7 @@ library('knitr')
 ```
 
 
-```{r get_inputs, echo=FALSE}
+```{r get_inputs, echo=FALSE, eval=TRUE}
 args <- commandArgs(TRUE)
 work_dir = args[1] #path to working directory - necessary to set root.dir
 anot = args[2] #/home/buyar/projects/RCAS/test/PARCLIP_AGO1234_Hafner2010a_hg19_xaa.anot.tsv
@@ -26,9 +26,11 @@ go_cc = args[7] ##go enrichment results for sub-cellular locations
 msigdb = args[8] ##msigdb enrichment results 
 meme_outdir = args[9] ##output directory of meme results that contains the logos and meme.txt file 
 motif_anot_file = args[10] ##'../test/PARCLIP_AGO1234_Hafner2010a_hg19_xaa.anot-motif.tsv' #motif annotation output from top_motifs.py script of Dilmurat
+coverage_profile_option = args[11] ##option to run or not run the coverage profile calculations 
 figure_count = 1
 table_count = 1
 ```
+
 
 ```{r define_modules_to_run, echo=FALSE, warning=FALSE}
 ##based on the input options; define boolean parameters that are used in corresponding chunks to determine if chunk should be evaluated or not. 
@@ -40,7 +42,7 @@ run_go = run_go_bp || run_go_mf || run_go_cc
 run_msigdb = ifelse(msigdb == 'NOT_RUN', FALSE, TRUE)
 run_meme = ifelse(meme_outdir == 'NOT_RUN', FALSE, TRUE)
 run_meme_anot = ifelse(motif_anot_file == 'NOT_RUN', FALSE, TRUE)
-run_coverage_profile = TRUE #TODO make this optional as well. 
+run_coverage_profile = ifelse(coverage_profile_option == 'NOT_RUN', FALSE, TRUE)
 ```
 
 
