@@ -4,6 +4,7 @@ RCAS_path = config["RCAS_path"]
 anot = RCAS_path  + "/src/RCAS.anot"
 motif = RCAS_path  + "/src/RCAS.motif"
 GOrich = RCAS_path  + "/src/RCAS.GOrich"
+PATHrich = RCAS_path  + "/src/RCAS.PATHrich"
 
 TRACK_gff = config["gff3"]
 genome_reference = config["genome"]
@@ -19,19 +20,10 @@ rule target:
 include: anot
 
 include: motif
-	 
-rule report_msigd:
-	 input:
-		  TRACK_gff,
-		  "{sample}.anot.tsv"
-	 output:
-		  "{sample}.msigdb.results.tsv"
-	 shell:
-		  "Rscript {RCAS_path}/src/rcas.msigdb.R --gmt={RCAS_path}/src/base/c2.cp.v5.0.entrez.gmt"
-		  " --gff3={input[0]} --anot={input[1]} --out={output}"
+
+include: PATHrich
 
 include: GOrich
-
 
 rule html_report:
 	 input:
