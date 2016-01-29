@@ -1,6 +1,7 @@
 import glob, os
 
 RCAS_path = config["RCAS_path"]
+anot = RCAS_path  + "/src/RCAS.anot"
 
 TRACK_gff = config["gff3"]
 genome_reference = config["genome"]
@@ -13,23 +14,7 @@ rule target:
 	 input:
 		  outfile
 
-rule intersect:
-	 #obtain intersect between infile and TRACK_gff
-	 input:
-		  infile
-	 output:
-		  "{sample}.intersect.bed"
-	 shell:
-		  "bedtools intersect -b {TRACK_gff} -a {input[0]}  -wao > {output}"
-
-rule anot_cor:
-	 #annotate coordinates with features
-	 input:
-		  "{sample}.intersect.bed"
-	 output:
-		  "{sample}.anot.tsv"
-	 shell:
-		  "python2 {RCAS_path}/src/parse_anot.py < {input}  > {output}"
+include: anot
 
 rule get_flanking_coordinates:
 	 #prepare flanking coordinates centering on binding site
