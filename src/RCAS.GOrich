@@ -1,0 +1,8 @@
+rule report_GO:
+	 input:
+		  TRACK_gff,
+		  "{sample}.anot.tsv"
+	 output:
+		  "{sample}-GO-term"
+	 shell:
+		  "Rscript {RCAS_path}/src/rcas.GO.R --gff3={input[0]} --anot={input[1]} --out={output}"

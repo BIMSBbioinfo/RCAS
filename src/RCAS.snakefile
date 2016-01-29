@@ -3,6 +3,7 @@ import glob, os
 RCAS_path = config["RCAS_path"]
 anot = RCAS_path  + "/src/RCAS.anot"
 motif = RCAS_path  + "/src/RCAS.motif"
+GOrich = RCAS_path  + "/src/RCAS.GOrich"
 
 TRACK_gff = config["gff3"]
 genome_reference = config["genome"]
@@ -29,14 +30,8 @@ rule report_msigd:
 		  "Rscript {RCAS_path}/src/rcas.msigdb.R --gmt={RCAS_path}/src/base/c2.cp.v5.0.entrez.gmt"
 		  " --gff3={input[0]} --anot={input[1]} --out={output}"
 
-rule report_GO:
-	 input:
-		  TRACK_gff,
-		  "{sample}.anot.tsv"
-	 output:
-		  "{sample}-GO-term"
-	 shell:
-		  "Rscript {RCAS_path}/src/rcas.GO.R --gff3={input[0]} --anot={input[1]} --out={output}"
+include: GOrich
+
 
 rule html_report:
 	 input:
