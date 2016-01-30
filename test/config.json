@@ -1,0 +1,19 @@
+{
+  "RCAS_path": "/home/dilmurat/Work/RCAS",
+
+  "gff3": "/home/dilmurat/database/gencode.v23.annotation.gff3",
+
+  "genome": "/home/dilmurat/database/hg19.fa",
+
+  "infile": {
+    "xaa": "xaa.bed",
+    "xab": "xab.bed"
+  },
+
+  "switch": {
+    "run_motif": "False",
+    "run_PATHrich": "False",
+    "run_GOrich": "False",
+    "run_coverage": "False"
+  }
+}
