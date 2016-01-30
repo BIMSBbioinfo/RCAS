@@ -1,7 +1,7 @@
 rule intersect:
 	 #obtain intersect between infile and TRACK_gff
 	 input:
-		  infile
+		  lambda wildcards: infile[wildcards.sample]
 	 output:
 		  "{sample}.intersect.bed"
 	 shell:

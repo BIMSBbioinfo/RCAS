@@ -1,4 +1,4 @@
-import glob, os
+configfile: "config.json"
 
 def report_arguments(run_motif, run_PATHrich, run_GOrich, run_coverage):
 	 if run_motif:
@@ -43,20 +43,18 @@ def report_arguments(run_motif, run_PATHrich, run_GOrich, run_coverage):
 		  "--msigdb=%s" % msigdb,
 		  "--meme_out=%s --motif_annot=%s" % (meme_out, motif_annot),
 		  "--coverage_profile_option=%s" % coverage_profile]
-
 	 cmd = " ".join(cmd)
+
 	 imput_args = ["{sample}.anot.tsv",
-					infile,
-					{TRACK_gff},
+					lambda wildcards: infile[wildcards.sample],
+					TRACK_gff,
 					GO_term,
 					msigdb_results,
 					memechip_out,
 					anot_motif]
-
 	 imput_args = [arg for arg in imput_args if arg != None]
 
 	 return imput_args, cmd
-
 
 RCAS_path = config["RCAS_path"]
 anot = RCAS_path  + "/src/RCAS.anot"
@@ -68,19 +66,17 @@ TRACK_gff = config["gff3"]
 genome_reference = config["genome"]
 
 infile = config["infile"]
-infile = glob.glob(infile)
-outfile = [out.split(".")[0] + ".rcas.html" for out in infile]
 
-run_motif = False
-run_PATHrich = False
-run_GOrich = False
-run_coverage = True
+run_motif = eval(config["switch"]["run_motif"])
+run_PATHrich = eval(config["switch"]["run_PATHrich"])
+run_GOrich = eval(config["switch"]["run_GOrich"])
+run_coverage = eval(config["switch"]["run_coverage"])
 
 imput_args, cmd = report_arguments(run_motif, run_PATHrich, run_GOrich, run_coverage)
 
 rule target:
 	 input:
-		  outfile
+		   expand("{sample}.rcas.html", sample=infile)
 
 #default step
 include: anot
