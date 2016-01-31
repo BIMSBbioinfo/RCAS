@@ -3,6 +3,9 @@ rule report_GO:
 		  TRACK_gff,
 		  "{sample}.anot.tsv"
 	 output:
-		  "{sample}-GO-term"
+		  "{sample}-GO-term",
+		  "{sample}-GO-term/BP.GO.results.tsv",
+		  "{sample}-GO-term/MF.GO.results.tsv",
+		  "{sample}-GO-term/CC.GO.results.tsv"
 	 shell:
-		  "Rscript {RCAS_path}/src/rcas.GO.R --gff3={input[0]} --anot={input[1]} --out={output}"
+		  "Rscript {RCAS_path}/src/rcas.GO.R --gff3={input[0]} --anot={input[1]} --out={output[0]}"
