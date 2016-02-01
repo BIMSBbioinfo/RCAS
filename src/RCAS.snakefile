@@ -41,6 +41,7 @@ PATHrich = RCAS_path  + "/src/RCAS.PATHrich"
 
 TRACK_gff = config["gff3"]
 genome_reference = config["genome"]
+species = config["species"]
 
 infile = config["infile"]
 
@@ -49,7 +50,9 @@ run_PATHrich = eval(config["switch"]["run_PATHrich"])
 run_GOrich = eval(config["switch"]["run_GOrich"])
 run_coverage = eval(config["switch"]["run_coverage"])
 
-input_options, coverage_profile = report_arguments(infile, TRACK_gff, run_motif, run_PATHrich, run_GOrich, run_coverage)
+input_options, coverage_profile = report_arguments(infile, TRACK_gff,
+								run_motif, run_PATHrich,
+								run_GOrich, run_coverage)
 
 rule target:
 	 input:
