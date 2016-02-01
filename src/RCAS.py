@@ -30,7 +30,9 @@ def get_argument_parser():
     parser.add_argument("--gff3", "-f",
                         metavar="FILE",
                         required=True,
-                        help="Annotation reference in gff3 format.")
+                        help="Annotation reference in gff3 format"
+                        " whose version should conform with"
+                        " genome version.")
 
     parser.add_argument("--run_motif", "-m",
                         default="False",
@@ -56,6 +58,18 @@ def get_argument_parser():
                         help="True: run coverage profile."
                         " False (default): not run.")
 
+    parser.add_argument("--species", "-s",
+                        default="human",
+                        choices=["human", "fly", "worm", "mouse"],
+                        help="Required for running GO-term or pathway enrichment."
+                        " Default: human")
+
+    parser.add_argument("--forcerun", "-F",
+                        action='store_true',
+                        help=("Force the re-execution of snakemake."
+                              " Use this option if you want to have all "
+                              "output in your workflow updated."))
+
     return parser
 
 def extract_key(filename):
@@ -78,6 +92,8 @@ def generate_config(args):
 
       "genome": args.genome,
 
+      "species": args.species,
+
       "infile": infiles,
 
       "switch": {
@@ -97,7 +113,12 @@ def generate_config(args):
 def call_snakemake(RCAS_path):
     print "start snakemake:\n"
 
-    subprocess.call("snakemake -p -s %s/src/RCAS.snakefile" % RCAS_path, shell=True)
+    if args.forcerun:
+        forcerun = "F"
+    else:
+        forcerun = ""
+
+    subprocess.call("snakemake -%sp -s %s/src/RCAS.snakefile" % (forcerun, RCAS_path), shell=True)
 
 if __name__ == '__main__':
     import argparse
