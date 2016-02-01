@@ -52,16 +52,50 @@ def get_argument_parser():
 
     return parser
 
-def generate_config():
-    pass
+def extract_key(filename):
+    base = os.path.basename(filename)
+    key = base.split(".")[:-1]
+    key = ".".join(key)
+    return key
+
+def generate_config(args):
+    BED_files = args.BED
+    infiles = {}
+
+    for BED in BED_files:
+        infiles[extract_key(BED)] = BED
+
+    config = {
+      "RCAS_path": os.path.abspath(args.RCAS_path),
+
+      "gff3": args.gff3,
+
+      "genome": args.genome,
+
+      "infile": infiles,
+
+      "switch": {
+        "run_motif": args.run_motif,
+        "run_PATHrich": args.run_PATHrich,
+        "run_GOrich": args.run_GOrich,
+        "run_coverage": args.run_coverage
+      }
+    }
+
+    # Writing JSON data
+    with open('config.json', 'w') as f:
+         json.dump(config, f, sort_keys=True, indent=4)
 
 def call_snakemake():
     pass
 
 if __name__ == '__main__':
-
     import argparse
+    import json
+    import os
 
     #process commandline Arguments
     parser = get_argument_parser()
     args = parser.parse_args()
+
+    generate_config(args)
