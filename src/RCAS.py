@@ -34,35 +34,31 @@ def get_argument_parser():
                         " whose version should conform with"
                         " genome version.")
 
-    parser.add_argument("--run_motif", "-m",
-                        default="False",
-                        choices=["True", "False"],
-                        help="True: run motif search."
-                        " False (default): not run.")
-
-    parser.add_argument("--run_PATHrich", "-p",
-                        default="False",
-                        choices=["True", "False"],
-                        help="True: run pathway enrichment."
-                        " False (default): not run.")
-
-    parser.add_argument("--run_GOrich", "-t",
-                        default="False",
-                        choices=["True", "False"],
-                        help="True: run GO-term enrichment."
-                        " False (default): not run.")
-
-    parser.add_argument("--run_coverage", "-c",
-                        default="False",
-                        choices=["True", "False"],
-                        help="True: run coverage profile."
-                        " False (default): not run.")
-
     parser.add_argument("--species", "-s",
                         default="human",
                         choices=["human", "fly", "worm", "mouse"],
                         help="Required for running GO-term or pathway enrichment."
                         " Default: human")
+
+    parser.add_argument("--run_motif", "-m",
+                        action='store_true',
+                        help="Run motif search.")
+
+    parser.add_argument("--run_PATHrich", "-p",
+                        action='store_true',
+                        help="Run pathway enrichment.")
+
+    parser.add_argument("--run_GOrich", "-t",
+                        action='store_true',
+                        help="Run GO term enrichment.")
+
+    parser.add_argument("--run_coverage", "-c",
+                        action='store_true',
+                        help="Run coverage profile.")
+
+    parser.add_argument("--run_all", "-a",
+                        action='store_true',
+                        help="Run all steps.")
 
     parser.add_argument("--forcerun", "-F",
                         action='store_true',
@@ -85,6 +81,32 @@ def generate_config(args):
     for BED in BED_files:
         infiles[extract_key(BED)] = BED
 
+    if args.run_motif:
+        run_motif = "True"
+    else:
+        run_motif = "False"
+
+    if args.run_PATHrich:
+        run_PATHrich = "True"
+    else:
+        run_PATHrich = "False"
+
+    if args.run_GOrich:
+        run_GOrich = "True"
+    else:
+        run_GOrich = "False"
+
+    if args.run_coverage:
+        run_coverage = "True"
+    else:
+        run_coverage = "False"
+
+    if args.run_all:
+        run_motif = "True"
+        run_PATHrich = "True"
+        run_GOrich = "True"
+        run_coverage = "True"
+
     config = {
       "RCAS_path": os.path.abspath(args.RCAS_path),
 
@@ -97,10 +119,10 @@ def generate_config(args):
       "infile": infiles,
 
       "switch": {
-        "run_motif": args.run_motif,
-        "run_PATHrich": args.run_PATHrich,
-        "run_GOrich": args.run_GOrich,
-        "run_coverage": args.run_coverage
+        "run_motif": run_motif,
+        "run_PATHrich": run_PATHrich,
+        "run_GOrich": run_GOrich,
+        "run_coverage": run_coverage
       }
     }
 
@@ -108,7 +130,7 @@ def generate_config(args):
     with open('config.json', 'w') as f:
          json.dump(config, f, sort_keys=True, indent=4)
 
-    print "wrote config.json.\n"
+    print "\nwrote config.json.\n"
 
 def call_snakemake(RCAS_path):
     print "start snakemake:\n"
