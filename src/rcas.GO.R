@@ -13,10 +13,11 @@ help_command = "
       --gff3=<path to GENCODE Annotation File>  - e.g /data/akalin/Base/Annotation/GenomeAnnotation/hg19/gencode/gencode.v19.annotation.gff3
       --anot=<path to parse_anot.py output>  - e.g /home/buyar/projects/RCAS/test/PARCLIP_AGO1234_Hafner2010a_hg19_xaa.anot.tsv
       --out=<output prefix>   -e.g Hafner2010.hg19
+      --species=<species name>    -Choose between (human, fly, worm, mouse)
       --help              - print this text
       
       Example:
-      Rscript rcas.GO.R --gff3=gencode.v19.annotation.gff3 --anot=PARCLIP_AGO1234_Hafner2010a_hg19_xaa.anot.tsv"
+      Rscript rcas.GO.R --gff3=gencode.v19.annotation.gff3 --anot=PARCLIP_AGO1234_Hafner2010a_hg19_xaa.anot.tsv --out=Hafner2010.hg19 --species=hg19"
 
 ## Help section
 if("--help" %in% args) {
@@ -42,15 +43,28 @@ if(!("anot" %in% argsDF$V1)) {
   stop("provide the path to anot.bed file")
 }
 
-## Arg2 default
+## Arg3 default
 if(!("out" %in% argsDF$V1)) {
   cat(help_command, "\n")
   stop("provide the output prefix to anot.bed file")
 }
 
+## Arg4
+if(!("species" %in% argsDF$V1)) {
+  cat(help_command, "\n")
+  stop("Choose which species' annotation to retrieve: human, fly, worm, or mouse")
+}
+
 gff3_file = argsL$gff3
 anot_file = argsL$anot
 out_prefix = argsL$out
+species = argsL$species
+
+if (!(species %in% c('human', 'fly', 'worm', 'mouse'))){
+  cat(help_command, "\n")
+  cat('selected species \"',species, '\" is not supported','\n')
+  stop("Choose which species' annotation to retrieve. Supported species are: human, fly, worm, or mouse")
+}
 
 ########################################################################################################################################
 suppressWarnings(suppressMessages(library('rtracklayer')))
@@ -77,9 +91,12 @@ ann.gene_ids = unique(ann$gene_id)
 ########################################################################################################################################
 #4. Look for enriched GO terms for the genes found in the anot.bed compared to the background genes (found in gtf)
 #source("http://www.bioconductor.org/biocLite.R")
-#biocLite(c("biomaRt", "topGO", "org.Hs.eg.db"))
+#biocLite(c("biomaRt", "topGO", "org.Hs.eg.db", "org.Ce.eg.db", "org.Mm.eg.db", "org.Dm.eg.db"))
 suppressWarnings(suppressMessages(library('biomaRt')))
 suppressWarnings(suppressMessages(library('org.Hs.eg.db'))) #mouse: org.Mm.eg.db
+suppressWarnings(suppressMessages(library('org.Ce.eg.db'))) 
+suppressWarnings(suppressMessages(library('org.Mm.eg.db'))) 
+suppressWarnings(suppressMessages(library('org.Dm.eg.db'))) 
 suppressWarnings(suppressMessages(library('topGO')))    
 
 gene_universe = data.table(cbind(all_gene_ids))
@@ -94,8 +111,18 @@ names(all_genes) = gsub("\\..*$", "", gene_universe$gene_id) #ensembl gene ids d
 selection_function = function (x){ return(x == 1) }
 
 calculate_go_enrichment = function (ontology){
+
+if (species == 'human'){
+  species_orgdb = 'org.Hs.eg.db'
+}else if (species == 'mouse'){
+  species_orgdb = 'org.Mm.eg.db'
+}else if (species == 'fly'){
+  species_orgdb = 'org.Dm.eg.db'
+}else if (species == 'worm'){
+  species_orgdb = 'org.Ce.eg.db'
+}
   
-GOdata <- new("topGOdata", ontology = ontology, allGenes = all_genes, geneSel = selection_function, description = "Test", annot = annFUN.org, mapping="org.Hs.eg.db", ID="Ensembl")
+GOdata <- new("topGOdata", ontology = ontology, allGenes = all_genes, geneSel = selection_function, description = "Test", annot = annFUN.org, mapping=species_orgdb, ID="Ensembl")
 
 resultFisher <- runTest(GOdata, algorithm = "classic", statistic = "fisher")
 mt = GenTable(GOdata, classicFisher = resultFisher, topNodes = length(usedGO(GOdata)))
