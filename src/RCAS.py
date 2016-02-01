@@ -86,16 +86,25 @@ def generate_config(args):
     with open('config.json', 'w') as f:
          json.dump(config, f, sort_keys=True, indent=4)
 
-def call_snakemake():
-    pass
+    print "wrote config.json.\n"
+
+def call_snakemake(RCAS_path):
+    print "start snakemake:\n"
+
+    subprocess.call("snakemake -p -s %s/src/RCAS.snakefile" % RCAS_path, shell=True)
 
 if __name__ == '__main__':
     import argparse
     import json
     import os
+    import subprocess
 
     #process commandline Arguments
     parser = get_argument_parser()
     args = parser.parse_args()
 
+    #dump argument to config.json
     generate_config(args)
+
+    #run snakemake
+    call_snakemake(args.RCAS_path)
