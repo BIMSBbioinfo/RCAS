@@ -3,7 +3,12 @@
 def get_argument_parser():
     parser = argparse.ArgumentParser(
         description="RCAS provides intuitive reports and publication ready graphics"
-        " from input peak intervals in BED foramt, generated from clip-seq.")
+        " from input peak intervals in BED foramt, generated from clip-seq."
+        )
+
+    parser.add_argument('--version',
+                        action='version',
+                        version='%(prog)s 0.1')
 
     parser.add_argument("BED",
                         metavar="BED",
