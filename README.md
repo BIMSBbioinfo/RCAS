@@ -1,8 +1,18 @@
-
 #RCAS project
-Make a standalone RNA Centric Annotation System that provides intuitive reports and publication ready graphics.
+Make a standalone RNA Centric Annotation System that
+provides intuitive reports and publication ready graphics.
 
-##Tutorial
+RCAS takes input peak intervals in BED foramt from clip-seq data
+and automatically generates distributions of annotation features,
+detected motifs, GO-term enrichment, pathway enrichment
+and genomic coverage.
+
+The workflow is modularized so user can switch on/off
+optional steps including motif detection, GO-term enrichment,
+pathway enrichment and genomic coverage.
+By default these optional steps are switched off
+and RCAS only generates distributions of annotation features
+including biotypes and genomic features.
 
 ###RCAS dependencies:
 
@@ -53,7 +63,9 @@ http://software.broadinstitute.org/gsea/msigdb/download_file.jsp?filePath=/resou
 
     RCAS.snakefile
 
--In-house scripts in src:
+-RCAS scripts in src:
+
+    RCAS.py
 
     parse_anot.py
 
@@ -78,11 +90,11 @@ http://software.broadinstitute.org/gsea/msigdb/download_file.jsp?filePath=/resou
     Drosophila_melanogaster-U2T.meme
 
     c2.cp.v5.0.entrez.gmt
-    
+
     c2.cp.v5.0.entrez.dm3.gmt
-    
+
     c2.cp.v5.0.entrez.mm9.gmt
-    
+
     c2.cp.v5.0.entrez.ce10.gmt
 
     custom.css
@@ -92,15 +104,18 @@ http://software.broadinstitute.org/gsea/msigdb/download_file.jsp?filePath=/resou
     img folder
 
 ###Test case
-####Aim: **generate analysis report** for coordinates in the target bed files
+####Aim: generate analysis report for intervals in the target BED files
 
-1. clone the source: **git clone https://github.com/BIMSBbioinfo/RCAS**
+*Besides the default annotation step, pathway enrichment is also enabled vi '--run_PATHrich True'*
 
-2. cd path_to/RCAS/test
+1. clone the source: **git clone -b modular https://github.com/BIMSBbioinfo/RCAS**
 
-3. tartget files in path_to/RCAS/test: **PARCLIP_AGO1234_Hafner2010a_hg19_xaa.bed  PARCLIP_AGO1234_Hafner2010a_hg19_xab.bed  PARCLIP_AGO1234_Hafner2010a_hg19_xac.bed** 
+2. cd /path/to/RCAS/test
 
-4. sample command: **snakemake -s ../src/RCAS.snakefile -p --config gff3=path_to/gencode.v19.annotation.gff3 genome=path_to/hg19.fa RCAS_path=../ infile=PARCLIP_AGO1234_Hafner2010a_hg19_xaa.bed**
+3. tartget files in /path/to/RCAS/test: **xaa.bed  xab.bed**
 
-5. output: **PARCLIP_AGO1234_Hafner2010a_hg19_xaa.rcas.html**
+4. check help message: **python2 ../src/RCAS.py -h**
 
+4. sample command: **python2 ../src/RCAS.py --genome /path/to/hg19.fa --gff3 /path/to/gencode.v23.annotation.gff3 --RCAS_path ../ ../test/xaa.bed ../test/xab.bed --run_PATHrich True**
+
+5. output: **xaa.rcas.html xab.rcas.html**
