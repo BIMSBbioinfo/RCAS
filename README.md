@@ -38,6 +38,12 @@ http://meme-suite.org/meme-software/4.10.2/meme_4.10.2.tar.gz
 
 -**org.Hs.eg.db**
 
+-**org.Ce.eg.db**
+
+-**org.Mm.eg.db**
+
+-**org.Dm.eg.db**
+
 -**topGO**
 
 -**DT**
