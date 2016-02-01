@@ -112,7 +112,7 @@ http://software.broadinstitute.org/gsea/msigdb/download_file.jsp?filePath=/resou
 ###Test case
 ####Aim: generate analysis report for intervals in the target BED files
 
-*Besides the default annotation step, pathway enrichment is also enabled vi '--run_PATHrich True'*
+*Besides the default annotation step, pathway enrichment is also enabled vi '--run_PATHrich'*
 
 1. clone the source: **git clone -b modular https://github.com/BIMSBbioinfo/RCAS**
 
@@ -122,6 +122,6 @@ http://software.broadinstitute.org/gsea/msigdb/download_file.jsp?filePath=/resou
 
 4. check help message: **python2 ../src/RCAS.py -h**
 
-4. sample command: **python2 ../src/RCAS.py --genome /path/to/hg19.fa --gff3 /path/to/gencode.v19.annotation.gff3 --RCAS_path ../ ../test/xaa.bed ../test/xab.bed --run_PATHrich True**
+4. sample command: **python2 ../src/RCAS.py --genome /path/to/hg19.fa --gff3 /path/to/gencode.v19.annotation.gff3 --RCAS_path ../ ../test/xaa.bed ../test/xab.bed --run_PATHrich**
 
 5. output: **xaa.rcas.html xab.rcas.html**
