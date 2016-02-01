@@ -3,13 +3,16 @@
 
 suppressWarnings(suppressMessages(library('org.Hs.eg.db'))) #mouse: org.Mm.eg.db
 suppressWarnings(suppressMessages(library(data.table)))
+suppressWarnings(suppressMessages(library('org.Ce.eg.db'))) 
+suppressWarnings(suppressMessages(library('org.Mm.eg.db'))) 
+suppressWarnings(suppressMessages(library('org.Dm.eg.db'))) 
 suppressWarnings(suppressMessages(library('rtracklayer')))
-
+  
 #1. Collect arguments
 args <- commandArgs(TRUE)
 
 ## Default setting when no arguments passed
-if(length(args) < 3) {
+if(length(args) < 4) {
   args <- c("--help")
 }
 
@@ -21,10 +24,11 @@ Arguments:
 --gff3=<path to GENCODE Annotation File>  - e.g /data/akalin/Base/Annotation/GenomeAnnotation/hg19/gencode/gencode.v19.annotation.gff3
 --anot=<path to parse_anot.py output>  - e.g /home/buyar/projects/RCAS/test/PARCLIP_AGO1234_Hafner2010a_hg19_xaa.anot.tsv
 --out=<output prefix>   -e.g Hafner2010.hg19
+--species=<species name>    -Choose between (human, fly, worm, mouse)
 --help              - print this text
 
 Example:
-Rscript rcas.msigdb.R --gmt=c2.cp.v5.0.entrez.gmt --gff3=gencode.v19.annotation.gff3 --anot=PARCLIP_AGO1234_Hafner2010a_hg19_xaa.anot.tsv --out=myproject.hg19"
+Rscript rcas.msigdb.R --gmt=c2.cp.v5.0.entrez.gmt --gff3=gencode.v19.annotation.gff3 --anot=PARCLIP_AGO1234_Hafner2010a_hg19_xaa.anot.tsv --out=myproject.hg19 --species=human"
 
 ## Help section
 if("--help" %in% args) {
@@ -58,10 +62,23 @@ if(!("out" %in% argsDF$V1)) {
   stop("provide the output prefix to anot.bed file")
 }
 
+## Arg4
+if(!("species" %in% argsDF$V1)) {
+  cat(help_command, "\n")
+  stop("Choose which species' annotation to retrieve: human, fly, worm, or mouse")
+}
+
 msigdb = argsL$gmt
 gff3_file = argsL$gff3
 anot_file = argsL$anot
 out_file = argsL$out
+species = argsL$species
+
+if (!(species %in% c('human', 'fly', 'worm', 'mouse'))){
+  cat(help_command, "\n")
+  cat('selected species \"',species, '\" is not supported','\n')
+  stop("Choose which species' annotation to retrieve. Supported species are: human, fly, worm, or mouse")
+}
 
 ########################################################################################################################################
 #2. Get the list of all protein-coding genes from the GTF file 
@@ -150,7 +167,16 @@ gene_lists = parse_msigdb(msigdb)
 cat("got the gene lists from",msigdb,"\n")
 
 #map ENSEMBL gene ids to ENtrez Gene Ids
-ens2eg <- as.list(org.Hs.egENSEMBL2EG) #mapping dictionary
+if (species == 'human'){
+  mapping_dict = org.Hs.egENSEMBL2EG
+}else if (species == 'mouse'){
+  mapping_dict = org.Mm.egENSEMBL2EG
+}else if (species == 'fly'){
+  mapping_dict = org.Dm.egENSEMBL2EG
+}else if (species == 'worm'){
+  mapping_dict = org.Ce.egENSEMBL2EG
+}
+ens2eg <- as.list(mapping_dict) #mapping dictionary from ENSEMBL to ENTREZ 
 treatment = get_unique_items_from_list(ens2eg[gsub("\\..*$", "", ann.gene_ids)])
 background = get_unique_items_from_list(ens2eg[gsub("\\..*$", "", all_gene_ids)])
 
@@ -164,7 +190,8 @@ results = count_associations(treatment = treatment, background = background, gen
 results = results[order(pval)]
 
 #Write pathways with FDR < 0.001 to file
-write.table(results[bonferroni < 0.001], file = out_file, quote = FALSE, row.names = FALSE, sep="\t")
+#write.table(results[bonferroni < 0.001], file = out_file, quote = FALSE, row.names = FALSE, sep="\t")
+write.table(results, file = out_file, quote = FALSE, row.names = FALSE, sep="\t")
 
 
 
