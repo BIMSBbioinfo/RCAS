@@ -3,7 +3,8 @@
 def get_argument_parser():
     parser = argparse.ArgumentParser(
         description="RCAS provides intuitive reports and publication ready graphics"
-        " from input peak intervals in BED foramt, generated from clip-seq."
+        " from input peak intervals in BED foramt,"
+        " which are detected in clip-seq data."
         )
 
     parser.add_argument('--version',
@@ -35,25 +36,25 @@ def get_argument_parser():
                         default="False",
                         choices=["True", "False"],
                         help="True: run motif search."
-                        " False (default): not run motif search.")
+                        " False (default): not run.")
 
     parser.add_argument("--run_PATHrich", "-p",
                         default="False",
                         choices=["True", "False"],
                         help="True: run pathway enrichment."
-                        " False (default): not run pathway enrichment.")
+                        " False (default): not run.")
 
     parser.add_argument("--run_GOrich", "-t",
                         default="False",
                         choices=["True", "False"],
                         help="True: run GO-term enrichment."
-                        " False (default): not run GO-term enrichment.")
+                        " False (default): not run.")
 
     parser.add_argument("--run_coverage", "-c",
                         default="False",
                         choices=["True", "False"],
                         help="True: run coverage profile."
-                        " False (default): not run coverage_profile profile.")
+                        " False (default): not run.")
 
     return parser
 
