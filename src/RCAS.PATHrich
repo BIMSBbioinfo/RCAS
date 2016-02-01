@@ -6,4 +6,4 @@ rule report_msigd:
 		  "{sample}.msigdb.results.tsv"
 	 shell:
 		  "Rscript {RCAS_path}/src/rcas.msigdb.R --gmt={RCAS_path}/src/base/c2.cp.v5.0.entrez.gmt"
-		  " --gff3={input[0]} --anot={input[1]} --out={output}"
+		  " --gff3={input[0]} --anot={input[1]} --species=%s --out={output}" % species

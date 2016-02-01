@@ -8,4 +8,5 @@ rule report_GO:
 		  "{sample}-GO-term/MF.GO.results.tsv",
 		  "{sample}-GO-term/CC.GO.results.tsv"
 	 shell:
-		  "Rscript {RCAS_path}/src/rcas.GO.R --gff3={input[0]} --anot={input[1]} --out={output[0]}"
+		  "Rscript {RCAS_path}/src/rcas.GO.R --gff3={input[0]}"
+			" --anot={input[1]} --species=%s --out={output[0]}" % species
