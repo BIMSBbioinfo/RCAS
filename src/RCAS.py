@@ -181,7 +181,6 @@ if __name__ == '__main__':
     import signal
     import time
     import shlex
-    import sys
 
     #process commandline Arguments
     parser = get_argument_parser()
