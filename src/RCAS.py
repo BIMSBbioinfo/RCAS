@@ -40,6 +40,17 @@ def get_argument_parser():
                         help="Required for running GO-term or pathway enrichment."
                         " Default: human")
 
+    parser.add_argument("--cores", "-j",
+                        metavar="N",
+                        default="1",
+                        help="Use at most N cores in parallel (default: 1).")
+
+    parser.add_argument("--forcerun", "-F",
+                        action='store_true',
+                        help="Force the re-execution of snakemake."
+                              " Use this option if you want to have all"
+                              " output in your workflow updated.")
+
     parser.add_argument("--run_motif", "-m",
                         action='store_true',
                         help="Run motif search.")
@@ -59,12 +70,6 @@ def get_argument_parser():
     parser.add_argument("--run_all", "-a",
                         action='store_true',
                         help="Run all steps.")
-
-    parser.add_argument("--forcerun", "-F",
-                        action='store_true',
-                        help=("Force the re-execution of snakemake."
-                              " Use this option if you want to have all "
-                              "output in your workflow updated."))
 
     return parser
 
@@ -132,7 +137,7 @@ def generate_config(args):
 
     print "\nwrote config.json.\n"
 
-def call_snakemake(RCAS_path, forcerun):
+def call_snakemake(RCAS_path, forcerun, cores):
     print "start snakemake:\n"
 
     if forcerun:
@@ -140,7 +145,7 @@ def call_snakemake(RCAS_path, forcerun):
     else:
         forcerun = ""
 
-    command_line = "snakemake -%sp -s %s/src/RCAS.snakefile" % (forcerun, RCAS_path)
+    command_line = "snakemake -%sp -j %s -s %s/src/RCAS.snakefile" % (forcerun, cores, RCAS_path)
     cmd = shlex.split(command_line)
 
     p = Popen(cmd)
@@ -186,4 +191,4 @@ if __name__ == '__main__':
     generate_config(args)
 
     #run snakemake
-    call_snakemake(args.RCAS_path, args.forcerun)
+    call_snakemake(args.RCAS_path, args.forcerun, args.cores)
