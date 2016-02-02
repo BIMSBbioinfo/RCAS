@@ -132,21 +132,51 @@ def generate_config(args):
 
     print "\nwrote config.json.\n"
 
-def call_snakemake(RCAS_path):
+def call_snakemake(RCAS_path, forcerun):
     print "start snakemake:\n"
 
-    if args.forcerun:
+    if forcerun:
         forcerun = "F"
     else:
         forcerun = ""
 
-    subprocess.call("snakemake -%sp -s %s/src/RCAS.snakefile" % (forcerun, RCAS_path), shell=True)
+    command_line = "snakemake -%sp -s %s/src/RCAS.snakefile" % (forcerun, RCAS_path)
+    cmd = shlex.split(command_line)
+
+    p = Popen(cmd)
+
+    try:
+        p.communicate()
+    except KeyboardInterrupt:
+        try:
+            p.send_signal(signal.SIGINT)
+            time.sleep(0.1)
+            if p.poll() is not None:
+                print "Process is interrupted."
+                return
+            p.terminate()
+            time.sleep(0.1)
+            if p.poll() is not None:
+                print "Process is terminated."
+                return
+            p.kill()
+            print "Process is killed."
+        except OSError:
+            pass
+        except Exception as e:
+            print "Error while terminating subprocess (pid=%i): %s" \
+                % (p.pid, e)
+        return
 
 if __name__ == '__main__':
     import argparse
     import json
     import os
-    import subprocess
+    from subprocess import Popen
+    import signal
+    import time
+    import shlex
+    import sys
 
     #process commandline Arguments
     parser = get_argument_parser()
@@ -156,4 +186,4 @@ if __name__ == '__main__':
     generate_config(args)
 
     #run snakemake
-    call_snakemake(args.RCAS_path)
+    call_snakemake(args.RCAS_path, args.forcerun)
