@@ -43,6 +43,15 @@ TRACK_gff = config["gff3"]
 genome_reference = config["genome"]
 species = config["species"]
 
+if species == "human":
+	gmt = "c2.cp.v5.0.entrez.gmt"
+elif species == "fly":
+	gmt = "c2.cp.v5.0.entrez.dm3.gmt"
+elif species == "worm":
+	gmt = "c2.cp.v5.0.entrez.ce10.gmt"
+elif species == "mouse":
+	gmt = "c2.cp.v5.0.entrez.mm9.gmt"
+
 infile = config["infile"]
 
 run_motif = eval(config["switch"]["run_motif"])
