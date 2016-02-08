@@ -24,12 +24,7 @@ classifiers = [
     "Intended Audience :: Science/Research",
     "Topic :: Scientific/Engineering :: Bio-Informatics"]
 
-import sys
-
-try:
-    from setuptools import setup
-except ImportError:
-    print("Could not load setuptools. Please install the setuptools package.", file=sys.stderr)
+from setuptools import setup
 
 setup(name='RCAS',
       version=__version__,
