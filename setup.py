@@ -4,7 +4,7 @@ __copyright__ = "Copyright (c) 2016--, %s" % __author__
 __credits__ = ["Dilmurat Yusuf", "Bora Uyar",
              "Ricardo Wurmus", "Altuna Akalin"]
 __license__ = "MIT"
-__version__ = "0.1"
+__version__ = "0.1.0"
 __maintainer__ = "Dilmurat Yusuf"
 __email__ = "dilmurat.yusuf@gmail.com"
 
@@ -19,7 +19,7 @@ classifiers = [
     "Development Status :: 4 - Beta",
     "Environment :: Console",
     "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 2.7",
     "Operating System :: Unix",
     "Intended Audience :: Science/Research",
     "Topic :: Scientific/Engineering :: Bio-Informatics"]
@@ -42,29 +42,40 @@ setup(name='RCAS',
       maintainer_email=__email__,
       url='https://github.com/BIMSBbioinfo/RCAS.git',
       packages=['RCAS'],
+      license=__license__,
+      keywords=['Bioinformatics', 'Clip-Seq', 'Peaks', 'Annotation'],
+      platforms=['Linux'],
+      entry_points={"console_scripts": ["RCAS = RCAS.RCAS:main"]}
       package_data={'RCAS':
                     ['data/*gmt',
                      'data/*meme',
                      'data/*css',
                      'data/*html',
                      'data/img/*',
-                     'data/snakefiles/*'],
+                     'data/snakefiles/*',
+                     'libexec/*R',
+                     'libexec/*py',
+                     'libexec/rcas.Rmd',
+                     'libexec/generate_report.sh'],
                     },
-      license=__license__,
-      keywords=['bioinformatics', 'microbiome', 'microbiology', 'RCAS'],
-      platforms=['Linux'],
-      install_requires=['numpy >= 1.9.0',
-                        'scipy >= 0.14.0',
-                        'cogent == 1.5.3',
-                        'natsort < 4.0.0',
-                        'matplotlib >= 1.1.0, != 1.4.2',
-                        'pynast == 1.2.2', 'qcli >= 0.1.1, < 0.2.0', 'gdata',
-                        'biom-format >= 2.1.4, < 2.2.0',
-                        'emperor >= 0.9.51, < 1.0.0',
-                        'scikit-bio >= 0.2.3, < 0.3.0',
-                        'burrito-fillings >= 0.1.1, < 0.2.0',
-                        'pandas >= 0.13.1', 'burrito >= 0.9.1, < 1.0.0',
-                        'RCAS-default-reference >= 0.1.2, < 0.2.0'],
-      extras_require={'all': ['ipython[notebook] >= 3.1.0, < 4.0.0',
-                              'sphinx >= 0.3']}
+      install_requires=[
+                      'snakemake',
+                      'bedtools < 2.5.0',
+                      'MEME-chip',
+                      'pandoc >= 1.12.3',
+                      'rmarkdown',
+                      'rtracklayer',
+                      'data.table',
+                      'biomaRt',
+                      'org.Hs.eg.db',
+                      'org.Ce.eg.db',
+                      'org.Mm.eg.db',
+                      'org.Dm.eg.db',
+                      'topGO',
+                      'DT',
+                      'plotly',
+                      'dplyr',
+                      'genomation',
+                      'GenomicFeatures'
+                      ]
       )
