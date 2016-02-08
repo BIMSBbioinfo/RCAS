@@ -173,7 +173,7 @@ def call_snakemake(RCAS_path, forcerun, cores):
                 % (p.pid, e)
         return
 
-if __name__ == '__main__':
+def main():
     import argparse
     import json
     import os
