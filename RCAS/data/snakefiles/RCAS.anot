@@ -14,4 +14,4 @@ rule anot_cor:
 	 output:
 		  "{sample}.anot.tsv"
 	 shell:
-		  "python2 {RCAS_path}/src/parse_anot.py < {input}  > {output}"
+		  "python2 {RCAS_path}/libexec/parse_anot.py < {input}  > {output}"
