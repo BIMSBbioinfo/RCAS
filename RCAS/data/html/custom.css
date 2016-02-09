@@ -97,7 +97,7 @@ hr {
 }
 
 .jumbotron {
-    background-image: url("img/jumbotron_image.jpg");
+    background-image: url("jumbotron_image.jpg");
     background-size: cover;
     background-repeat: no-repeat;
     color: white;
@@ -164,11 +164,3 @@ hr {
 #TOC li a:focus {
     text-decoration: none;
 }
-
-
-
-
-
-
-
-
