@@ -113,4 +113,5 @@ rule html_report:
 			" --go_cc={input.go_cc}"
 			" --msigdb={input.msigdb}"
 			" --meme_out={input.meme_out} --motif_annot={input.motif_annot}"
-			" --coverage_profile_option=%s" % coverage_profile
+			" --coverage_profile_option=%s"
+			" --RCAS_path=%s"% (coverage_profile, RCAS_path)
