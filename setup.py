@@ -45,13 +45,10 @@ setup(name='RCAS',
       package_data={'RCAS':
                     ['data/gmt/*gmt',
                      'data/meme/*meme',
-                     'data/custom.css',
-                     'data/header.html',
-                     'data/img/*',
+                     'data/html/*',
                      'data/snakefiles/*',
                      'libexec/*R',
                      'libexec/*py',
-                     'libexec/rcas.Rmd',
                      'libexec/generate_report.sh']
                     },
       )
