@@ -1,12 +1,4 @@
 #!/bin/bash
-#echo "The script you are running has basename `basename $0`, dirname `dirname $0`"
-#echo "The present working directory is `pwd`"
-
-SCRIPT_DIR=`dirname $0`
-report_script="${SCRIPT_DIR}/rcas.Rmd"
-css="${SCRIPT_DIR}/base/custom.css"
-outdir=`pwd`
-header="${SCRIPT_DIR}/base/header.html"
 
 function usage()
 {
@@ -23,9 +15,10 @@ function usage()
 	echo "	-c --go_cc=<go_cc.tsv>				file containing GO term analysis results for Cellular Compartments"
 	echo "	-s --msigdb=<msigdb_file.tsv>			file containing MSIGDB gene set enrichment analysis results as output from rcas.msigdb.R"
 	echo "	-e --meme_out=</path/to/meme_out_dir>		path to the folder that contains the output of meme results (e.g. /path/to/meme_out/)"
-	echo "	-t --motif_annot=<motif_anot_file.tsv>		file containing the output of top_motifs.py scripts, which contains the annotations related to the detected motifs in the experiment" 
+	echo "	-t --motif_annot=<motif_anot_file.tsv>		file containing the output of top_motifs.py scripts, which contains the annotations related to the detected motifs in the experiment"
 	echo "	-i --coverage_profile_option=<option>		option to run or not run coverage profile calculations: choose 'NOT_RUN' in order to turn it off. choose 'RUN' to keep it on."
-	echo ""
+  echo "	-r --RCAS_path=<option>		path to source of RCAS"
+  echo ""
 }
 
 if [ "$1" == "" ]; then
@@ -67,12 +60,15 @@ while [ "$1" != "" ]; do
 			;;
 		-e | --meme_out)
 			meme_outdir=$VALUE
-			;;	
+			;;
 		-t | --motif_annot)
 			motif_annot_file=$VALUE
 			;;
 		-i | --coverage_profile_option)
 			coverage_profile_option=$VALUE
+			;;
+    -r | --RCAS_path)
+			RCAS_path=$VALUE
 			;;
         	*)
             		echo "ERROR: unknown parameter \"$PARAM\""
@@ -87,7 +83,7 @@ done
 if [ -z "${output_filename}" ]; then
 	echo "Error: missing argument, provide output filename"
 	usage
-	exit 1 
+	exit 1
 fi
 
 if [ -z "${annotation_file}" ]; then
@@ -132,7 +128,7 @@ if [ -z "${msigdb_results}" ]; then
 	exit 1
 fi
 
-if [ -z "${meme_outdir}" ]; then 
+if [ -z "${meme_outdir}" ]; then
 	echo "Error: missing MEME output directory"
 	usage
 	exit 1
@@ -141,12 +137,24 @@ fi
 if [ -z "${motif_annot_file}" ]; then
 	echo "Error: missing motif annotation results"
 	usage
-	exit 1 
+	exit 1
 fi
 if [ -z "${coverage_profile_option}" ]; then
 	echo "Error: missing option for coverage profile calculations"
 	usage
 	exit 1
 fi
+if [ -z "${RCAS_path}" ]; then
+	echo "Error: missing option for path to source of RCAS"
+	usage
+	exit 1
+fi
+
+report_script="${RCAS_path}/data/html/rcas.Rmd"
+css="${RCAS_path}/data/html/custom.css"
+header="${RCAS_path}/data/html/header.html"
+
+#echo "The present working directory is `pwd`"
+outdir=`pwd`
 
 Rscript -e "library('rmarkdown'); rmarkdown::render('${report_script}', output_file = '${output_filename}', output_dir='${outdir}', html_document(toc=TRUE, theme='cerulean', number_sections=TRUE, css='${css}', includes=includes(before_body='${header}')))" ${outdir} ${annotation_file} ${peaks_file} ${gff3_file} ${go_bp_results} ${go_mf_results} ${go_cc_results} ${msigdb_results} ${meme_outdir} ${motif_annot_file} ${coverage_profile_option}
