@@ -5,6 +5,7 @@ from subprocess import Popen
 import signal
 import time
 import shlex
+import pkg_resources
 
 def get_argument_parser():
     parser = argparse.ArgumentParser(
@@ -21,11 +22,6 @@ def get_argument_parser():
                         metavar="BED",
                         nargs="*",
                         help="Target intervals in BED format.")
-
-    parser.add_argument("--RCAS_path", "-r",
-                        metavar="path/to/RCAS",
-                        required=True,
-                        help="Path to RCAS.")
 
     parser.add_argument("--genome", "-g",
                         metavar="FILE",
@@ -85,7 +81,7 @@ def extract_key(filename):
     key = ".".join(key)
     return key
 
-def generate_config(args):
+def generate_config(RCAS_path, args):
     BED_files = args.BED
     infiles = {}
 
@@ -119,7 +115,7 @@ def generate_config(args):
         run_coverage = "True"
 
     config = {
-      "RCAS_path": os.path.abspath(args.RCAS_path),
+      "RCAS_path": RCAS_path,
 
       "gff3": args.gff3,
 
@@ -151,7 +147,7 @@ def call_snakemake(RCAS_path, forcerun, cores):
     else:
         forcerun = ""
 
-    command_line = "snakemake -%sp -j %s -s %s/src/RCAS.snakefile" % (forcerun, cores, RCAS_path)
+    command_line = "snakemake -%sp -j %s -s %s/data/snakefiles/RCAS.snakefile" % (forcerun, cores, RCAS_path)
     cmd = shlex.split(command_line)
 
     p = Popen(cmd)
@@ -184,8 +180,10 @@ def main():
     parser = get_argument_parser()
     args = parser.parse_args()
 
+    RCAS_path = pkg_resources.resource_filename(__name__, '')
+
     #dump argument to config.json
-    generate_config(args)
+    generate_config(RCAS_path, args)
 
     #run snakemake
-    call_snakemake(args.RCAS_path, args.forcerun, args.cores)
+    call_snakemake(RCAS_path, args.forcerun, args.cores)
