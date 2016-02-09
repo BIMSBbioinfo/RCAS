@@ -1,4 +1,10 @@
-#!/usr/bin/python2
+import argparse
+import json
+import os
+from subprocess import Popen
+import signal
+import time
+import shlex
 
 def get_argument_parser():
     parser = argparse.ArgumentParser(
@@ -174,14 +180,6 @@ def call_snakemake(RCAS_path, forcerun, cores):
         return
 
 def main():
-    import argparse
-    import json
-    import os
-    from subprocess import Popen
-    import signal
-    import time
-    import shlex
-
     #process commandline Arguments
     parser = get_argument_parser()
     args = parser.parse_args()
