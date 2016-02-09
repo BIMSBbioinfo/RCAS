@@ -180,6 +180,7 @@ def main():
     parser = get_argument_parser()
     args = parser.parse_args()
 
+    #locate source dir at run time
     RCAS_path = pkg_resources.resource_filename(__name__, '')
 
     #dump argument to config.json
