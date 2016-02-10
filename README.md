@@ -70,52 +70,33 @@ following list for pointers:
 ### Tools
 
 - [snakemake](https://bitbucket.org/johanneskoester/snakemake/wiki/Documentation)
-
 - [R](https://www.r-project.org/)
-
 - fastaFromBed from [bedtools](http://bedtools.readthedocs.org/en/latest/content/installation.html)
-
 - [MEME-chip](http://meme-suite.org/meme-software/4.10.2/meme_4.10.2.tar.gz)
-
 - pandoc (>= 1.12.3)
 
 ### R packages
 
 - rmarkdown
-
 - rtracklayer
-
 - data.table
-
 - biomaRt
-
 - org.Hs.eg.db
-
 - org.Ce.eg.db
-
 - org.Mm.eg.db
-
 - org.Dm.eg.db
-
 - topGO
-
 - DT
-
 - plotly
-
 - dplyr
-
 - genomation
-
 - GenomicFeatures
 
 ### Data files
 
 - gff track e.g.  `wget -qO- ftp://ftp.sanger.ac.uk/pub/gencode/Gencode_human/release_19/gencode.v19.annotation.gff3.gz | gunzip > gencode.v19.annotation.gff3`
-
 - genome reference e.g. this
   [hg19 reference](http://hgdownload.cse.ucsc.edu/goldenPath/hg19/bigZips/chromFa.tar.gz)
-
 - [c2.cp.v5.0.entrez.gmt](http://software.broadinstitute.org/gsea/msigdb/download_file.jsp?filePath=/resources/msigdb/5.0/c2.cp.v5.0.entrez.gmt)
 
 ## RCAS workflow is built with snakemake:
