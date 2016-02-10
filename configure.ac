@@ -9,18 +9,26 @@ AM_SILENT_RULES([yes])
 # interpreter for at least version 2.2 and less than version 3.  This
 # sets the "PYTHON" variable.
 # https://www.gnu.org/software/automake/manual/html_node/Python.html
+
+# First check for the existence of a "python2" executable, because
+# systems where Python 3 is the default would otherwise get
+# PYTHON=/path/to/python3.
+AC_PATH_PROG([PYTHON], [python2])
 AM_PATH_PYTHON([2.2])
-AC_MSG_CHECKING([whether Python version is satisfied])
-case "$PYTHON_VERSION" in
-2*)
-  AC_MSG_RESULT([yes])
-  ;;
-*)
-  AC_MSG_RESULT([no])
-  AC_MSG_ERROR([RCAS needs Python version >=2.2 and <3 but $PYTHON_VERSION was found.
-  Run ./configure PYTHON=/path/to/python2 to override the default Python.])
-  ;;
-esac
+if test "x$PYTHON" == x
+then
+  AC_MSG_CHECKING([whether Python version is satisfied])
+  case "$PYTHON_VERSION" in
+  2*)
+    AC_MSG_RESULT([yes])
+    ;;
+  *)
+    AC_MSG_RESULT([no])
+    AC_MSG_ERROR([RCAS needs Python version >=2.2 and <3 but $PYTHON_VERSION was found.
+    Run ./configure PYTHON=/path/to/python2 to override the default Python.])
+    ;;
+  esac
+fi
 
 # Check for any variant of "awk" and store path in "AWK" variable
 AC_PROG_AWK
