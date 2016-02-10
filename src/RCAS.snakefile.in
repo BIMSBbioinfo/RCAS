@@ -35,10 +35,10 @@ def report_arguments(infile, TRACK_gff, run_motif, run_PATHrich, run_GOrich, run
 
 basedir = config["basedir"]
 libexecdir = config["libexecdir"]
-anot     = libexecdir + "/RCAS.anot"
-motif    = libexecdir + "/RCAS.motif"
-GOrich   = libexecdir + "/RCAS.GOrich"
-PATHrich = libexecdir + "/RCAS.PATHrich"
+anot     = libexecdir + "/RCAS.anot.snakefile"
+motif    = libexecdir + "/RCAS.motif.snakefile"
+GOrich   = libexecdir + "/RCAS.GOrich.snakefile"
+PATHrich = libexecdir + "/RCAS.PATHrich.snakefile"
 
 TRACK_gff = config["gff3"]
 genome_reference = config["genome"]

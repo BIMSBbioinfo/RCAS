@@ -10,10 +10,10 @@ bin_SCRIPTS =					\
 
 dist_libexec_SCRIPTS =				\
   src/RCAS.snakefile				\
-  src/RCAS.GOrich				\
-  src/RCAS.PATHrich				\
-  src/RCAS.anot					\
-  src/RCAS.motif				\
+  src/RCAS.GOrich.snakefile			\
+  src/RCAS.PATHrich.snakefile			\
+  src/RCAS.anot.snakefile			\
+  src/RCAS.motif.snakefile			\
   src/rcas.Rmd					\
   src/rcas.msigdb.R				\
   src/rcas.GO.R					\

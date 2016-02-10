@@ -58,12 +58,12 @@ else
 fi
 
 # Substitute placeholders to generate these target files
-AC_CONFIG_FILES([Makefile           \
-                 src/RCAS.snakefile \
-                 src/RCAS.anot      \
-                 src/RCAS.GOrich    \
-                 src/RCAS.motif     \
-                 src/RCAS.PATHrich  \
+AC_CONFIG_FILES([Makefile                     \
+                 src/RCAS.snakefile           \
+                 src/RCAS.anot.snakefile      \
+                 src/RCAS.GOrich.snakefile    \
+                 src/RCAS.motif.snakefile     \
+                 src/RCAS.PATHrich.snakefile  \
                  src/generate_report.sh])
 
 basedir="$datadir/RCAS/base"
