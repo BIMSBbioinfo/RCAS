@@ -151,7 +151,8 @@ omit `.in` for clarity.
 
 Aim: generate analysis report for intervals in the target BED files.
 
-*Besides the default annotation step, pathway enrichment is also enabled vi '--run_PATHrich'*
+Besides the default annotation step, pathway enrichment is enabled via
+the `--run_PATHrich` flag.
 
 1. Install as per the instructions above, e.g.
     ~~~
