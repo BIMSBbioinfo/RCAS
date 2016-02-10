@@ -101,49 +101,43 @@ following list for pointers:
 
 ## RCAS workflow is built with snakemake:
 
--rules of snakemake in src:
+Note that files containing placeholders that are substituted at
+configuration time end on `.in`.  Successful configuration generates
+the target files without the `.in` extension.  In the lists below we
+omit `.in` for clarity.
 
-    RCAS.snakefile
+- The pipeline wrapper and entry point:
+  - `src/RCAS.py`
 
--RCAS scripts in src:
+- All snakemake rules end on `.snakefile`.
+  - `src/RCAS.snakefile`
+  - `src/RCAS.anot.snakefile`
+  - `src/RCAS.motif.snakefile`
+  - `src/RCAS.GOrich.snakefile`
+  - `src/RCAS.PATHrich.snakefile`
 
-    RCAS.py
+- Custom scripts that are called at runtime:
+  - `src/parse_anot.py`
+  - `src/top_motifs.py`
+  - `src/rcas.GO.R`
+  - `src/rcas.msigdb.R`
+  - `src/rcas.Rmd`
+  - `src/generate_report.sh`
 
-    parse_anot.py
+- Plain data files are located in `src/base`:
+  - `Homo_sapiens-U2T.meme`
+  - `Mus_musculus-U2T.meme`
+  - `Caenorhabditis_elegans-U2T.meme`
+  - `Drosophila_melanogaster-U2T.meme`
 
-    top_motifs.py
+  - `c2.cp.v5.0.entrez.gmt`
+  - `c2.cp.v5.0.entrez.dm3.gmt`
+  - `c2.cp.v5.0.entrez.mm9.gmt`
+  - `c2.cp.v5.0.entrez.ce10.gmt`
 
-    rcas.GO.R
-
-    rcas.msigdb.R
-
-    rcas.Rmd
-
-    make.R
-
--Other dependencies in base:
-
-    Homo_sapiens-U2T.meme
-
-    Mus_musculus-U2T.meme
-
-    Caenorhabditis_elegans-U2T.meme
-
-    Drosophila_melanogaster-U2T.meme
-
-    c2.cp.v5.0.entrez.gmt
-
-    c2.cp.v5.0.entrez.dm3.gmt
-
-    c2.cp.v5.0.entrez.mm9.gmt
-
-    c2.cp.v5.0.entrez.ce10.gmt
-
-    custom.css
-
-    header.html
-
-    img folder
+  - `custom.css`
+  - `header.html`
+  - `img` folder
 
 ## Test case
 
