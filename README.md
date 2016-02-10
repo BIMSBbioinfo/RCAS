@@ -14,6 +14,51 @@ By default these optional steps are switched off
 and RCAS only generates distributions of annotation features
 including biotypes and genomic features.
 
+## Installing and building from source
+
+RCAS uses autotools to provide a standard configuration script and
+installation rules following the GNU coding standards.  To build from
+a simple repository checkout you need to first bootstrap the
+configuration script.
+
+~~~
+git clone https://github.com/BIMSBbioinfo/RCAS.git
+cd RCAS
+autoreconf -vif
+./configure --prefix=/where/you/want/rcas
+make install
+~~~
+
+When building from a release tarball this bootstrap step is not
+required:
+
+~~~
+tar xf rcas-0.0.1.tar.gz
+cd rcas
+./configure --prefix=/where/you/want/rcas
+make install
+~~~
+
+After the first official release we will also provide a Guix package
+definition for RCAS so that you can install the pipeline with a single
+command such as:
+
+    guix package -i rcas
+
+
+## Hacking on RCAS
+
+For development purposes we also provide a package expression for GNU
+Guix.  To enter a development shell in which all dependent tools are
+available run this:
+
+    guix environment -l package.scm
+
+In this shell you can configure and install RCAS as usual, but all
+tools and R packages will be handled by Guix.  There is no need to
+manually install the tools.
+
+
 ###RCAS dependencies:
 
 -**snakemake**: https://bitbucket.org/johanneskoester/snakemake/wiki/Documentation
