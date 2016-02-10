@@ -1,12 +1,17 @@
-#!/bin/bash
-#echo "The script you are running has basename `basename $0`, dirname `dirname $0`"
-#echo "The present working directory is `pwd`"
+#!@BASH@
 
-SCRIPT_DIR=`dirname $0`
+
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+bindir=@bindir@
+datarootdir=@datarootdir@
+basedir=@basedir@
+
+SCRIPT_DIR=$(dirname $0)
 report_script="${SCRIPT_DIR}/rcas.Rmd"
-css="${SCRIPT_DIR}/base/custom.css"
-outdir=`pwd`
-header="${SCRIPT_DIR}/base/header.html"
+css="${basedir}/custom.css"
+header="${basedir}/header.html"
+outdir=$(pwd)
 
 function usage()
 {
@@ -34,8 +39,8 @@ if [ "$1" == "" ]; then
 fi
 
 while [ "$1" != "" ]; do
-	PARAM=`echo $1 | awk -F= '{print $1}'`
-	VALUE=`echo $1 | awk -F= '{print $2}'`
+	PARAM=$(echo $1 | @AWK@ -F= '{print $1}')
+	VALUE=$(echo $1 | @AWK@ -F= '{print $2}')
     	case $PARAM in
         	-h | --help)
 	        	usage
@@ -149,4 +154,4 @@ if [ -z "${coverage_profile_option}" ]; then
 	exit 1
 fi
 
-Rscript -e "library('rmarkdown'); rmarkdown::render('${report_script}', output_file = '${output_filename}', output_dir='${outdir}', html_document(toc=TRUE, theme='cerulean', number_sections=TRUE, css='${css}', includes=includes(before_body='${header}')))" ${outdir} ${annotation_file} ${peaks_file} ${gff3_file} ${go_bp_results} ${go_mf_results} ${go_cc_results} ${msigdb_results} ${meme_outdir} ${motif_annot_file} ${coverage_profile_option}
+@RSCRIPT@ -e "library('rmarkdown'); rmarkdown::render('${report_script}', output_file = '${output_filename}', intermediates_dir = '${outdir}', output_dir='${outdir}', html_document(toc=TRUE, theme='cerulean', number_sections=TRUE, css='${css}', includes=includes(before_body='${header}')))" ${outdir} ${annotation_file} ${peaks_file} ${gff3_file} ${go_bp_results} ${go_mf_results} ${go_cc_results} ${msigdb_results} ${meme_outdir} ${motif_annot_file} ${coverage_profile_option}
