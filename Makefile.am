@@ -6,7 +6,7 @@
 # RCAS is free software; see LICENSE file for details.
 
 bin_SCRIPTS =					\
-  src/RCAS.py
+  src/RCAS
 
 dist_libexec_SCRIPTS =				\
   src/RCAS.snakefile				\
@@ -45,7 +45,7 @@ dist_doc_DATA =					\
 # where the base files and all other libexec scripts are located.  All
 # internal scripts called by snakemake rules and all snakefile parts
 # are located in libexecdir.
-src/RCAS.py: src/RCAS.py.in
+src/RCAS: src/RCAS.in
 	sed -e "s|#:MAKE|\n_libexecdir = \"$(libexecdir)\"\n_basedir = \"$(basedir)\"|" -i $<
 	mv $< $@
 
@@ -60,4 +60,4 @@ src/RCAS.py: src/RCAS.py.in
 src/base/header.html: src/base/header.html.in
 	sed -e "s|@basedir|$(basedir)|" $< > $@
 
-CLEANFILES = src/base/header.html src/RCAS.py
+CLEANFILES = src/base/header.html src/RCAS

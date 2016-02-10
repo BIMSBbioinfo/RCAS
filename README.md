@@ -117,7 +117,7 @@ the target files without the `.in` extension.  In the lists below we
 omit `.in` for clarity.
 
 - The pipeline wrapper and entry point:
-  - `src/RCAS.py`
+  - `src/RCAS`
 
 - All snakemake rules end on `.snakefile`.
   - `src/RCAS.snakefile`
@@ -165,13 +165,14 @@ Aim: generate analysis report for intervals in the target BED files.
 
 3. target files in `./test`: `xaa.bed`, `xab.bed`
 
-4. check help message: `./bin/RCAS.py -h`
+4. check help message: `./bin/RCAS -h`
 
 5. sample command:
     ~~~
-    ./bin/RCAS.py --genome /path/to/hg19.fa
-                  --gff3 /path/to/gencode.v19.annotation.gff3
-                  ./test/xaa.bed ./test/xab.bed --run_PATHrich
+    ./bin/RCAS --genome /path/to/hg19.fa                   \
+               --gff3 /path/to/gencode.v19.annotation.gff3 \
+               --run_PATHrich                              \
+               ./test/xaa.bed ./test/xab.bed
     ~~~
 
 6. output: `xaa.rcas.html`, `xab.rcas.html`

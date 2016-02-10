@@ -11,8 +11,8 @@ src/RCAS.anot.snakefile
 src/RCAS.PATHrich.snakefile
 src/RCAS.GOrich.snakefile
 src/RCAS.motif.snakefile
-src/RCAS.py
-src/RCAS.py.in
+src/RCAS
+src/RCAS.in
 src/snakeconfig.json
 src/base/header.html
 autom4te.cache/

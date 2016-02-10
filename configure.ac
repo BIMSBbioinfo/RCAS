@@ -82,6 +82,6 @@ AC_SUBST([basedir])
 
 # Create wrapper for snakemake.  This wrapper is appended to at "make"
 # time, so we keep the ".in" ending.
-AC_CONFIG_FILES([src/RCAS.py.in], [chmod +x src/RCAS.py.in])
+AC_CONFIG_FILES([src/RCAS.in], [chmod +x src/RCAS.in])
 
 AC_OUTPUT
