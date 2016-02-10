@@ -1,4 +1,5 @@
-#RCAS project
+# RCAS project
+
 Make a standalone RNA Centric Annotation System that
 provides intuitive reports and publication ready graphics.
 
@@ -59,56 +60,65 @@ tools and R packages will be handled by Guix.  There is no need to
 manually install the tools.
 
 
-###RCAS dependencies:
+## RCAS dependencies
 
--**snakemake**: https://bitbucket.org/johanneskoester/snakemake/wiki/Documentation
+We recommend to install dependencies with a package manager using one
+of the package recipes we provide (see "Hacking on RCAS" above).  If
+you really *must* install the dependencies manually please see the
+following list for pointers:
 
--**bedtools**:
-http://bedtools.readthedocs.org/en/latest/content/installation.html
+### Tools
 
---**fastaFromBed** (from bedtools)
+- [snakemake](https://bitbucket.org/johanneskoester/snakemake/wiki/Documentation)
 
--**MEME-chip**:
-http://meme-suite.org/meme-software/4.10.2/meme_4.10.2.tar.gz
+- [R](https://www.r-project.org/)
 
--**pandoc (>= 1.12.3)**
+- fastaFromBed from [bedtools](http://bedtools.readthedocs.org/en/latest/content/installation.html)
 
--**rmarkdown**
+- [MEME-chip](http://meme-suite.org/meme-software/4.10.2/meme_4.10.2.tar.gz)
 
--**rtracklayer**
+- pandoc (>= 1.12.3)
 
--**data.table**
+### R packages
 
--**biomaRt**
+- rmarkdown
 
--**org.Hs.eg.db**
+- rtracklayer
 
--**org.Ce.eg.db**
+- data.table
 
--**org.Mm.eg.db**
+- biomaRt
 
--**org.Dm.eg.db**
+- org.Hs.eg.db
 
--**topGO**
+- org.Ce.eg.db
 
--**DT**
+- org.Mm.eg.db
 
--**plotly**
+- org.Dm.eg.db
 
--**dplyr**
+- topGO
 
--**genomation**
+- DT
 
--**GenomicFeatures**
+- plotly
 
--**gff track** e.g.  wget -qO- ftp://ftp.sanger.ac.uk/pub/gencode/Gencode_human/release_19/gencode.v19.annotation.gff3.gz | gunzip > gencode.v19.annotation.gff3
+- dplyr
 
--**genome reference** e.g. http://hgdownload.cse.ucsc.edu/goldenPath/hg19/bigZips/chromFa.tar.gz
+- genomation
 
--**c2.cp.v5.0.entrez.gmt**:
-http://software.broadinstitute.org/gsea/msigdb/download_file.jsp?filePath=/resources/msigdb/5.0/c2.cp.v5.0.entrez.gmt
+- GenomicFeatures
 
-###RCAS workflow is built with snakemake:
+### Data files
+
+- gff track e.g.  `wget -qO- ftp://ftp.sanger.ac.uk/pub/gencode/Gencode_human/release_19/gencode.v19.annotation.gff3.gz | gunzip > gencode.v19.annotation.gff3`
+
+- genome reference e.g. this
+  [hg19 reference](http://hgdownload.cse.ucsc.edu/goldenPath/hg19/bigZips/chromFa.tar.gz)
+
+- [c2.cp.v5.0.entrez.gmt](http://software.broadinstitute.org/gsea/msigdb/download_file.jsp?filePath=/resources/msigdb/5.0/c2.cp.v5.0.entrez.gmt)
+
+## RCAS workflow is built with snakemake:
 
 -rules of snakemake in src:
 
@@ -154,8 +164,9 @@ http://software.broadinstitute.org/gsea/msigdb/download_file.jsp?filePath=/resou
 
     img folder
 
-###Test case
-####Aim: generate analysis report for intervals in the target BED files
+## Test case
+
+Aim: generate analysis report for intervals in the target BED files.
 
 *Besides the default annotation step, pathway enrichment is also enabled vi '--run_PATHrich'*
 
