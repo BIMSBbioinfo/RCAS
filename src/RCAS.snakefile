@@ -33,11 +33,12 @@ def report_arguments(infile, TRACK_gff, run_motif, run_PATHrich, run_GOrich, run
 
 	return input_options, coverage_profile
 
-RCAS_path = config["RCAS_path"]
-anot = RCAS_path  + "/src/RCAS.anot"
-motif = RCAS_path  + "/src/RCAS.motif"
-GOrich = RCAS_path  + "/src/RCAS.GOrich"
-PATHrich = RCAS_path  + "/src/RCAS.PATHrich"
+basedir = config["basedir"]
+libexecdir = config["libexecdir"]
+anot     = libexecdir + "/RCAS.anot"
+motif    = libexecdir + "/RCAS.motif"
+GOrich   = libexecdir + "/RCAS.GOrich"
+PATHrich = libexecdir + "/RCAS.PATHrich"
 
 TRACK_gff = config["gff3"]
 genome_reference = config["genome"]
@@ -104,7 +105,7 @@ rule html_report:
 	 output:
 			"{sample}.rcas.html"
 	 shell:
-			"bash {RCAS_path}/src/generate_report.sh"
+			"@BASH@ {libexecdir}/generate_report.sh"
 			" --output_filename={output} --annot={input.annot}"
 			" --peaks={input.peaks}"
 			" --gff3={input.gff3}"

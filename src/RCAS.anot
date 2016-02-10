@@ -5,7 +5,7 @@ rule intersect:
 	 output:
 		  "{sample}.intersect.bed"
 	 shell:
-		  "bedtools intersect -b {TRACK_gff} -a {input[0]}  -wao > {output}"
+		  "@BEDTOOLS@ intersect -b {TRACK_gff} -a {input[0]}  -wao > {output}"
 
 rule anot_cor:
 	 #annotate coordinates with features
@@ -14,4 +14,4 @@ rule anot_cor:
 	 output:
 		  "{sample}.anot.tsv"
 	 shell:
-		  "python2 {RCAS_path}/src/parse_anot.py < {input}  > {output}"
+		  "@PYTHON@ {libexecdir}/parse_anot.py < {input}  > {output}"
