@@ -1,4 +1,9 @@
-#!/usr/bin/python2
+#!@PYTHON@
+
+# The global definition of _libexecdir and _basedir is injected on the
+# line below by "make".
+
+#:MAKE
 
 def get_argument_parser():
     parser = argparse.ArgumentParser(
@@ -15,11 +20,6 @@ def get_argument_parser():
                         metavar="BED",
                         nargs="*",
                         help="Target intervals in BED format.")
-
-    parser.add_argument("--RCAS_path", "-r",
-                        metavar="path/to/RCAS",
-                        required=True,
-                        help="Path to RCAS.")
 
     parser.add_argument("--genome", "-g",
                         metavar="FILE",
@@ -113,7 +113,9 @@ def generate_config(args):
         run_coverage = "True"
 
     config = {
-      "RCAS_path": os.path.abspath(args.RCAS_path),
+      "libexecdir": _libexecdir,
+
+      "basedir": _basedir,
 
       "gff3": args.gff3,
 
@@ -137,7 +139,8 @@ def generate_config(args):
 
     print "\nwrote config.json.\n"
 
-def call_snakemake(RCAS_path, forcerun, cores):
+
+def call_snakemake(forcerun, cores):
     print "start snakemake:\n"
 
     if forcerun:
@@ -145,7 +148,8 @@ def call_snakemake(RCAS_path, forcerun, cores):
     else:
         forcerun = ""
 
-    command_line = "snakemake -%sp -j %s -s %s/src/RCAS.snakefile" % (forcerun, cores, RCAS_path)
+    snakefile = "%s/RCAS.snakefile" % _libexecdir
+    command_line = "@SNAKEMAKE@ -%sp -j %s -s %s" % (forcerun, cores, snakefile)
     cmd = shlex.split(command_line)
 
     p = Popen(cmd)
@@ -190,4 +194,4 @@ if __name__ == '__main__':
     generate_config(args)
 
     #run snakemake
-    call_snakemake(args.RCAS_path, args.forcerun, args.cores)
+    call_snakemake(args.forcerun, args.cores)
