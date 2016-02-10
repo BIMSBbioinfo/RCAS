@@ -157,4 +157,4 @@ header="${RCAS_path}/data/html/header.html"
 #echo "The present working directory is `pwd`"
 outdir=`pwd`
 
-Rscript -e "library('rmarkdown'); rmarkdown::render('${report_script}', output_file = '${output_filename}', output_dir='${outdir}', html_document(toc=TRUE, theme='cerulean', number_sections=TRUE, css='${css}', includes=includes(before_body='${header}')))" ${outdir} ${annotation_file} ${peaks_file} ${gff3_file} ${go_bp_results} ${go_mf_results} ${go_cc_results} ${msigdb_results} ${meme_outdir} ${motif_annot_file} ${coverage_profile_option}
+Rscript -e "library('rmarkdown'); rmarkdown::render('${report_script}',intermediates_dir = '${outdir}', output_file = '${output_filename}', output_dir='${outdir}', html_document(toc=TRUE, theme='cerulean', number_sections=TRUE, css='${css}', includes=includes(before_body='${header}')))" ${outdir} ${annotation_file} ${peaks_file} ${gff3_file} ${go_bp_results} ${go_mf_results} ${go_cc_results} ${msigdb_results} ${meme_outdir} ${motif_annot_file} ${coverage_profile_option}
