@@ -171,12 +171,12 @@ Aim: generate analysis report for intervals in the target BED files.
 *Besides the default annotation step, pathway enrichment is also enabled vi '--run_PATHrich'*
 
 1. Install as per the instructions above, e.g.
-~~~
-autoreconf -vif
-./configure --prefix=/opt/rcas
-make clean
-sudo make install
-~~~
+    ~~~
+    autoreconf -vif
+    ./configure --prefix=/opt/rcas
+    make clean
+    sudo make install
+    ~~~
 
 2. `cd /opt/rcas`
 
@@ -184,11 +184,11 @@ sudo make install
 
 4. check help message: `./bin/RCAS.py -h`
 
-4. sample command:
-~~~
-./bin/RCAS.py --genome /path/to/hg19.fa
-              --gff3 /path/to/gencode.v19.annotation.gff3
-              ./test/xaa.bed ./test/xab.bed --run_PATHrich
-~~~
+5. sample command:
+    ~~~
+    ./bin/RCAS.py --genome /path/to/hg19.fa
+                  --gff3 /path/to/gencode.v19.annotation.gff3
+                  ./test/xaa.bed ./test/xab.bed --run_PATHrich
+    ~~~
 
-5. output: `xaa.rcas.html`, `xab.rcas.html`
+6. output: `xaa.rcas.html`, `xab.rcas.html`
