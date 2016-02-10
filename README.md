@@ -40,6 +40,16 @@ cd rcas
 make install
 ~~~
 
+If your system provides both Python 2.x and Python 3.x and defaults to
+Python 3.x, you may need to pass `PYTHON=/path/to/python2` to the
+`configure` script to ensure that the Python 2.x interpreter is used,
+for example:
+
+~~~
+./configure PYTHON=/bin/python2 --prefix=/opt/rcas
+sudo make install
+~~~
+
 After the first official release we will also provide a Guix package
 definition for RCAS so that you can install the pipeline with a single
 command such as:

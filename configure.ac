@@ -6,10 +6,21 @@ AM_INIT_AUTOMAKE([color-tests -Wall -Wno-portability foreign])
 AM_SILENT_RULES([yes])
 
 # Load Python support for Automake and ensure we have a Python
-# interpreter for at least version 2.2.  This sets the "PYTHON"
-# variable.
+# interpreter for at least version 2.2 and less than version 3.  This
+# sets the "PYTHON" variable.
 # https://www.gnu.org/software/automake/manual/html_node/Python.html
 AM_PATH_PYTHON([2.2])
+AC_MSG_CHECKING([whether Python version is satisfied])
+case "$PYTHON_VERSION" in
+2*)
+  AC_MSG_RESULT([yes])
+  ;;
+*)
+  AC_MSG_RESULT([no])
+  AC_MSG_ERROR([RCAS needs Python version >=2.2 and <3 but $PYTHON_VERSION was found.
+  Run ./configure PYTHON=/path/to/python2 to override the default Python.])
+  ;;
+esac
 
 # Check for any variant of "awk" and store path in "AWK" variable
 AC_PROG_AWK
