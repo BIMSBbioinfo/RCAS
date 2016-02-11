@@ -5,7 +5,7 @@ rule intersect:
 	 output:
 		  "{sample}.intersect.bed"
 	 shell:
-		  "@BEDTOOLS@ intersect -b {TRACK_gff} -a {input[0]}  -wao > {output}"
+		  "@BEDTOOLS@ intersect -b {TRACK_gff} -a {input}  -wao > {output}"
 
 rule anot_cor:
 	 #annotate coordinates with features
