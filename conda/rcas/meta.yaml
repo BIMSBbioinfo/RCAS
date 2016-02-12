@@ -10,9 +10,11 @@ requirements:
   build:
     - python ==2.7.11
     - bedtools ==2.24.0
+    - snakemake
   run:
     - python ==2.7.11
     - bedtools ==2.24.0
+    - snakemake
 
 test:
   commands:
