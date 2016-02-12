@@ -12,6 +12,10 @@ requirements:
   run:
     - python ==2.7.8
 
+test:
+  commands:
+    - RCAS -h
+
 about:
   home: https://github.com/BIMSBbioinfo/RCAS.git
   license: MIT
