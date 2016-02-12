@@ -1,5 +1,3 @@
-#! /usr/bin/env python
-
 def check_argv(argv):
 
 	usage = """
@@ -20,18 +18,18 @@ def check_argv(argv):
 		opts, args = getopt.getopt(argv,"m:e:c:a:h:n:",[""])
 
 	except getopt.GetoptError:
-		print usage
+		print(usage)
 		sys.exit(1)
 
 	if set([opt for opt, arg in opts]) not in [set(["-m", "-e", "-a", "-c"]), set(["-m", "-e", "-a", "-c", '-n'])]:
-		print usage
+		print(usage)
 		sys.exit(1)
 
 	number_of_top_motifs = 10
 
 	for opt, arg in opts:
 		if opt == '-h' :
-			print  usage
+			print(usage)
 			sys.exit()
 
 		if opt == '-m':
@@ -251,7 +249,7 @@ if __name__ == '__main__':
 	anot_info = {}
 
 	with open(annotation) as handle:
-		handle.next()
+		handle.readline()
 
 		for line in handle:
 			anot_info = update_anot_info(line, anot_info)
@@ -264,4 +262,4 @@ if __name__ == '__main__':
 	for evalue_id_sites in motif_evalue_id_sites[:number_of_top_motifs]:
 		table = update_table(evalue_id_sites, motif_info, sequneces, mapped_coordinates, anot_info, table)
 
-	print "\n".join(table) #_tmp
+	print("\n".join(table))

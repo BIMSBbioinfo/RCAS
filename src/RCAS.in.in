@@ -137,11 +137,10 @@ def generate_config(args):
     with open('config.json', 'w') as f:
          json.dump(config, f, sort_keys=True, indent=4)
 
-    print "\nwrote config.json.\n"
-
+    print("\nwrote config.json.\n")
 
 def call_snakemake(forcerun, cores):
-    print "start snakemake:\n"
+    print("start snakemake:\n")
 
     if forcerun:
         forcerun = "F"
@@ -161,20 +160,20 @@ def call_snakemake(forcerun, cores):
             p.send_signal(signal.SIGINT)
             time.sleep(0.1)
             if p.poll() is not None:
-                print "Process is interrupted."
+                print("Process is interrupted.")
                 return
             p.terminate()
             time.sleep(0.1)
             if p.poll() is not None:
-                print "Process is terminated."
+                print("Process is terminated.")
                 return
             p.kill()
-            print "Process is killed."
+            print("Process is killed.")
         except OSError:
             pass
         except Exception as e:
-            print "Error while terminating subprocess (pid=%i): %s" \
-                % (p.pid, e)
+            print("Error while terminating subprocess (pid=%i): %s" \
+                % (p.pid, e))
         return
 
 if __name__ == '__main__':
