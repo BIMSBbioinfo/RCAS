@@ -12,40 +12,41 @@ requirements:
     - bedtools ==2.24.0
     - snakemake
     - pandoc
-    - r-base
-    - r-rmarkdown
-    - bioconductor-rtracklayer
-    - r-data.table
     - bioconductor-biomart
     - bioconductor-org.hs.eg.db
     - bioconductor-org.mm.eg.db
     - bioconductor-org.dm.eg.db
+    - bioconductor-org.ce.eg.db
     - bioconductor-topgo
+    - bioconductor-genomicfeatures
+    - bioconductor-genomation
+    - bioconductor-rtracklayer
+    - r
     - r-dt
     - r-plotly
     - r-dplyr
-    - bioconductor-genomicfeatures
-    - bioconductor-genomation
+    - r-rmarkdown
+    - r-data.table
   run:
     - python
     - bedtools ==2.24.0
     - snakemake
     - pandoc
-    - r-base
-    - r-rmarkdown
-    - bioconductor-rtracklayer
-    - r-data.table
     - bioconductor-biomart
     - bioconductor-org.hs.eg.db
     - bioconductor-org.mm.eg.db
     - bioconductor-org.dm.eg.db
+    - bioconductor-org.ce.eg.db
     - bioconductor-topgo
+    - bioconductor-genomicfeatures
+    - bioconductor-genomation
+    - bioconductor-rtracklayer
+    - r
     - r-dt
     - r-plotly
     - r-dplyr
-    - bioconductor-genomicfeatures
-    - bioconductor-genomation
-
+    - r-rmarkdown
+    - r-data.table
 test:
   commands:
     - RCAS -h
