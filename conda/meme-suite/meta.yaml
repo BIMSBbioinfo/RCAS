@@ -1,0 +1,20 @@
+package:
+  name: meme-suite
+  version: 4.10.2
+source:
+  fn: meme_4.10.2.tar.gz
+  url: http://meme-suite.org/meme-software/4.10.2/meme_4.10.2.tar.gz
+  md5: 6bb85140be3c64467a4de4c510032e52
+build:
+  number: 0
+requirements:
+  build:
+  run:
+test:
+  commands:
+about:
+  home: http://meme-suite.org/doc/download.html?man_type=web
+  license: http://meme-suite.org/doc/copyright.html?man_type=web
+  summary: 'The MEME Suite allows the biologist to discover novel motifs
+  in collections of unaligned nucleotide or protein sequences,
+  and to perform a wide variety of other motif-based analyses.'
