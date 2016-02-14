@@ -12,6 +12,7 @@ requirements:
     - bedtools ==2.24.0
     - snakemake
     - pandoc
+    - meme-suite
     - bioconductor-biomart
     - bioconductor-org.hs.eg.db
     - bioconductor-org.mm.eg.db
@@ -32,6 +33,7 @@ requirements:
     - bedtools ==2.24.0
     - snakemake
     - pandoc
+    - meme-suite
     - bioconductor-biomart
     - bioconductor-org.hs.eg.db
     - bioconductor-org.mm.eg.db
@@ -54,4 +56,8 @@ test:
 about:
   home: https://github.com/BIMSBbioinfo/RCAS.git
   license: MIT
-  license_file: LICENSE
+  summary: 'RNA Centric Annotation System
+  that provides intuitive reports and publication ready graphics.
+  RCAS takes input peak intervals in BED foramt (derived from clip-seq data)
+  and automatically generates distributions of annotation features,
+  detected motifs, GO-term enrichment, pathway enrichment and genomic coverage.'
