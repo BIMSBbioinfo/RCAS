@@ -1,0 +1,39 @@
+package:
+  name: bioconductor-seqpattern
+  version: 1.2.0
+source:
+  fn: seqPattern_1.2.0.tar.gz
+  url: https://www.bioconductor.org/packages/release/bioc/src/contrib/seqPattern_1.2.0.tar.gz
+  md5: 89c32074acf477e397280eac868944db
+build:
+  number: 0
+  rpaths:
+    - lib/R/lib/
+    - lib/
+requirements:
+  build:
+    - bioconductor-biostrings
+    - bioconductor-genomicranges
+    - bioconductor-iranges
+    - bioconductor-s4vectors
+    - r
+    - r-kernsmooth
+    - r-plotrix
+  run:
+    - bioconductor-biostrings
+    - bioconductor-genomicranges
+    - bioconductor-iranges
+    - bioconductor-s4vectors
+    - r
+    - r-kernsmooth
+    - r-plotrix
+
+test:
+  commands:
+    - '$R -e "library(''seqPattern'')"'
+about:
+  home: https://www.bioconductor.org/packages/3.3/bioc/html/seqPattern.html
+  license: GPL-3
+  summary: 'Visualising oligonucleotide patterns and sequence motifs
+  occurrences across a large set of sequences centred at a common reference point
+  and sorted by a user defined feature.'
