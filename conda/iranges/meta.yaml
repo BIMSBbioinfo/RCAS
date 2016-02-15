@@ -6,7 +6,7 @@ source:
   url: https://www.bioconductor.org/packages/release/bioc/src/contrib/IRanges_2.4.7.tar.gz
   md5: 838be15d5f7837ee7258e0af2e2f8d9d
 build:
-  number: 0
+  number: 1
   rpaths:
     - lib/R/lib/
     - lib/

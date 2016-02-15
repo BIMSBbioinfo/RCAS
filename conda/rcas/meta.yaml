@@ -3,8 +3,10 @@ package:
   version: "0.1"
 
 source:
-  #git_url: https://github.com/BIMSBbioinfo/RCAS.git
-  path: ../../
+  git_url: https://github.com/BIMSBbioinfo/RCAS.git
+  git_rev:
+build:
+  number: 1
 
 requirements:
   build:
