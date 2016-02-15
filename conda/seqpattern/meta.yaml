@@ -6,24 +6,24 @@ source:
   url: https://www.bioconductor.org/packages/release/bioc/src/contrib/seqPattern_1.2.0.tar.gz
   md5: 89c32074acf477e397280eac868944db
 build:
-  number: 0
+  number: 1
   rpaths:
     - lib/R/lib/
     - lib/
 requirements:
   build:
-    - bioconductor-biostrings
-    - bioconductor-genomicranges
-    - bioconductor-iranges
-    - bioconductor-s4vectors
+    - bioconductor-biostrings >=2.38.3
+    - bioconductor-genomicranges >=1.22.3
+    - bioconductor-iranges >=2.4.7
+    - bioconductor-s4vectors >=0.8.11
     - r
     - r-kernsmooth
     - r-plotrix
   run:
-    - bioconductor-biostrings
-    - bioconductor-genomicranges
-    - bioconductor-iranges
-    - bioconductor-s4vectors
+    - bioconductor-biostrings >=2.38.3
+    - bioconductor-genomicranges >=1.22.3
+    - bioconductor-iranges >=2.4.7
+    - bioconductor-s4vectors >=0.8.11
     - r
     - r-kernsmooth
     - r-plotrix
@@ -32,7 +32,7 @@ test:
   commands:
     - '$R -e "library(''seqPattern'')"'
 about:
-  home: https://www.bioconductor.org/packages/3.3/bioc/html/seqPattern.html
+  home: https://www.bioconductor.org/packages/release/bioc/html/seqPattern.html
   license: GPL-3
   summary: 'Visualising oligonucleotide patterns and sequence motifs
   occurrences across a large set of sequences centred at a common reference point
