@@ -6,23 +6,23 @@ source:
   url: http://bioconductor.org/packages/release/bioc/src/contrib/genomation_1.2.2.tar.gz
   md5: 05b9776d71d7d653835487787ee896d7
 build:
-  number: 0
+  number: 1
   rpaths:
     - lib/R/lib/
     - lib/
 requirements:
   build:
-    - bioconductor-biostrings
-    - bioconductor-bsgenome
-    - bioconductor-genomeinfodb
-    - bioconductor-genomicranges
-    - bioconductor-genomicalignments
-    - bioconductor-rsamtools
-    - bioconductor-rtracklayer
-    - bioconductor-impute
-    - bioconductor-iranges
-    - bioconductor-seqpattern
-    - bioconductor-s4vectors
+    - bioconductor-biostrings >=2.38.3
+    - bioconductor-bsgenome >=1.38.0
+    - bioconductor-genomeinfodb >=1.6.1
+    - bioconductor-genomicranges >=1.22.3
+    - bioconductor-genomicalignments >=1.6.3
+    - bioconductor-rsamtools >=1.22.0
+    - bioconductor-rtracklayer >=1.30.1
+    - bioconductor-impute >=1.40.0
+    - bioconductor-iranges >=2.4.7
+    - bioconductor-seqpattern >=1.2.0
+    - bioconductor-s4vectors >=0.8.11
     - r
     - r-data.table
     - r-ggplot2
@@ -34,17 +34,17 @@ requirements:
     - r-reshape2
 
   run:
-    - bioconductor-biostrings
-    - bioconductor-bsgenome
-    - bioconductor-genomeinfodb
-    - bioconductor-genomicranges
-    - bioconductor-genomicalignments
-    - bioconductor-rsamtools
-    - bioconductor-rtracklayer
-    - bioconductor-impute
-    - bioconductor-iranges
-    - bioconductor-seqpattern
-    - bioconductor-s4vectors
+    - bioconductor-biostrings >=2.38.3
+    - bioconductor-bsgenome >=1.38.0
+    - bioconductor-genomeinfodb >=1.6.1
+    - bioconductor-genomicranges >=1.22.3
+    - bioconductor-genomicalignments >=1.6.3
+    - bioconductor-rsamtools >=1.22.0
+    - bioconductor-rtracklayer >=1.30.1
+    - bioconductor-impute >=1.40.0
+    - bioconductor-iranges >=2.4.7
+    - bioconductor-seqpattern >=1.2.0
+    - bioconductor-s4vectors >=0.8.11
     - r
     - r-data.table
     - r-ggplot2
