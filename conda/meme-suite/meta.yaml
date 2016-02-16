@@ -6,12 +6,32 @@ source:
   url: http://meme-suite.org/meme-software/4.10.2/meme_4.10.2.tar.gz
   md5: 6bb85140be3c64467a4de4c510032e52
 build:
-  number: 0
+  number: 1
 requirements:
   build:
+    - gcc
+    - perl
+    - perl-xml-parser 2.44
+    - perl-xml-simple 2.20
+    - python
+    - libxml2 2.9.3
+    - openmpi 1.10.2
+    - libxslt 1.1.28
+    - ghostscript 9.16
+
   run:
+    - gcc
+    - perl
+    - perl-xml-parser 2.44
+    - perl-xml-simple 2.20
+    - python
+    - libxml2 2.9.3
+    - openmpi 1.10.2
+    - libxslt 1.1.28
+    - ghostscript 9.16
 test:
   commands:
+    - meme-chip -version
 about:
   home: http://meme-suite.org/doc/download.html?man_type=web
   license: http://meme-suite.org/doc/copyright.html?man_type=web
