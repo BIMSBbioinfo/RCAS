@@ -13,7 +13,7 @@ requirements:
     - python
     - bedtools ==2.24.0
     - snakemake
-    - pandoc
+    - pandoc >=1.16.0.2
     - meme-suite
     - bioconductor-biomart
     - bioconductor-org.hs.eg.db
@@ -34,7 +34,7 @@ requirements:
     - python
     - bedtools ==2.24.0
     - snakemake
-    - pandoc
+    - pandoc >=1.16.0.2
     - meme-suite
     - bioconductor-biomart
     - bioconductor-org.hs.eg.db
