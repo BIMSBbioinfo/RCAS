@@ -12,18 +12,16 @@ build:
     - lib/
 requirements:
   build:
-    - bioconductor-biostrings >=2.38.3
-    - bioconductor-genomicranges >=1.22.3
-    - bioconductor-iranges >=2.4.7
-    - bioconductor-s4vectors >=0.8.11
+    - bioconductor-biostrings >=2.38.3 #in the documentation, 2.38.4 is required.
+    - bioconductor-genomicranges >=1.22.3 #in the documentation, 1.22.3 is required.
+    - bioconductor-iranges >=2.4.6 #in the documentation, 2.4.7 is required.
     - r
     - r-kernsmooth
     - r-plotrix
   run:
-    - bioconductor-biostrings >=2.38.3
-    - bioconductor-genomicranges >=1.22.3
-    - bioconductor-iranges >=2.4.7
-    - bioconductor-s4vectors >=0.8.11
+    - bioconductor-biostrings >=2.38.3 #in the documentation, 2.38.4 is required.
+    - bioconductor-genomicranges >=1.22.3 #in the documentation, 1.22.3 is required.
+    - bioconductor-iranges >=2.4.6 #in the documentation, 2.4.7 is required.
     - r
     - r-kernsmooth
     - r-plotrix
