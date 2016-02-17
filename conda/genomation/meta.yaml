@@ -12,17 +12,16 @@ build:
     - lib/
 requirements:
   build:
-    - bioconductor-biostrings >=2.38.3
+    - bioconductor-biostrings >=2.38.3 # documentation, requires  2.38.4
     - bioconductor-bsgenome >=1.38.0
-    - bioconductor-genomeinfodb >=1.6.1
-    - bioconductor-genomicranges >=1.22.3
+    - bioconductor-genomeinfodb >=1.6.1 #documentation, requires 1.6.3
+    - bioconductor-genomicranges >=1.22.3 #documentation, requires 1.22.4
     - bioconductor-genomicalignments >=1.6.3
     - bioconductor-rsamtools >=1.22.0
-    - bioconductor-rtracklayer >=1.30.1
-    - bioconductor-impute >=1.40.0
-    - bioconductor-iranges >=2.4.7
+    - bioconductor-rtracklayer >=1.30.1 #documentation, requires 1.30.2
+    - bioconductor-impute >=1.40.0 #documentation, requires 1.44.0
+    - bioconductor-iranges >=2.4.6 #documentation, requires 2.4.7
     - bioconductor-seqpattern >=1.2.0
-    - bioconductor-s4vectors >=0.8.11
     - r
     - r-data.table
     - r-ggplot2
@@ -34,17 +33,16 @@ requirements:
     - r-reshape2
 
   run:
-    - bioconductor-biostrings >=2.38.3
+    - bioconductor-biostrings >=2.38.3 # documentation, requires  2.38.4
     - bioconductor-bsgenome >=1.38.0
-    - bioconductor-genomeinfodb >=1.6.1
-    - bioconductor-genomicranges >=1.22.3
+    - bioconductor-genomeinfodb >=1.6.1 #documentation, requires 1.6.3
+    - bioconductor-genomicranges >=1.22.3 #documentation, requires 1.22.4
     - bioconductor-genomicalignments >=1.6.3
     - bioconductor-rsamtools >=1.22.0
-    - bioconductor-rtracklayer >=1.30.1
-    - bioconductor-impute >=1.40.0
-    - bioconductor-iranges >=2.4.7
+    - bioconductor-rtracklayer >=1.30.1 #documentation, requires 1.30.2
+    - bioconductor-impute >=1.40.0 #documentation, requires 1.44.0
+    - bioconductor-iranges >=2.4.6 #documentation, requires 2.4.7
     - bioconductor-seqpattern >=1.2.0
-    - bioconductor-s4vectors >=0.8.11
     - r
     - r-data.table
     - r-ggplot2
@@ -54,6 +52,7 @@ requirements:
     - r-plyr
     - r-readr
     - r-reshape2
+
 test:
   commands:
     - '$R -e "library(''genomation'')"'
