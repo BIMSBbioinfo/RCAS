@@ -18,14 +18,14 @@ AC_PROG_SED
 # Check for required programmes and store their full path in the given
 # variables.  The variables are used to substitute placeholders in the
 # scripts such as RCAS.snakemake.
-AC_PATH_PROG([SNAKEMAKE], [snakemake])
-AC_PATH_PROG([BASH], [bash])
-AC_PATH_PROG([BEDTOOLS], [bedtools])
-AC_PATH_PROG([FASTA_FROM_BED], [fastaFromBed])
-AC_PATH_PROG([MEME_CHIP], [meme-chip])
-AC_PATH_PROG([PANDOC], [pandoc])
-AC_PATH_PROG([RSCRIPT], [Rscript])
-AC_PATH_PROG([R], [R])
+AC_PATH_PROG([SNAKEMAKE], [snakemake], [$SNAKEMAKE])
+AC_PATH_PROG([BASH], [bash], [$BASH])
+AC_PATH_PROG([BEDTOOLS], [bedtools], [$BEDTOOLS])
+AC_PATH_PROG([FASTA_FROM_BED], [fastaFromBed], [$FASTA_FROM_BED])
+AC_PATH_PROG([MEME_CHIP], [meme-chip], [$MEME_CHIP])
+AC_PATH_PROG([PANDOC], [pandoc], [$PANDOC])
+AC_PATH_PROG([RSCRIPT], [Rscript], [$RSCRIPT])
+AC_PATH_PROG([R], [R], [$R])
 
 AC_DEFUN([AX_TEST_R_PACKAGE], [
     pushdef([PKG],$1)
