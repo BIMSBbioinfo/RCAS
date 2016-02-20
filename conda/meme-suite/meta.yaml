@@ -13,7 +13,7 @@ requirements:
     - perl
     - perl-xml-parser 2.44
     - perl-xml-simple 2.20
-    - python
+    - python 2.*
     - libxml2 2.9.3
     - openmpi 1.10.2
     - libxslt 1.1.28
@@ -24,7 +24,7 @@ requirements:
     - perl
     - perl-xml-parser 2.44
     - perl-xml-simple 2.20
-    - python
+    - python 2.*
     - libxml2 2.9.3
     - openmpi 1.10.2
     - libxslt 1.1.28
