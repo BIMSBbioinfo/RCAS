@@ -14,7 +14,6 @@ requirements:
     - bedtools ==2.24.0
     - snakemake
     - pandoc >=1.16.0.2
-    - meme-suite
     - bioconductor-biomart
     - bioconductor-org.hs.eg.db
     - bioconductor-org.mm.eg.db
@@ -35,7 +34,6 @@ requirements:
     - bedtools ==2.24.0
     - snakemake
     - pandoc >=1.16.0.2
-    - meme-suite
     - bioconductor-biomart
     - bioconductor-org.hs.eg.db
     - bioconductor-org.mm.eg.db
