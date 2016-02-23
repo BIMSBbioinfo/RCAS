@@ -55,6 +55,9 @@ def process_cor_line(line):
 
 	return cor_info, anot_info
 
+def iterate_list(elements, tag):
+	return [ele for ele in elements if tag in ele]
+
 def extract_info(cor_anot):
 	#extract cor_info, feature_info, child_id, parent_id
 
@@ -77,7 +80,8 @@ def extract_info(cor_anot):
 		if "Parent=" not in feature_info:
 			parent_id = "None"
 		else:
-			parent_id = infos[1].replace("Parent=", "")
+			parent = iterate_list(infos, "Parent=")[0]
+			parent_id = parent.replace("Parent=", "")
 
 	return cor_info, anot_info, child_id, parent_id
 
