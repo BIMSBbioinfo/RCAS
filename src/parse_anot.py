@@ -89,7 +89,6 @@ def extract_info(cor_anot):
     cor_info, anot_info = cor_anot
     feature_info = anot_info[-2]
     anot_info, overlap_number = anot_info[:-1], anot_info[-1]
-
     # overlap_number is conditioned to cor_info and anot_info
     cor_info = "%s\t%s" % (cor_info, overlap_number)
 
@@ -97,13 +96,28 @@ def extract_info(cor_anot):
 
         infos = feature_info.split(";")
 
-        child_id = infos[0].split("=")[1]
+        """Contrary to GENCODE gff3 format,
+        which uses constant fields and order in each line,
+        ENSEMBL gff3 format varies in both respects.
+        Therefore, instead of acessing values vi index,
+        I use iterate_list to locate
+        value with given key (tag).""
+        """
 
         if "Parent=" not in feature_info:
             parent_id = "None"
         else:
             parent = iterate_list(infos, "Parent=")[0]
             parent_id = parent.replace("Parent=", "")
+
+        try:
+            child_id = iterate_list(infos, "ID=")[0].split("=")[1]
+        except:
+            try:
+                child_id = iterate_list(infos, "exon_id=")[0].split("=")[1]
+            except:
+                feature = anot_info[0]
+                child_id = feature + ":" + parent_id.split(":")[-1]
 
     return cor_info, anot_info, child_id, parent_id
 
