@@ -178,7 +178,6 @@ def extract_feature(anot_info):
 
     else:
         info = info.split(";")
-
         feature_id = info[0].split("=")[1]
         gene_id = info[2].split("=")[1]
         transcript_id = info[3].split("=")[1]
@@ -259,9 +258,13 @@ if __name__ == '__main__':
             substract associated parent exon ids
             defined in exon:CDS or exon:UTR.
             unfortunately in gencode gff3,
-            the relation is not clear between exon and CDS or UTR
+            the relation is not explict between exon and CDS or UTR
             that's why it can not be implemented by substract_parent_id()"""
-            child_ids = substract_parent_exon(child_ids)
+            # the function substract_parent_exon() is switched off,
+            # since even though it is easy for GENCODE gff3 format,
+            # there is no way to trace relation between exons and CDS/UTR
+            # in the format of ENSEMBLE gff3
+            # child_ids = substract_parent_exon(child_ids)
 
             cor_and_ids[cor] = child_ids
 
