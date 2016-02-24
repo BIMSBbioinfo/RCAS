@@ -55,7 +55,23 @@ def process_cor_line(line):
 
     line = line.strip().split("\t")
     cor_info = "\t".join(line[:6])
-    anot_info = line[8], line[12], line[-2], line[-1]
+    anot_info = [line[8], line[12], line[-2], line[-1]]
+
+    """ determine feature of annotation.
+    check if ID is present.
+    it is always true in GENCODE foramt,
+    but it varies in ENSEMBL format.
+    use feature in ID field if it is cotained in the field.
+    by this way, it can conform feature annotations
+    between GENCODE and ENSEMBL
+    that feature annotation sush as
+    "processed_transcript" etc. will be exluded,
+    instead to use "transcript" for both annotations."""
+    if anot_info[2].startswith("ID="):
+        ID = anot_info[2].split(";")[0]
+        if ":" in ID:
+            feature = ID.split(":")[0].replace("ID=", "")
+            anot_info[0] = feature
 
     return cor_info, anot_info
 
