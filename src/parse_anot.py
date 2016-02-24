@@ -217,8 +217,13 @@ if __name__ == '__main__':
     # check commandline options
     check_argv(argv, handler)
 
-    # extract coordinate info & feature infos
-    cor_anot_list = [process_cor_line(line) for line in handler]
+    """ extract coordinate info & feature infos.
+    for the case of gff3 from ENSEMBLE,
+    since it cotains ID=chromosome,
+    I provide control to remove such line."""
+    cor_anot_list = [process_cor_line(line)
+                     for line in handler
+                     if "ID=chromosome:" not in line]
 
     # build dictionary between child_id and parent_id
     # defined in gene:transcript:exon
