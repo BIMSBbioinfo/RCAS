@@ -10,7 +10,7 @@ build:
 
 requirements:
   build:
-    - python
+    - python !=3.5.1
     - bedtools ==2.24.0
     - snakemake
     - pandoc >=1.16.0.2
@@ -30,7 +30,7 @@ requirements:
     - r-rmarkdown
     - r-data.table
   run:
-    - python
+    - python !=3.5.1
     - bedtools ==2.24.0
     - snakemake
     - pandoc >=1.16.0.2
