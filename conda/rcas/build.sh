@@ -2,6 +2,6 @@
 
 autoreconf -vif
 
-./configure --prefix=$PREFIX
+./configure MEME_CHIP=meme-chip   --prefix=$PREFIX
 
 make install
