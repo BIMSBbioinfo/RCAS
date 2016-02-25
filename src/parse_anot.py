@@ -92,6 +92,8 @@ def extract_info(cor_anot):
     # overlap_number is conditioned to cor_info and anot_info
     cor_info = "%s\t%s" % (cor_info, overlap_number)
 
+    feature = anot_info[0]
+
     if feature_info != '.':
 
         infos = feature_info.split(";")
@@ -116,8 +118,23 @@ def extract_info(cor_anot):
             try:
                 child_id = iterate_list(infos, "exon_id=")[0].split("=")[1]
             except:
-                feature = anot_info[0]
                 child_id = feature + ":" + parent_id.split(":")[-1]
+
+    if feature == "transcript":
+        try:
+            gene_type = iterate_list(infos, "gene_type=")[0].split("=")[1]
+        except:
+            gene_type = iterate_list(infos, "biotype=")[0].split("=")[1]
+
+        try:
+            gene_name = iterate_list(infos, "gene_name=")[0].split("=")[1]
+        except:
+            gene_name = iterate_list(infos, "Name=")[0].split("=")[1]
+
+        gene_id = parent_id
+
+        id_description[child_id] = [gene_id,
+                                    gene_type, gene_name]
 
     return cor_info, anot_info, child_id, parent_id
 
@@ -193,9 +210,10 @@ def substract_parent_exon(child_ids):
     return child_ids
 
 
-def extract_feature(anot_info):
+def extract_feature(anot_info, child_id, child_and_parent, id_description):
 
-    feature, strand, info = anot_info
+    feature = anot_info[0]
+    strand = anot_info[1]
 
     if feature == ".":
         feature = "intergenic"
@@ -207,12 +225,20 @@ def extract_feature(anot_info):
         strand = "*"
 
     else:
-        info = info.split(";")
-        feature_id = info[0].split("=")[1]
-        gene_id = info[2].split("=")[1]
-        transcript_id = info[3].split("=")[1]
-        gene_type = info[4].split("=")[1]
-        gene_name = info[6].split("=")[1]
+        feature_id = child_id
+
+        if feature == "transcript":
+            transcript_id = feature_id
+        else:
+            transcript_id = child_and_parent[feature_id]
+
+        feature_description = id_description[transcript_id]
+
+        transcript_id = transcript_id.replace("transcript:", "")
+
+        gene_id = feature_description[0].replace("gene:", "")
+        gene_type = feature_description[1]
+        gene_name = feature_description[2]
 
         if feature == "transcript":
             feature = "intronic"
@@ -220,17 +246,23 @@ def extract_feature(anot_info):
         if feature == "UTR":
             feature = feature_id.split(":")[0]
 
-    return "\t".join([feature, feature_id, gene_id, transcript_id, gene_type,
+    return "\t".join([feature, feature_id, gene_id,
+                     transcript_id, gene_type,
                      gene_name, strand])
 
 
-def update_table(cor_info, child_ids, id_and_info, table):
+def update_table(cor_info, child_ids, id_and_info,
+                 child_and_parent,
+                 id_description, table):
+
     weight = 1. / len(child_ids)
 
     for child_id in child_ids:
         anot_info = id_and_info[child_id]
 
-        feature_info = extract_feature(anot_info)
+        feature_info = extract_feature(anot_info, child_id,
+                                       child_and_parent,
+                                       id_description)
 
         table.append("%s\t%f\t%s" % (cor_info, weight, feature_info))
 
@@ -264,7 +296,10 @@ if __name__ == '__main__':
     # build dictionary between coordinate info and list of associated ids
     cor_and_ids = {}
 
-    # update child_and_parent, id_and_info, cor_and_ids
+    # build dictionary between transcript_id and feature description
+    id_description = {}
+
+    # update child_and_parent, id_and_info, cor_and_ids, id_description
     for cor_anot in cor_anot_list:
         cor_info, anot_info, child_id, parent_id = extract_info(cor_anot)
 
@@ -305,6 +340,8 @@ if __name__ == '__main__':
               "\tgene_type\tgene_name\tgene_strand")
     table = [header]
     for cor_info, child_ids in cor_and_ids.items():
-        table = update_table(cor_info, child_ids, id_and_info, table)
+        table = update_table(cor_info, child_ids, id_and_info,
+                             child_and_parent, id_description,
+                             table)
 
     print("\n".join(table))
