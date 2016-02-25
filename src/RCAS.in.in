@@ -40,6 +40,14 @@ def get_argument_parser():
                         help="Required for running GO-term or pathway enrichment."
                         " Default: human")
 
+    parser.add_argument("--keyword", "-k",
+                        default=False,
+                        help="User defined keyword."
+                        " Used as prefix in output filenames."
+                        " Only valid when input is a single BED file."
+                        " By default, RCAS automatically determine keyword"
+                        " by excluding extension of input filename.")
+
     parser.add_argument("--cores", "-j",
                         metavar="N",
                         default="1",
@@ -83,8 +91,14 @@ def generate_config(args):
     BED_files = args.BED
     infiles = {}
 
-    for BED in BED_files:
-        infiles[extract_key(BED)] = BED
+    if args.keyword and len(BED_files) == 1:
+        BED = BED_files[0]
+        sample = args.keyword
+        infiles[sample] = BED
+    else:
+        for BED in BED_files:
+            sample = extract_key(BED)
+            infiles[sample] = BED
 
     if args.run_motif:
         run_motif = "True"
