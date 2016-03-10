@@ -142,7 +142,7 @@ omit `.in` for clarity.
   - `c2.cp.v5.0.entrez.gmt`
   - `c2.cp.v5.0.entrez.dm3.gmt`
   - `c2.cp.v5.0.entrez.mm9.gmt`
-  - `c2.cp.v5.0.entrez.ce10.gmt`
+  - `c2.cp.v5.0.entrez.ce6.gmt`
   - `custom.css`
   - `header.html`
   - `img` folder
