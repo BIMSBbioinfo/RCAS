@@ -137,16 +137,19 @@ count_associations = function(treatment, background, gene_lists){
     b = sum(background %in% l)
     exp = t_size * (b/b_size)
     comparison =  matrix(c(t, b, t_size - t, b_size - b), nrow = 2, dimnames = list(c("treatment", "background"), c("found", "not_found")))
-    pval  = fisher.test(comparison, alternative = "two.sided")$p.value
+    pval  = fisher.test(comparison, alternative = "greater")$p.value
+    
     t_counts = c(t_counts, t)
     b_counts = c(b_counts, b)
     exp_vals = c(exp_vals, exp)
-    if (t >= exp){enrichment_status = c(enrichment_status, "enriched")}
-    if (t < exp){enrichment_status = c(enrichment_status, "depleted")}
     pval_calc = c(pval_calc, pval)
   }
-  results = cbind.data.frame(mynames, t_counts, rep(t_size, length(mynames)), b_counts, rep(b_size, length(mynames)), exp_vals, enrichment_status, pval_calc)
-  colnames(results) = c("list_name", "treatment_count", "treatment_size", "background_count", "background_size", "expected_in_treatment", "enrichment_status", "pval")
+  #debug# results = cbind.data.frame(mynames, t_counts, rep(t_size, length(mynames)), b_counts, rep(b_size, length(mynames)), exp_vals, enrichment_status, pval_calc)
+  #debug# colnames(results) = c("list_name", "treatment_count", "treatment_size", "background_count", "background_size", "expected_in_treatment", "enrichment_status", "pval")
+  
+  results = cbind.data.frame(mynames, t_counts, rep(t_size, length(mynames)), exp_vals, pval_calc)
+  colnames(results) = c("list_name", "treatment_count", "treatment_size", "expected_in_treatment", "pval")
+  
   results$bonferroni = p.adjust(results$pval, method = "bonferroni")
   results$BH = p.adjust(results$pval, method = "BH")
   return(data.table(results))
