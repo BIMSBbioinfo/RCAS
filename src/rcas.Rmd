@@ -3,14 +3,14 @@ date: "30 Nov 2015"
 ---
 
 ```{r load_libraries, message=FALSE, warning=FALSE, echo=FALSE}
-library('data.table')
-library('DT')
-library('plotly')
-library('dplyr')
-library('genomation')
-library('rtracklayer')
-library('GenomicFeatures')
-library('knitr')
+suppressMessages(suppressWarnings(library('data.table')))
+suppressMessages(suppressWarnings(library('DT')))
+suppressMessages(suppressWarnings(library('plotly')))
+suppressMessages(suppressWarnings(library('dplyr')))
+suppressMessages(suppressWarnings(library('genomation')))
+suppressMessages(suppressWarnings(library('rtracklayer')))
+suppressMessages(suppressWarnings(library('GenomicFeatures')))
+suppressMessages(suppressWarnings(library('knitr')))
 ```
 
 
@@ -31,8 +31,9 @@ figure_count = 1
 table_count = 1
 ```
 
+`r cat('arguments:',args,'\n')`
 
-```{r define_modules_to_run, echo=FALSE, warning=FALSE}
+```{r define_modules_to_run, echo=FALSE, warning=FALSE, eval=TRUE}
 ##based on the input options; define boolean parameters that are used in corresponding chunks to determine if chunk should be evaluated or not. 
 run_anot = ifelse(anot == 'NOT_RUN', FALSE, TRUE)
 run_go_bp = ifelse(go_bp == 'NOT_RUN', FALSE, TRUE)
@@ -50,7 +51,7 @@ run_coverage_profile = ifelse(coverage_profile_option == 'NOT_RUN', FALSE, TRUE)
 opts_knit$set(root.dir=work_dir)
 ```
 
-```{r read_anot_input, echo=FALSE, eval=run_anot}
+```{r read_anot_input, echo=FALSE, warning=FALSE, eval=run_anot}
 mdata = fread(anot)
 mdata$peak_id = paste(mdata$chromosome_id, mdata$start_position, mdata$end_position, mdata$strand, sep=":")
 ```
@@ -99,8 +100,8 @@ figure_count = figure_count + 1
 ```
 
 ```{r MEME_top_genes_tabcap, echo=FALSE, results='asis', eval=run_meme_anot}
-cat('## Top genes with most discovered types of motifs','\n')
-cat('**Table',table_count,':** Genes with highest motif diversity (100: highest; 0:lowest)', '\n')
+cat('## Top 50 genes with most discovered types of motifs','\n')
+cat('**Table',table_count,':** Genes with highest number of motif types (diversity)', '\n')
 ```
 
 ```{r MEME_top_genes, echo=FALSE, warning=FALSE, message=FALSE, eval=run_meme_anot}
@@ -109,9 +110,10 @@ df = unique(dt[,c("gene_name", "motif"), with=FALSE])
 df = df[,length(motif),by=gene_name]
 colnames(df) = c("gene_name", "motif_diversity")
 df = df[order(motif_diversity, decreasing=TRUE)]
-df$motif_diversity = round(df$motif_diversity/length(unique(df$motif_diversity)),2)*100
+#df$motif_diversity = round(df$motif_diversity/length(unique(df$motif_diversity)),2)*100
 #get top 90% of genes with highest motif diversity
-datatable(df[motif_diversity > quantile(df$motif_diversity, c(0.95))], filter = 'top')
+#print(df)
+datatable(df[1:50], filter = 'top')
 table_count = table_count + 1
 ```
 
@@ -373,16 +375,16 @@ cat("# GO term and Pathway Enrichment Results\n")
 
 ```{r GO_BP_tabcap, results='asis', echo=FALSE, eval=run_go_bp}
 cat("## GO Term Enrichment Results for Biological Processes\n")
-cat("**Table",table_count,":** Significant Biological Process GO terms (FDR < 0.001) enriched for genes that overlap query regions\n")  
+cat("**Table",table_count,":** Significant Biological Process GO terms (BH < 0.1) enriched for genes that overlap query regions\n")  
 ```
 
 ```{r GO_BP, results='asis', warning=FALSE, echo=FALSE, eval=run_go_bp}
 go = fread(go_bp)
-results = go[bonferroni < 0.001]
+results = go[bh < 0.1]
 if (nrow(results) > 0){
   datatable(results, filter = 'top')
 }else{
-    cat("**WARNING: Couldn't detect any enrichment/depletion of GO terms (FDR < 0.001) related to biological processes**\n")
+    cat("**WARNING: Couldn't detect any enrichment/depletion of GO terms (BH < 0.001) related to biological processes**\n")
 }
 table_count = table_count + 1
 ```
@@ -390,16 +392,16 @@ table_count = table_count + 1
 
 ```{r GO_MF_tabcap, results='asis', echo=FALSE, eval=run_go_mf}
 cat("## GO Term Enrichment Results for Molecular Functions\n")
-cat("**Table",table_count,":** Significant Molecular Function GO terms (FDR < 0.001) enriched for genes that overlap query regions\n")
+cat("**Table",table_count,":** Significant Molecular Function GO terms (BH < 0.1) enriched for genes that overlap query regions\n")
 ```
 
 ```{r GO_MF, results='asis', warning=FALSE,  echo=FALSE, eval=run_go_mf}
 go = fread(go_mf)
-results = go[bonferroni < 0.001]
+results = go[bh < 0.1]
 if (nrow(results) > 0){
   datatable(results,   filter = 'top')
 }else{
-  cat("**WARNING: Couldn't detect any enrichment/depletion of GO terms (FDR < 0.001) related to molecular functions**\n")
+  cat("**WARNING: Couldn't detect any enrichment/depletion of GO terms (BH < 0.1) related to molecular functions**\n")
 }
 table_count = table_count + 1
 ```
@@ -407,12 +409,12 @@ table_count = table_count + 1
 
 ```{r GO_CC_tabcap, results='asis', echo=FALSE, eval=run_go_cc}
 cat("## GO Term Enrichment Results for Cellular Compartments\n")
-cat("**Table",table_count,":** Significant Cellular Compartment GO terms (FDR < 0.001) enriched for genes that overlap query regions\n")
+cat("**Table",table_count,":** Significant Cellular Compartment GO terms (BH < 0.1) enriched for genes that overlap query regions\n")
 ```
 
 ```{r GO_CC, results='asis', warning=FALSE,  echo=FALSE, eval=run_go_cc}
 go = fread(go_cc)
-results = go[bonferroni < 0.001]
+results = go[bh < 0.1]
 if (nrow(results) > 0){
   datatable(results,  filter = 'top')
 }else{
@@ -423,13 +425,13 @@ table_count = table_count + 1
 
 ```{r GSEA_msigdb_tabcap, results='asis', echo=FALSE, eval=run_msigdb}
 cat("## Gene Set Enrichment Results based on MSigDB\n")
-cat("**Table",table_count,":** Significant MSigDB Gene Sets (FDR < 0.001) enriched for genes that overlap query regions\n")
+cat("**Table",table_count,":** Significant MSigDB Gene Sets (BH < 0.1) enriched for genes that overlap query regions\n")
 ```
 
 ```{r GSEA_msigdb, results='asis', warning=FALSE,  echo=FALSE, eval=run_msigdb}
 msigdb = fread(msigdb)
-if (nrow(msigdb) > 0){
-  datatable(msigdb, filter='top')
+if (nrow(msigdb[BH < 0.1]) > 0){
+  datatable(msigdb[BH < 0.1], filter='top')
 }else{
    cat("**WARNING: Couldn't detect any enrichment/depletion of MSIGDB gene sets**\n")
 }
