@@ -147,11 +147,12 @@ count_associations = function(treatment, background, gene_lists){
   #debug# results = cbind.data.frame(mynames, t_counts, rep(t_size, length(mynames)), b_counts, rep(b_size, length(mynames)), exp_vals, enrichment_status, pval_calc)
   #debug# colnames(results) = c("list_name", "treatment_count", "treatment_size", "background_count", "background_size", "expected_in_treatment", "enrichment_status", "pval")
   
-  results = cbind.data.frame(mynames, t_counts, rep(t_size, length(mynames)), exp_vals, pval_calc)
+  results = cbind.data.frame(mynames, t_counts, rep(t_size, length(mynames)), round(exp_vals, 1), pval_calc)
   colnames(results) = c("list_name", "treatment_count", "treatment_size", "expected_in_treatment", "pval")
   
-  results$bonferroni = p.adjust(results$pval, method = "bonferroni")
-  results$BH = p.adjust(results$pval, method = "BH")
+  results$bonferroni = format.pval(p.adjust(results$pval, method = "bonferroni"))
+  results$BH = format.pval(p.adjust(results$pval, method = "BH"))
+  results$pval = format.pval(results$pval)
   return(data.table(results))
 }
 
