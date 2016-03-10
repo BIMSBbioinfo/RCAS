@@ -2,6 +2,7 @@
 #Supported annotations 
 #human (hg19)=  #host='feb2014.archive.ensembl.org', dataset = "hsapiens_gene_ensembl") #ENSEMBL75; GRCh37 release
 #worm (ce10) #host='jan2013.archive.ensembl.org', dataset = "celegans_gene_ensembl" # ENSEMBL70; WormBase v. WS220 WBcel215; CE10
+#worm (ce6) #host='may2009.archive.ensembl.org', dataset = "celegans_gene_ensembl" # ENSEMBL54; WormBase v. WS190; CE6
 #fly (dm3) =  #host='dec2014.archive.ensembl.org', dataset = "dmelanogaster_gene_ensembl") #ENSEMBL78; #BDGP-5 release dm3
 #mouse (mm9) =  #host='may2012.archive.ensembl.org', dataset = "mmusculus_gene_ensembl") #ENSEMBL67 #NCBI 37 mm9
 
@@ -81,20 +82,12 @@ retrieve_orthologs = function(mart1, mart2, gene_set){
 create_msigdb_dataset = function(hg19_genesets, orthologs){
   
   dataset = list()
-  counts1 = c()
-  counts2 = c()
   for (i in 1:length(hg19_genesets)){
     my_set = unique(as.numeric(paste(unlist(hg19_genesets[i]))))
     my_orth = unique(orthologs[orthologs$EntrezGene.ID %in% my_set,]$EntrezGene.ID.1)
     my_name = names(hg19_genesets)[i]
-    #cat(my_name,'\n',orthologs[orthologs$EntrezGene.ID %in% my_set,]$EntrezGene.ID,'\n',my_orth,'\n')
     dataset[[my_name]] = my_orth
-    counts1 = c(counts1, length(my_set))
-    counts2 = c(counts2, length(my_orth))
-    #if(length(my_set) > 800){cat(my_name, "\n")}
-    #if((length(my_set) / length(my_orth)) < 0.5){ cat(my_name, length(my_set), length(my_orth), "\n")}
   }
-  plot(counts1, counts2) #diagnostic plot to see if number of found orthologs are correlated to number of input genes
   return(dataset)
 }
 
@@ -121,7 +114,8 @@ cat("got the gene lists from",msigdb,"\n")
 hg19 = useMart(biomart='ENSEMBL_MART_ENSEMBL', host='feb2014.archive.ensembl.org', dataset = "hsapiens_gene_ensembl")
 mm9 = useMart(biomart='ENSEMBL_MART_ENSEMBL', host='may2012.archive.ensembl.org', dataset = "mmusculus_gene_ensembl")
 dm3 = useMart(biomart='ENSEMBL_MART_ENSEMBL', host='dec2014.archive.ensembl.org', dataset = "dmelanogaster_gene_ensembl")
-ce10 = useMart(biomart='ENSEMBL_MART_ENSEMBL', host='jan2013.archive.ensembl.org', dataset = "celegans_gene_ensembl")
+#ce10 = useMart(biomart='ENSEMBL_MART_ENSEMBL', host='jan2013.archive.ensembl.org', dataset = "celegans_gene_ensembl")
+ce6 = useMart(biomart='ENSEMBL_MART_ENSEMBL', host='may2009.archive.ensembl.org', dataset = "celegans_gene_ensembl")
 cat('Created the database connections to biomart\n')
 
 #define all available human genes in all the given gene sets 
@@ -132,8 +126,8 @@ mm9_orth = retrieve_orthologs(mart1 = hg19, mart2 = mm9, hg19_genes)
 cat('retrieved mm9 orthologs\n')
 dm3_orth = retrieve_orthologs(mart1 = hg19, mart2 = dm3, hg19_genes)
 cat('retrieved dm3 orthologs\n')
-ce10_orth = retrieve_orthologs(mart1 = hg19, mart2 = ce10, hg19_genes)
-cat('retrieved ce10 orthologs\n')
+ce6_orth = retrieve_orthologs(mart1 = hg19, mart2 = ce6, hg19_genes)
+cat('retrieved ce6 orthologs\n')
 
 
 #create MSIGDB datasets for each species (worm, fly, and mouse) by using orthologous relationships to human
@@ -147,7 +141,7 @@ mm9_msigdb = create_msigdb_dataset(hg19_genesets = hg19_genesets, orthologs = mm
 print_msigdb_dataset(dataset = mm9_msigdb, output_filename = paste(base, 'mm9', ext, sep='.'))
 
 dm3_msigdb = create_msigdb_dataset(hg19_genesets = hg19_genesets, orthologs = dm3_orth)
-print_msigdb_dataset(dataset = mm9_msigdb, output_filename = paste(base, 'dm3', ext, sep='.'))
+print_msigdb_dataset(dataset = dm3_msigdb, output_filename = paste(base, 'dm3', ext, sep='.'))
 
-ce10_msigdb = create_msigdb_dataset(hg19_genesets = hg19_genesets, orthologs = ce10_orth)
-print_msigdb_dataset(dataset = mm9_msigdb, output_filename = paste(base, 'ce10', ext, sep='.'))
+ce6_msigdb = create_msigdb_dataset(hg19_genesets = hg19_genesets, orthologs = ce6_orth)
+print_msigdb_dataset(dataset = ce6_msigdb, output_filename = paste(base, 'ce6', ext, sep='.'))
