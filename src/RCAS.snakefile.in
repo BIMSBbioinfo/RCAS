@@ -49,7 +49,7 @@ if species == "human":
 elif species == "fly":
 	gmt = "c2.cp.v5.0.entrez.dm3.gmt"
 elif species == "worm":
-	gmt = "c2.cp.v5.0.entrez.ce10.gmt"
+	gmt = "c2.cp.v5.0.entrez.ce6.gmt"
 elif species == "mouse":
 	gmt = "c2.cp.v5.0.entrez.mm9.gmt"
 
