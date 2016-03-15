@@ -189,6 +189,7 @@ results = results[order(pval)]
 
 #Write pathways with FDR < 0.001 to file
 #write.table(results[bonferroni < 0.001], file = out_file, quote = FALSE, row.names = FALSE, sep="\t")
+out_file = paste0(out_prefix,'.msigdb_results.tsv')
 write.table(results, file = out_file, quote = FALSE, row.names = FALSE, sep="\t")
 
 
