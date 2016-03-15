@@ -21,14 +21,14 @@ rcas.msigdb.R: Gene Set Enrichment Analysis module of RCAS based on Gene Sets fr
 
 Arguments:
 --gmt=<path to MSigDB gmt file>  - e.g /home/buyar/projecst/RCAS/c2.cp.v5.0.symbols.gmt
---gff_rds=<path to gtf in granges.rds >  - e.g /data/akalin/Base/Annotation/GenomeAnnotation/hg19/EnsemblGenes/*.gtf
---peaks=<peaks file in BED format>  - e.g Hafner2010.hg19.bed
---out=<output prefix>   -e.g Hafner2010.hg19
+--background_list=<background list of genes >  - e.g {sample}.background_genes.txt
+--targeted_list=<peaks file in BED format>  - e.g {sample}.targeted_genes.txt
+--out_prefix=<output prefix>   -e.g Hafner2010.hg19
 --species=<species name>    -Choose between (human, fly, worm, mouse)
 --help              - print this text
 
 Example:
-Rscript rcas.msigdb.R --gmt=c2.cp.v5.0.entrez.gmt --gff_rds=ensembl.hg19.gtf.granges.rds --peaks=Hafner2010.hg19.bed --out=myproject.hg19 --species=human"
+Rscript rcas.msigdb.R --gmt=c2.cp.v5.0.entrez.gmt --background_list={sample}.background_genes.txt--targeted_list={sample}.targeted_genes.txt --out_prefix=Hafner2010.hg19 --species=human"
 
 ## Help section
 if("--help" %in% args) {
@@ -47,20 +47,22 @@ if(!("gmt" %in% argsDF$V1)) {
   stop("provide the path to gmt file")
 }
 
-if(!("gff_rds" %in% argsDF$V1)) {
+## Arg1 default
+if(!("background_list" %in% argsDF$V1)) {
   cat(help_command, "\n")
-  stop("provide the path to gtf/gff file in granges.rds format")
+  stop("provide the path to background gene list")
 }
 
 ## Arg2 default
-if(!("peaks" %in% argsDF$V1)) {
+if(!("targeted_list" %in% argsDF$V1)) {
   cat(help_command, "\n")
-  stop("provide the path to input.bed file")
+  stop("provide the path to query/targeted gene list")
 }
 
-if(!("out" %in% argsDF$V1)) {
+## Arg3 default
+if(!("out_prefix" %in% argsDF$V1)) {
   cat(help_command, "\n")
-  stop("provide the output prefix to anot.bed file")
+  stop("provide the output prefix")
 }
 
 ## Arg4
@@ -70,9 +72,9 @@ if(!("species" %in% argsDF$V1)) {
 }
 
 msigdb = argsL$gmt
-gff_rds = argsL$gff_rds
-peaks = argsL$peaks
-out_file = argsL$out
+background_list = argsL$background_list
+targeted_list = argsL$targeted_list
+out_prefix = argsL$out_prefix
 species = argsL$species
 
 if (!(species %in% c('human', 'fly', 'worm', 'mouse'))){
@@ -84,20 +86,13 @@ if (!(species %in% c('human', 'fly', 'worm', 'mouse'))){
 ########################################################################################################################################
 #2. Get the list of all protein-coding genes from the GTF file 
 
-gff = readRDS(gff_rds)
-all_gene_ids = na.omit(unique(gff$gene_id))
+all_gene_ids = na.omit(scan(background_list, what = character()))
 head(all_gene_ids)
 
-seqlevelsStyle(gff) = 'UCSC'
-
-cat("Read ",length(all_gene_ids),"genes from ",gff_rds,"\n")
+cat("Read ",length(all_gene_ids),"genes from ",background_list,"\n")
 
 # Get the query regions info
-peaks = import.bed(peaks)
-seqlevelsStyle(peaks) = 'UCSC'
-overlaps = gff[queryHits(findOverlaps(gff, peaks))]
-targeted_gene_ids = na.omit(unique(overlaps$gene_id))
-
+targeted_gene_ids = na.omit(scan(targeted_list, what = character()))
 cat("Found ",length(targeted_gene_ids),"genes targeted by query regions\n")
 
 #4. Look for enriched MSigDB gene sets for the genes found in the anot.bed compared to the background genes (found in gtf)
