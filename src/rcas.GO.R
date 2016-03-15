@@ -12,12 +12,12 @@ help_command = "
       Arguments:
       --background_list=<background list of genes >  - e.g {sample}.background_genes.txt
       --targeted_list=<peaks file in BED format>  - e.g {sample}.targeted_genes.txt
-      --out=<output prefix>   -e.g Hafner2010.hg19
+      --out_prefix=<output prefix>   -e.g Hafner2010.hg19
       --species=<species name>    -Choose between (human, fly, worm, mouse)
       --help              - print this text
       
       Example:
-      Rscript rcas.GO.R --background_list=ensembl.hg19.gtf.granges.rds --targeted_list=Hafner2010.hg19.bed --out=Hafner2010.hg19 --species=human"
+      Rscript rcas.GO.R --background_list={sample}.background_genes.txt--targeted_list={sample}.targeted_genes.txt --out_prefix=Hafner2010.hg19 --species=human"
 
 ## Help section
 if("--help" %in% args) {
@@ -44,7 +44,7 @@ if(!("targeted_list" %in% argsDF$V1)) {
 }
 
 ## Arg3 default
-if(!("out" %in% argsDF$V1)) {
+if(!("out_prefix" %in% argsDF$V1)) {
   cat(help_command, "\n")
   stop("provide the output prefix")
 }
@@ -57,7 +57,7 @@ if(!("species" %in% argsDF$V1)) {
 
 background_list = argsL$background_list
 targeted_list = argsL$targeted_list
-out_prefix = argsL$out
+out_prefix = argsL$out_prefix
 species = argsL$species
 
 if (!(species %in% c('human', 'fly', 'worm', 'mouse'))){
