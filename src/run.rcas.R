@@ -60,6 +60,7 @@ genome_version = argsL$genome_version
 
 ### must be configured by configuration script 
 source_dir = '/home/buyar/projects/RCAS/src'
+base_dir = '/home/buyar/projects/RCAS/src/base'
 ###
 
 if(!genome_version %in% c('hg19', 'ce6', 'mm9', 'dm3')){
@@ -137,8 +138,16 @@ GO_command = paste0('Rscript ',source_dir,'/rcas.GO.R',
 cat(GO_command,'\n')
 #system(GO_command)
 
-
-
+#Use the gene lists to run MSIGDB module
+msigdb_gmt = paste0(base_dir,'/c2.cp.v5.0.entrez.',genome_version,'.gmt')
+MSIGDB_command = paste0('Rscript ',source_dir,'/rcas.msigdb.R',
+                    ' --gmt=',msigdb_gmt,
+                    ' --background_list=',background_geneset,
+                    ' --targeted_list=',targeted_geneset,
+                    ' --out_prefix=',out_prefix,
+                    ' --species=',species)
+cat(MSIGDB_command,'\n')
+#system(MSIGDB_command)
 
 
 
