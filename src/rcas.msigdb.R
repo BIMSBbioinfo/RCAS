@@ -21,14 +21,14 @@ rcas.msigdb.R: Gene Set Enrichment Analysis module of RCAS based on Gene Sets fr
 
 Arguments:
 --gmt=<path to MSigDB gmt file>  - e.g /home/buyar/projecst/RCAS/c2.cp.v5.0.symbols.gmt
---gff3=<path to GENCODE Annotation File>  - e.g /data/akalin/Base/Annotation/GenomeAnnotation/hg19/gencode/gencode.v19.annotation.gff3
---anot=<path to parse_anot.py output>  - e.g /home/buyar/projects/RCAS/test/PARCLIP_AGO1234_Hafner2010a_hg19_xaa.anot.tsv
+--gff_rds=<path to gtf in granges.rds >  - e.g /data/akalin/Base/Annotation/GenomeAnnotation/hg19/EnsemblGenes/*.gtf
+--peaks=<peaks file in BED format>  - e.g Hafner2010.hg19.bed
 --out=<output prefix>   -e.g Hafner2010.hg19
 --species=<species name>    -Choose between (human, fly, worm, mouse)
 --help              - print this text
 
 Example:
-Rscript rcas.msigdb.R --gmt=c2.cp.v5.0.entrez.gmt --gff3=gencode.v19.annotation.gff3 --anot=PARCLIP_AGO1234_Hafner2010a_hg19_xaa.anot.tsv --out=myproject.hg19 --species=human"
+Rscript rcas.msigdb.R --gmt=c2.cp.v5.0.entrez.gmt --gff_rds=ensembl.hg19.gtf.granges.rds --peaks=Hafner2010.hg19.bed --out=myproject.hg19 --species=human"
 
 ## Help section
 if("--help" %in% args) {
@@ -47,14 +47,15 @@ if(!("gmt" %in% argsDF$V1)) {
   stop("provide the path to gmt file")
 }
 
-if(!("gff3" %in% argsDF$V1)) {
+if(!("gff_rds" %in% argsDF$V1)) {
   cat(help_command, "\n")
-  stop("provide the path to gff3 file")
+  stop("provide the path to gtf/gff file in granges.rds format")
 }
 
-if(!("anot" %in% argsDF$V1)) {
+## Arg2 default
+if(!("peaks" %in% argsDF$V1)) {
   cat(help_command, "\n")
-  stop("provide the path to anot.bed file")
+  stop("provide the path to input.bed file")
 }
 
 if(!("out" %in% argsDF$V1)) {
@@ -69,8 +70,8 @@ if(!("species" %in% argsDF$V1)) {
 }
 
 msigdb = argsL$gmt
-gff3_file = argsL$gff3
-anot_file = argsL$anot
+gff_rds = argsL$gff_rds
+peaks = argsL$peaks
 out_file = argsL$out
 species = argsL$species
 
@@ -83,23 +84,21 @@ if (!(species %in% c('human', 'fly', 'worm', 'mouse'))){
 ########################################################################################################################################
 #2. Get the list of all protein-coding genes from the GTF file 
 
-if(file.exists(paste0(gff3_file, ".rds")))
-{
-  gff = readRDS(paste0(gff3_file, ".rds"))
-}else
-{
-  gff = import.gff3(gff3_file)
-  saveRDS(gff, file=paste0(gff3_file, ".rds"))
-}
-idx <- mcols(gff)$gene_type == "protein_coding" & mcols(gff)$type=="gene"
-all_gene_ids = unique(gff[idx]$gene_id)
+gff = readRDS(gff_rds)
+all_gene_ids = na.omit(unique(gff$gene_id))
+head(all_gene_ids)
 
-cat("Read ",length(all_gene_ids),"genes from ",gff3_file,"\n")
+seqlevelsStyle(gff) = 'UCSC'
 
-#3. Get the list of protein-coding genes from the anot.bed file => those that are found to be targeted in the PAR-CLIP experiments
-ann = fread(anot_file)
-ann.gene_ids = unique(ann$gene_id)
-cat("Read ",length(ann.gene_ids),"genes from ",anot_file, "\n")
+cat("Read ",length(all_gene_ids),"genes from ",gff_rds,"\n")
+
+# Get the query regions info
+peaks = import.bed(peaks)
+seqlevelsStyle(peaks) = 'UCSC'
+overlaps = gff[queryHits(findOverlaps(gff, peaks))]
+targeted_gene_ids = na.omit(unique(overlaps$gene_id))
+
+cat("Found ",length(targeted_gene_ids),"genes targeted by query regions\n")
 
 #4. Look for enriched MSigDB gene sets for the genes found in the anot.bed compared to the background genes (found in gtf)
 #source("http://www.bioconductor.org/biocLite.R")
@@ -128,7 +127,6 @@ count_associations = function(treatment, background, gene_lists){
   t_counts = c()
   b_counts = c()
   exp_vals = c()
-  enrichment_status = c()
   pval_calc = c()
   for (l in gene_lists){
     i = i + 1
@@ -144,8 +142,9 @@ count_associations = function(treatment, background, gene_lists){
     exp_vals = c(exp_vals, exp)
     pval_calc = c(pval_calc, pval)
   }
-  #debug# results = cbind.data.frame(mynames, t_counts, rep(t_size, length(mynames)), b_counts, rep(b_size, length(mynames)), exp_vals, enrichment_status, pval_calc)
-  #debug# colnames(results) = c("list_name", "treatment_count", "treatment_size", "background_count", "background_size", "expected_in_treatment", "enrichment_status", "pval")
+  #for debugging#
+  #results = cbind.data.frame(mynames, t_counts, rep(t_size, length(mynames)), b_counts, rep(b_size, length(mynames)), exp_vals, pval_calc)
+  #colnames(results) = c("list_name", "treatment_count", "treatment_size", "background_count", "background_size", "expected_in_treatment", "pval")
   
   results = cbind.data.frame(mynames, t_counts, rep(t_size, length(mynames)), round(exp_vals, 1), pval_calc)
   colnames(results) = c("list_name", "treatment_count", "treatment_size", "expected_in_treatment", "pval")
@@ -181,10 +180,10 @@ if (species == 'human'){
   mapping_dict = org.Ce.egENSEMBL2EG
 }
 ens2eg <- as.list(mapping_dict) #mapping dictionary from ENSEMBL to ENTREZ 
-treatment = get_unique_items_from_list(ens2eg[gsub("\\..*$", "", ann.gene_ids)])
+treatment = get_unique_items_from_list(ens2eg[gsub("\\..*$", "", targeted_gene_ids)])
 background = get_unique_items_from_list(ens2eg[gsub("\\..*$", "", all_gene_ids)])
 
-cat("mapped ",length(ann.gene_ids),"from ensembl to",length(treatment),"gene ids from entrez for treatment", "\n")
+cat("mapped ",length(targeted_gene_ids),"from ensembl to",length(treatment),"gene ids from entrez for treatment", "\n")
 cat("mapped ",length(all_gene_ids)," from ensembl to",length(background),"gene ids from entrez for background", "\n")
 
 #count the number of times each pathway is associated to the gene list of interest
