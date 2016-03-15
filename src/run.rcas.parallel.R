@@ -1,11 +1,4 @@
-# Script to run RCAS in parallel on BEAST. 
-
-# ls bedfiles/*.bed | while read f; do base=`echo $f | sed 's/.bed$//g'`;  \
-# base=`basename $base`; echo "$f $base"; mkdir $base; cp $f $base; cd $base; 
-# /home/buyar/tools/RCAS/bin/RCAS --genome /data/akalin/Base/Genomes/hg19/hg19.fa 
-                                 #--gff3 /data/akalin/Base/Annotation/GenomeAnnotation/hg19/gencode/gencode.v19.annotation.gff3 
-                                 #--species human --cores 4 --run_all $base.bed; cd ../; done
-
+# Script to run RCAS in parallel 
 
 #1. Collect arguments
 args <- commandArgs(TRUE)
