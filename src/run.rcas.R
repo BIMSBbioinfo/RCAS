@@ -47,8 +47,6 @@ if(!("genome_version" %in% argsDF$V1)) {
   stop("provide the genome version: choose between hg19, mm9, ce6 or dm3\n")
 }
 
-
-
 #load libraries#
 suppressMessages(library('tools'))
 suppressMessages(library('rtracklayer'))
@@ -78,6 +76,9 @@ if(genome_version %in% c('hg19', 'hg38')){
 }else if(genome_version %in% c('dm3', 'dm6')){
   species = 'fly'
 }
+
+out_prefix = sub(x = basename(peak_file), pattern = paste0('.',file_ext(peak_file)), replacement = '')
+
 
 gff_version = file_ext(gff_file)
 
@@ -123,7 +124,6 @@ all_gene_ids = na.omit(unique(gff$gene_id))
 overlaps = gff[queryHits(findOverlaps(gff, peaks))]
 targeted_gene_ids = na.omit(unique(overlaps$gene_id))
 
-out_prefix = sub(x = basename(peak_file), pattern = paste0('.',file_ext(peak_file)), replacement = '')
 
 background_geneset = paste0(out_prefix, '.background_genes.txt')
 write(x = all_gene_ids, file = background_geneset)
@@ -158,10 +158,24 @@ MSIGDB_command = paste0(Rscript,' ',source_dir,'/rcas.msigdb.R',
 cat(MSIGDB_command,'\n')
 system(MSIGDB_command)
 
+work_dir = getwd()
+report_script = paste0(source_dir,'/rcas.Rmd')
+output_filename = paste0(out_prefix, '.rcas.html')
+css = paste0(base_dir,'/custom.css')
+header=paste0(base_dir,'/header.html')
+REPORT_command = paste0(Rscript," -e \"library('rmarkdown'); rmarkdown::render('",report_script,"',",
+                          " output_file = '",output_filename,"',",
+                          " intermediates_dir = '",work_dir,"',",
+                          " output_dir = '",work_dir,"',",
+                          " html_document(toc=TRUE, theme='cerulean', number_sections=TRUE, css='",css,"',",
+                          " includes=includes(before_body='",header,"')))\"",
+                          " ",work_dir," ",peak_file," ",paste0(gff_file,'.granges.rds')," ",
+                          " ",paste0(gff_file,'.gfeatures.txdb'),
+                          " ",paste0(out_prefix,".BP.GO.results.tsv"),
+                          " ",paste0(out_prefix,".MF.GO.results.tsv"),
+                          " ",paste0(out_prefix,".CC.GO.results.tsv"),
+                          " ",paste0(out_prefix,".msigdb_results.tsv"),
+                          " RUN")
 
-
-
-
-
-
-
+cat(REPORT_command)
+system(REPORT_command)

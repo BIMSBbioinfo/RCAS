@@ -6,7 +6,6 @@ date: "30 Nov 2015"
 suppressMessages(suppressWarnings(library('data.table')))
 suppressMessages(suppressWarnings(library('DT')))
 suppressMessages(suppressWarnings(library('plotly')))
-suppressMessages(suppressWarnings(library('dplyr')))
 suppressMessages(suppressWarnings(library('genomation')))
 suppressMessages(suppressWarnings(library('rtracklayer')))
 suppressMessages(suppressWarnings(library('GenomicFeatures')))
@@ -24,9 +23,7 @@ go_bp = args[5] ##go enrichment results for biological processes
 go_mf = args[6] ##go enrichment results for molecular functions
 go_cc = args[7] ##go enrichment results for sub-cellular locations
 msigdb = args[8] ##msigdb enrichment results 
-meme_outdir = args[9] ##output directory of meme results that contains the logos and meme.txt file 
-motif_anot_file = args[10] ##'../test/PARCLIP_AGO1234_Hafner2010a_hg19_xaa.anot-motif.tsv' #motif annotation output from top_motifs.py script of Dilmurat
-coverage_profile_option = args[11] ##option to run or not run the coverage profile calculations 
+coverage_profile_option = args[9] ##option to run or not run the coverage profile calculations 
 figure_count = 1
 table_count = 1
 ```
@@ -41,8 +38,6 @@ run_go_mf = ifelse(go_mf == 'NOT_RUN', FALSE, TRUE)
 run_go_cc = ifelse(go_cc == 'NOT_RUN', FALSE, TRUE)
 run_go = run_go_bp || run_go_mf || run_go_cc 
 run_msigdb = ifelse(msigdb == 'NOT_RUN', FALSE, TRUE)
-run_meme = ifelse(meme_outdir == 'NOT_RUN', FALSE, TRUE)
-run_meme_anot = ifelse(motif_anot_file == 'NOT_RUN', FALSE, TRUE)
 run_coverage_profile = ifelse(coverage_profile_option == 'NOT_RUN', FALSE, TRUE)
 ```
 
@@ -367,97 +362,6 @@ if (nrow(msigdb[BH < 0.1]) > 0){
    cat("**WARNING: Couldn't detect any enrichment/depletion of MSIGDB gene sets**\n")
 }
 table_count = table_count + 1
-```
-
-```{r MEME_top_motifs_figcap, echo=FALSE, results='asis', eval=run_meme}
-cat("# Motif Analysis Results\n")
-cat('## TOP MEME motifs discovered in the query regions\n')
-cat('**Figure',figure_count,':** The genomic sequences of the regions that are covered by each query region is extracted from the fasta file of the genome. Then, [MEME](http://meme-suite.org/tools/meme) was run to find enriched motif patterns in the list of query regions. The logos of the discovered motif patterns and the corresponding statistical test results are provided below.','\n')
-```
-
-```{r MEME_top_motifs, results='asis', echo=FALSE, warning=FALSE, message=FALSE, eval=run_meme}
-logos = dir(meme_outdir, "^logo[0-9]*.png$", full.names=TRUE )
-#get motif data:
-
-logos = normalizePath(logos)
-
-mylines = readLines(paste(meme_outdir, "meme.txt", sep="/"))
-motifs = grep("^MOTIF", mylines, value = TRUE)
-
-for (i in 1:length(logos)){
-  #cat(logos[i], motifs[i], "\n")
-  cat(paste("**",motifs[i],"** \n\n", sep=""),"\n")
-  cat(paste("![alt text](", logos[i], ")", sep = ""), "\n")
-  cat("\n")
-}
-figure_count = figure_count + 1
-```
-
-```{r read_motif_input, echo=FALSE, warning=FALSE, eval=run_meme_anot}
-motif_data = fread(motif_anot_file)
-motif_data$motif_instance_id = paste(motif_data$motif, motif_data$chromosome_id, motif_data$start_position, motif_data$end_position, motif_data$strand, sep=":")
-```
-
-```{r MEME_motif_frequency_figcap, echo=FALSE, results='asis', eval=run_meme_anot}
-cat('## Discovered consensus motifs and their frequency in the target transcriptome','\n')
-cat('**Figure',figure_count,':** The frequency of the top 10 discovered motifs in the transcriptome is plotted.','\n') 
-```
-
-```{r MEME_motif_frequency, echo=FALSE, warning=FALSE, message=FALSE, eval=run_meme_anot}
-dt = motif_data
-df = dt[,length(unique(motif_instance_id)), by=c('motif')]
-colnames(df) = c('motif', 'motif_instance_count')
-p = plot_ly(df, x=motif_instance_count, y=motif, mode="markers", size=motif_instance_count, color=motif_instance_count)
-layout(p, yaxis = list(title="Consensus Motifs"), margin = list(l=150))
-figure_count = figure_count + 1
-```
-
-```{r MEME_top_genes_tabcap, echo=FALSE, results='asis', eval=run_meme_anot}
-cat('## Top 50 genes with most discovered types of motifs','\n')
-cat('**Table',table_count,':** Genes with highest number of motif types (diversity)', '\n')
-```
-
-```{r MEME_top_genes, echo=FALSE, warning=FALSE, message=FALSE, eval=run_meme_anot}
-dt = motif_data
-df = unique(dt[,c("gene_name", "motif"), with=FALSE])
-df = df[,length(motif),by=gene_name]
-colnames(df) = c("gene_name", "motif_diversity")
-df = df[order(motif_diversity, decreasing=TRUE)]
-#df$motif_diversity = round(df$motif_diversity/length(unique(df$motif_diversity)),2)*100
-#get top 90% of genes with highest motif diversity
-#print(df)
-datatable(df[1:50], filter = 'top')
-table_count = table_count + 1
-```
-
-
-```{r MEME_gene_types_figcap, echo=FALSE, results='asis', eval=run_meme_anot}
-cat('## Distribution of discovered motifs in gene types\n')
-cat('**Figure',figure_count,':** The frequency of the top 10 discovered motifs in the transcriptome is plotted with respect to different types of genes.\n')
-```
-
-```{r MEME_gene_types, echo=FALSE, warning=FALSE, message=FALSE, eval=run_meme_anot}
-dt = motif_data
-df = dt[,length(unique(motif_instance_id)), by=c('motif', 'gene_type')]
-colnames(df) = c("motif", "gene_type", "motif_instance_count")
-p = plot_ly(df, x=motif_instance_count, y=motif, color = gene_type, mode="markers", size=motif_instance_count, text=gene_type)
-layout(p, margin=list(l=150, b=100))
-figure_count = figure_count + 1
-```
-
-
-```{r MEME_gene_features_figcap, echo=FALSE, results='asis', eval=run_meme_anot}
-cat('## Distribution of discovered motifs in gene features\n')
-cat('**Figure',figure_count,':** The frequency of the top 10 discovered motifs in the transcriptome is plotted with respect to different types of gene features.\n')
-```
-
-```{r MEME_gene_features, echo=FALSE, warning=FALSE, message=FALSE, eval=run_meme_anot}
-dt = motif_data
-df = dt[,length(unique(motif_instance_id)), by=c('motif', 'feature')]
-colnames(df) = c("motif", "feature", "motif_instance_count")
-p = plot_ly(df, x=motif_instance_count, y=motif, color = feature, mode="markers", size=motif_instance_count, text=feature)
-layout(p, margin=list(l=150, b=100))
-figure_count = figure_count + 1
 ```
 
 

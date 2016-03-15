@@ -100,39 +100,34 @@ names(all_genes) = gsub("\\..*$", "", gene_universe$gene_id) #ensembl gene ids d
 selection_function = function (x){ return(x == 1) }
 
 calculate_go_enrichment = function (ontology){
-
-if (species == 'human'){
-  species_orgdb = 'org.Hs.eg.db'
-}else if (species == 'mouse'){
-  species_orgdb = 'org.Mm.eg.db'
-}else if (species == 'fly'){
-  species_orgdb = 'org.Dm.eg.db'
-}else if (species == 'worm'){
-  species_orgdb = 'org.Ce.eg.db'
-}
   
-GOdata <- new("topGOdata", ontology = ontology, allGenes = all_genes, geneSel = selection_function, nodeSize=20, description = "Test", annot = annFUN.org, mapping=species_orgdb, ID="Ensembl")
-
-resultFisher <- runTest(GOdata, algorithm = "classic", statistic = "fisher")
-mt = GenTable(GOdata, classicFisher = resultFisher, topNodes = length(usedGO(GOdata)))
-
-#Do multiple-testing correction
-mt$classicFisher = gsub("<", "", mt$classicFisher) #some p-values have the "less than" sign ("<"), which causes the numeric column to be interpreted as character. 
-mt$bonferroni = p.adjust(mt$classicFisher, method="bonferroni")
-mt$bh = p.adjust(mt$classicFisher, method="BH")
-
-if (!dir.exists(out_prefix)) {dir.create(out_prefix)}
-out_file = paste0(c(ontology, "GO.results.tsv"), collapse = '.')
-out_file = paste0(out_prefix, "/", out_file)
-
-write.table(mt, file = out_file, sep='\t', quote = FALSE, row.names = FALSE)
+  if (species == 'human'){
+    species_orgdb = 'org.Hs.eg.db'
+  }else if (species == 'mouse'){
+    species_orgdb = 'org.Mm.eg.db'
+  }else if (species == 'fly'){
+    species_orgdb = 'org.Dm.eg.db'
+  }else if (species == 'worm'){
+    species_orgdb = 'org.Ce.eg.db'
+  }
+    
+  GOdata <- new("topGOdata", ontology = ontology, allGenes = all_genes, geneSel = selection_function, nodeSize=20, description = "Test", annot = annFUN.org, mapping=species_orgdb, ID="Ensembl")
+  
+  resultFisher <- runTest(GOdata, algorithm = "classic", statistic = "fisher")
+  mt = GenTable(GOdata, classicFisher = resultFisher, topNodes = length(usedGO(GOdata)))
+  
+  #Do multiple-testing correction
+  mt$classicFisher = gsub("<", "", mt$classicFisher) #some p-values have the "less than" sign ("<"), which causes the numeric column to be interpreted as character. 
+  mt$bonferroni = p.adjust(mt$classicFisher, method="bonferroni")
+  mt$bh = p.adjust(mt$classicFisher, method="BH")
+  
+  
+  out_file = paste(out_prefix, ontology, "GO.results.tsv", sep = '.')
+  cat('writing to file',out_file,'\n')
+  write.table(mt, file = out_file, sep='\t', quote = FALSE, row.names = FALSE)
 }
 
 calculate_go_enrichment('BP')
 calculate_go_enrichment('MF')
 calculate_go_enrichment('CC')
-
-
-
-
 
