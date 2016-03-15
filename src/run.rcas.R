@@ -12,10 +12,10 @@ if(length(args) < 3) {
 }
 
 help_command = "
-preprocess.anot.R: given a gtf/gff3 file; create rtracklayer::GRanges and GenomicFeatures::txdb objects and write to disk
+run.rcas.R: run RCAS pipeline for a given ENSEMBL gtf file and BED formatted input file 
 
 Arguments:
---gff_file=<path to ENSEMBL GTF/GFF file>  - e.g /data/akalin/Base/Annotation/GenomeAnnotation/hg19/EnsemblGenes/*.gtf
+--gff_file=<path to ENSEMBL GTF/GFF file>  - e.g /data/akalin/Base/Annotation/hg19/EnsemblGenes/142812_EnsemblFTP_hg19_EnsemblGenes.gtf
 --peak_file=<path to query regions in BED format> - e.g. Hafner2009.bed
 --genome_version=<choose genome version: e.g. hg19; dm3; ce6; mm9>
 --help              - print this text"
