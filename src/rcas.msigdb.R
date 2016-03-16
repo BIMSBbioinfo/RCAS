@@ -130,7 +130,7 @@ count_associations = function(treatment, background, gene_lists){
     b = sum(background %in% l)
     exp = t_size * (b/b_size)
     comparison =  matrix(c(t, b, t_size - t, b_size - b), nrow = 2, dimnames = list(c("treatment", "background"), c("found", "not_found")))
-    pval  = fisher.test(comparison, alternative = "greater")$p.value
+    pval  = gsub(pattern = '<', replacement = '', x = fisher.test(comparison, alternative = "greater")$p.value)
     
     t_counts = c(t_counts, t)
     b_counts = c(b_counts, b)
