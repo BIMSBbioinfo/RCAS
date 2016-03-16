@@ -2,14 +2,16 @@
 date: "30 Nov 2015"
 ---
 
-```{r load_libraries, message=FALSE, warning=FALSE, echo=FALSE}
-suppressMessages(suppressWarnings(library('data.table')))
-suppressMessages(suppressWarnings(library('DT')))
-suppressMessages(suppressWarnings(library('plotly')))
-suppressMessages(suppressWarnings(library('genomation')))
-suppressMessages(suppressWarnings(library('rtracklayer')))
-suppressMessages(suppressWarnings(library('GenomicFeatures')))
-suppressMessages(suppressWarnings(library('knitr')))
+```{r load_libraries, results='hide', message=FALSE, warning=FALSE, echo=FALSE}
+library('data.table')
+library('DT')
+library('plotly')
+library('genomation')
+library('rtracklayer')
+library('GenomicFeatures')
+library('knitr')
+library('motifRG')
+library('seqLogo')
 ```
 
 
@@ -23,7 +25,8 @@ go_bp = args[5] ##go enrichment results for biological processes
 go_mf = args[6] ##go enrichment results for molecular functions
 go_cc = args[7] ##go enrichment results for sub-cellular locations
 msigdb = args[8] ##msigdb enrichment results 
-coverage_profile_option = args[9] ##option to run or not run the coverage profile calculations 
+coverage_profile_option = args[9] ##option to run or not run the coverage profile calculations
+motif_results = args[10] # motifRG results in rds format e.g. <sample>.motif.results.rds
 figure_count = 1
 table_count = 1
 ```
@@ -32,13 +35,15 @@ table_count = 1
 
 ```{r define_modules_to_run, echo=FALSE, warning=FALSE, eval=TRUE}
 ##based on the input options; define boolean parameters that are used in corresponding chunks to determine if chunk should be evaluated or not. 
-run_anot = TRUE #basic annotation summary is always run
+run_anot = FALSE #basic annotation summary is always run
+eval_query_gene_types = FALSE #depends on run_anot; 
 run_go_bp = ifelse(go_bp == 'NOT_RUN', FALSE, TRUE)
 run_go_mf = ifelse(go_mf == 'NOT_RUN', FALSE, TRUE)
 run_go_cc = ifelse(go_cc == 'NOT_RUN', FALSE, TRUE)
 run_go = run_go_bp || run_go_mf || run_go_cc 
 run_msigdb = ifelse(msigdb == 'NOT_RUN', FALSE, TRUE)
 run_coverage_profile = ifelse(coverage_profile_option == 'NOT_RUN', FALSE, TRUE)
+run_motif = ifelse(motif_results == 'NOT_RUN', FALSE, TRUE)
 ```
 
 
@@ -46,12 +51,12 @@ run_coverage_profile = ifelse(coverage_profile_option == 'NOT_RUN', FALSE, TRUE)
 opts_knit$set(root.dir=work_dir)
 ```
 
-```{r read_gff_rds, echo=FALSE, warning=FALSE, message=FALSE, eval=TRUE} 
+```{r read_gff_rds, echo=FALSE, warning=FALSE, message=FALSE, eval=run_anot} 
 #prepare datasets that will be used in later chunks 
 gff = readRDS(gff_rds) #GRanges object 
 ```
 
-```{r get_txdb_features ,echo=FALSE, warning=FALSE, message=FALSE, eval=TRUE}
+```{r get_txdb_features ,echo=FALSE, warning=FALSE, message=FALSE, eval=run_anot}
 txdb = loadDb(txdb_file)
 
 txdb_transcripts = transcripts(txdb) #has tx_name
@@ -82,10 +87,32 @@ txdb_cds$gene_name = gff[match(names(txdb_cds), gff$transcript_id)]$gene_name
 
 ```
 
-```{r read_peaks,echo=FALSE, warning=FALSE, message=FALSE, eval=TRUE}
+```{r read_peaks,echo=FALSE, warning=FALSE, message=FALSE, eval=run_anot}
 peaks = import(peaks_file, format = "bed")
 seqlevelsStyle(peaks) = 'UCSC'
 ```
+
+```{r motif_results_figcap, echo=FALSE, results='asis', eval=run_motif}
+cat('# motifRG analysis results \n')
+cat('## Top motifs discovered using motifRG \n')
+```
+
+```{r plot_motif_results, results='asis', echo=FALSE, eval=run_motif}
+motif = readRDS(motif_results)
+
+if(length(motif$motifs) > 0){
+  cat(paste0("**Figure-",figure_count,":** Discovered motifs"))
+  par(mfrow=c(3,2), mar=c(2,2,2,2))
+  for (i in 1:length(motif$motifs)){
+    motif_pattern = motif$motifs[[i]]@pattern
+    plotMotif(motif$motifs[[i]]@match$pattern, main=paste0('Motif-',i,': ',motif_pattern), cex=0.5)
+  }
+  figure_count = figure_count + 1
+}else{
+  cat('**Could not detect any motif enrichment in the given query regions**\n')
+}
+```
+
 
 ```{r overlap_gene_features_figcap, echo=FALSE, results='asis', eval=run_anot}
 cat('# Distribution of query regions in genomic annotation features \n')
@@ -122,10 +149,7 @@ overlaps.dt = data.table(as.data.frame(o.gff)) ##convert granges object into dat
 
 if (any(grepl('biotype', colnames(overlaps.dt)))){
   eval_query_gene_types = TRUE
-}else{
-  eval_query_gene_types = FALSE
 }
-
 ```
 
 ```{r query_gene_types_figcap, echo=FALSE, results='asis', eval=eval_query_gene_types}
@@ -191,7 +215,7 @@ tbls = lapply(tbls, function(i) setkey(i, tx_name))
 merged <- Reduce(function(...) merge(..., all = T), tbls)
 merged$gene_name = gff[match(merged$tx_name, gff$transcript_id)]$gene_name
 merged = merged[order(transcript_total, decreasing=T)]
-datatable(merged, filter = 'top')
+datatable(merged[1:500], filter = 'top')
 table_count = table_count + 1
 ```
 
