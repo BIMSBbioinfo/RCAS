@@ -11,7 +11,7 @@ library('rtracklayer')
 library('GenomicFeatures')
 library('knitr')
 library('motifRG')
-library('seqLogo')
+library('reshape2')
 ```
 
 
@@ -27,6 +27,7 @@ go_cc = args[7] ##go enrichment results for sub-cellular locations
 msigdb = args[8] ##msigdb enrichment results 
 coverage_profile_option = args[9] ##option to run or not run the coverage profile calculations
 motif_results = args[10] # motifRG results in rds format e.g. <sample>.motif.results.rds
+peak_seqs_fasta = args[11] # fasta sequences of peaks, output of rcas.motif.R <sample>.foreground.fasta 
 figure_count = 1
 table_count = 1
 ```
@@ -35,7 +36,7 @@ table_count = 1
 
 ```{r define_modules_to_run, echo=FALSE, warning=FALSE, eval=TRUE}
 ##based on the input options; define boolean parameters that are used in corresponding chunks to determine if chunk should be evaluated or not. 
-run_anot = FALSE #basic annotation summary is always run
+run_anot = TRUE #basic annotation summary is always run
 eval_query_gene_types = FALSE #depends on run_anot; 
 run_go_bp = ifelse(go_bp == 'NOT_RUN', FALSE, TRUE)
 run_go_mf = ifelse(go_mf == 'NOT_RUN', FALSE, TRUE)
@@ -44,6 +45,7 @@ run_go = run_go_bp || run_go_mf || run_go_cc
 run_msigdb = ifelse(msigdb == 'NOT_RUN', FALSE, TRUE)
 run_coverage_profile = ifelse(coverage_profile_option == 'NOT_RUN', FALSE, TRUE)
 run_motif = ifelse(motif_results == 'NOT_RUN', FALSE, TRUE)
+provide_motif_summary = FALSE #depends on run_anot and run_motif being TRUE 
 ```
 
 
@@ -85,6 +87,20 @@ txdb_cds = unlist(cdsBy(txdb, by="tx",use.names=TRUE))#row names are transcript_
 txdb_cds$tx_name = names(txdb_cds)
 txdb_cds$gene_name = gff[match(names(txdb_cds), gff$transcript_id)]$gene_name
 
+#define a function that can be used to summarize a given set of peaks 
+summarize_peaks = function(peaks){
+  tr = length(unique(queryHits(findOverlaps(peaks, txdb_transcripts))))
+  pr = length(unique(queryHits(findOverlaps(peaks, txdb_promoters))))
+  futr = length(unique(queryHits(findOverlaps(peaks, txdb_five_UTRs))))
+  ex = length(unique(queryHits(findOverlaps(peaks, txdb_exons))))
+  cds = length(unique(queryHits(findOverlaps(peaks, txdb_cds))))
+  inr = length(unique(queryHits(findOverlaps(peaks, txdb_introns))))
+  tutr = length(unique(queryHits(findOverlaps(peaks, txdb_three_UTRs))))
+  res = c(tr, pr, futr, ex, cds, inr, tutr)
+  df = data.frame(freq = res, features = c('transcripts', 'promoters', "5'UTR", 'exons', 'cds', 'intron', "3'UTR"))
+  return(df)
+}
+
 ```
 
 ```{r read_peaks,echo=FALSE, warning=FALSE, message=FALSE, eval=run_anot}
@@ -92,25 +108,72 @@ peaks = import(peaks_file, format = "bed")
 seqlevelsStyle(peaks) = 'UCSC'
 ```
 
-```{r motif_results_figcap, echo=FALSE, results='asis', eval=run_motif}
+```{r plot_motif_results_figcap, echo=FALSE, results='asis', eval=run_motif}
 cat('# motifRG analysis results \n')
 cat('## Top motifs discovered using motifRG \n')
 ```
 
 ```{r plot_motif_results, results='asis', echo=FALSE, eval=run_motif}
 motif = readRDS(motif_results)
-
+peak_seqs = readDNAStringSet(peak_seqs_fasta)
 if(length(motif$motifs) > 0){
-  cat(paste0("**Figure-",figure_count,":** Discovered motifs"))
+  provide_motif_summary = TRUE
+  cat(paste0("**Figure-",figure_count,":** Top motifs discovered in the sequences of the query regions"))
   par(mfrow=c(3,2), mar=c(2,2,2,2))
   for (i in 1:length(motif$motifs)){
     motif_pattern = motif$motifs[[i]]@pattern
-    plotMotif(motif$motifs[[i]]@match$pattern, main=paste0('Motif-',i,': ',motif_pattern), cex=0.5)
+    plotMotif(motif$motifs[[i]]@match$pattern, main=paste0('Motif-',i,': ',motif_pattern), entropy = T)
   }
   figure_count = figure_count + 1
 }else{
   cat('**Could not detect any motif enrichment in the given query regions**\n')
 }
+```
+
+```{r summarize_stats_tablecap, echo=FALSE, results='asis', eval=provide_motif_summary}
+cat('## motifRG motif discovery statistics \n')
+cat("**Table",table_count,":** motifRG motif discovery statistics. fg: foreground; bg: background; hits: number of motif hits; seq: number of sequences with motifs; frac: fraction of sequences that contain the motif compared to the all sequences; ratio: ratio of foreground motif fraction versus background motif fraction\n")
+```
+
+```{r summarize_stats_table, echo=FALSE, warning=FALSE, eval=provide_motif_summary}
+motif = readRDS(motif_results)
+df = summaryMotif(motif$motifs, motif$category)
+df$scores = round(df$scores, 1)
+df$ratio = round(df$ratio, 1)
+datatable(df[,-c(2)])
+table_count = table_count + 1
+```
+
+```{r summarize_motif_hits_figcap, echo=FALSE, results='asis', eval=provide_motif_summary}
+cat('## Genomic features overlapping with discovered motifs \n')
+cat("**Figure",figure_count,":** The number of motif containing query regions in different gene features.\n")
+
+```
+
+```{r summarize_motif_hits, echo=FALSE, warning=FALSE, eval=provide_motif_summary}
+
+motif = readRDS(motif_results)
+peak_seqs = readDNAStringSet(peak_seqs_fasta) 
+peak_ids = which(motif$category==1) #which ids correspond to the foreground seqs (peaks)
+
+#the sequence of features must be the same as defined in summarize_peaks function
+motif_summary = data.frame(features = c('transcripts', 'promoters', "5'UTR", 'exons', 'cds', 'intron', "3'UTR"))
+
+for (i in 1:length(motif$motifs)){
+  match_seqid = motif$motifs[[i]]@match$seq.id #found sequence ids of all query regions (both foreground (peaks) and background)
+  match_peaks = peaks[match_seqid[match_seqid %in% peak_ids]] #found peaks that match the current motif
+  motif_pattern = motif$motifs[[i]]@pattern
+  #now do summary stats by overlap operations 
+  res = summarize_peaks(match_peaks)
+  motif_summary = cbind(motif_summary, res$freq)
+  colnames(motif_summary)[length(colnames(motif_summary))] = motif_pattern 
+}
+
+m = melt.data.table(data.table(motif_summary), id.vars = c('features'))
+p = plot_ly(data = m, x = variable, y = value, color = features, type='bar')
+layout(p, xaxis = list(title="Discovered Motif Patterns"), yaxis=list(title=paste0('Number of Peaks containing the motif')))
+figure_count = figure_count + 1
+
 ```
 
 
@@ -119,21 +182,13 @@ cat('# Distribution of query regions in genomic annotation features \n')
 cat('## Distribution of query regions across gene features\n')
 
 cat("**Figure",figure_count,":** The number of query regions that overlap different kinds of gene features are counted. The 'y' axis denotes the types of gene features included in the analysis and the 'x' axis denotes the percentage of query regions (out of total number of query regions denoted with 'n') that overlap at least one genomic interval that host the corresponding feature. Notice that the sum of the percentage values for different features don't add up to 100%, because some query regions may overlap multiple kinds of features \n")
+
 ```
 
 ```{r overlap_gene_features, echo=FALSE, warning=FALSE, message=FALSE, eval=run_anot}
-tr = length(unique(queryHits(findOverlaps(peaks, txdb_transcripts))))
-pr = length(unique(queryHits(findOverlaps(peaks, txdb_promoters))))
-futr = length(unique(queryHits(findOverlaps(peaks, txdb_five_UTRs))))
-ex = length(unique(queryHits(findOverlaps(peaks, txdb_exons))))
-cds = length(unique(queryHits(findOverlaps(peaks, txdb_cds))))
-inr = length(unique(queryHits(findOverlaps(peaks, txdb_introns))))
-tutr = length(unique(queryHits(findOverlaps(peaks, txdb_three_UTRs))))
+res = summarize_peaks(peaks)
 
-res = c(tr, pr, futr, ex, cds, inr, tutr)
-df = data.frame(freq = res, features = c('transcripts', 'promoters', "5'UTR", 'exons', 'cds', 'intron', "3'UTR"))
-
-p <- plot_ly(df, x=features, y=freq, type = 'bar')
+p <- plot_ly(res, x=features, y=freq, type = 'bar')
 layout(p, xaxis = list(title="Gene Features"), yaxis=list(title=paste0('Number of Peaks (out of ',length(peaks),')')))
 
 figure_count = figure_count + 1
@@ -184,12 +239,12 @@ figure_count = figure_count + 1
 ```
 
 
-```{r get_table_of_genes_tabcap, echo=FALSE, results='asis', eval=run_anot}
+```{r get_table_of_genes_tabcap, echo=FALSE, results='asis', eval=FALSE}
 cat("## Interactive table of genes that overlap query regions\n")
 cat("**Table",table_count,":** Interactive table of genes (top 500) that overlap query regions, grouped by gene features such as introns, exons, UTRs, etc.\n")
 ```
 
-```{r get_table_of_genes, echo=FALSE, message=FALSE, warning=FALSE, eval=run_anot}
+```{r get_table_of_genes, echo=FALSE, message=FALSE, warning=FALSE, eval=FALSE}
 
 process_hits = function(peaks, tx, type){
   o = findOverlaps(peaks, tx)
