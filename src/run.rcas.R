@@ -79,7 +79,6 @@ if(genome_version %in% c('hg19', 'hg38')){
 
 out_prefix = sub(x = basename(peak_file), pattern = paste0('.',file_ext(peak_file)), replacement = '')
 
-
 gff_version = file_ext(gff_file)
 
 if(file.exists(paste0(gff_file, ".granges.rds")))
@@ -160,7 +159,7 @@ system(MSIGDB_command)
 
 work_dir = getwd()
 report_script = paste0(source_dir,'/rcas.Rmd')
-output_filename = paste0(out_prefix, '.rcas.html')
+output_filename = paste0(out_prefix, '.rcas.report.html')
 css = paste0(base_dir,'/custom.css')
 header=paste0(base_dir,'/header.html')
 REPORT_command = paste0(Rscript," -e \"library('rmarkdown'); rmarkdown::render('",report_script,"',",
@@ -175,7 +174,9 @@ REPORT_command = paste0(Rscript," -e \"library('rmarkdown'); rmarkdown::render('
                           " ",paste0(out_prefix,".MF.GO.results.tsv"),
                           " ",paste0(out_prefix,".CC.GO.results.tsv"),
                           " ",paste0(out_prefix,".msigdb_results.tsv"),
-                          " RUN")
+                          " RUN",
+                          " ",paste0(out_prefix,".motif.results.rds")
+                        )
 
-cat(REPORT_command)
+cat(REPORT_command,"\n")
 system(REPORT_command)
