@@ -11,7 +11,7 @@ if(length(args) < 3) {
 help_command = "
 
 Arguments:
---gff_file=<path to ENSEMBL GTF/GFF file>  - e.g /data/akalin/Base/Annotation/GenomeAnnotation/hg19/EnsemblGenes/*.gtf
+--gff_file=<path to ENSEMBL GTF/GFF file>  - e.g /data/akalin/Base/Annotation/hg19/EnsemblGenes/*.gtf
 --bed_dir=<path to directory containing input bed files> e.g. /data/akalin/buyar/rcas_analysis/sample_bed_files/
 --genome_version=<choose genome version: e.g. hg19; dm3; ce6; mm9>
 --help              - print this text
