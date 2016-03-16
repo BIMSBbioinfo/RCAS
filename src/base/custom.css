@@ -11,7 +11,7 @@ body {
   width: auto;
   padding: 1em;
   background-color: #cce5ff;
-  text-align: justify;
+  text-align: left;
   overflow-y: auto;
 }
 
