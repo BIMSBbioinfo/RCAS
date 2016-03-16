@@ -134,5 +134,3 @@ saveRDS(object = motif_results, file = paste0(out_prefix, '.motif.results.rds'))
 
 
 
-
-
