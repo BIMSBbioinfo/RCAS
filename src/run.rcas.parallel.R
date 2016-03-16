@@ -68,9 +68,9 @@ workdir = getwd()
 registerDoParallel(cores = 5)
 
 foreach (i=1:length(bedfiles)) %dopar% { 
+  setwd(workdir)
   f = bedfiles[i]
   f = file_path_as_absolute(f)
-  setwd(workdir)
   base = sub(pattern = '.bed$', basename(f), replacement = '')
   cat(f, base, '\n')
   system(paste('mkdir', base))
