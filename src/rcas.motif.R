@@ -124,7 +124,7 @@ writeXStringSet(peak_seqs, filepath=control_peak_fasta, format='fasta')
 
 cat('running motifRG...')
 motif_results = findMotifFgBg(peak_seqs, control_seqs, enriched.only=T,max.motif=5, is.parallel=TRUE, mc.cores=8, both.strand=FALSE) 
-motifHtmlTable(motif_results, prefix=out_prefix)
+#motifHtmlTable(motif_results, prefix=out_prefix)
 
 saveRDS(object = motif_results, file = paste0(out_prefix, '.motif.results.rds'))
 
