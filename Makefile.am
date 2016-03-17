@@ -13,7 +13,6 @@ dist_libexec_SCRIPTS =				\
   src/rcas.msigdb.R				\
   src/rcas.GO.R					\
   src/rcas.motif.R				\
-  src/run.rcas.parallel.R			\
   src/map_msigdb_orthologs.R
 
 basedir = $(datadir)/RCAS/base
@@ -40,7 +39,7 @@ dist_doc_DATA =					\
 # internal scripts called by snakemake rules and all snakefile parts
 # are located in libexecdir.
 src/RCAS: src/run.rcas.R.in
-	sed -e "s|#:MAKE|\nlibexecdir = \"$(libexecdir)\"\nbasedir = \"$(basedir)\"|" -i $<
+	sed -e "s|#:MAKE|\nbindir = \"$(bindir)\"\nlibexecdir = \"$(libexecdir)\"\nbasedir = \"$(basedir)\"|" -i $<
 	mv $< $@
 
 # Pandoc expects images to be relative to the current working

@@ -1,5 +1,13 @@
 #!@RSCRIPT@
 
+# The following variables are defined at configuration and build time:
+# bindir     (containing RCAS)
+# libexecdir (containing scripts and executables)
+# basedir    (containing data files)
+#:MAKE
+Rscript = '@RSCRIPT@'
+
+
 #preprocess the gtf/gff files to 
 # 1. create GRanges object and write it to .rds file; 
 # 2. create txdb file using GenomicFeatures library and write to disk 
@@ -19,9 +27,18 @@ RCAS: run RCAS pipeline for a given ENSEMBL annotation file and BED formatted in
 Arguments:
   --gff_file=annotation.{gft,gff}     ENSEMBL GTF or GFF annotation file
   --peak_file=regions.bed             path to query regions in BED format, e.g. Hafner2009.bed
+  --bed_dir=./bed_files/              location of directory of BED files
+  --cores=NUMBER                      number of cores to use for parallel execution;
+                                      only effective with the '--bed_dir' option.
   --genome_version=VERSION            genome version; supported values for VERSION are
                                        'hg19', 'dm3', 'ce6', and 'mm9'
   --help                              display this help text and exit
+
+Example:
+  RCAS --gff_file=/data/akalin/Base/Annotation/hg19/EnsemblGenes/142812_EnsemblFTP_hg19_EnsemblGenes.gtf \
+       --genome_version=hg19   \
+       --cores=5               \
+       --bed_dir=./bed_files/
 
 RCAS @VERSION@
 Copyright (C) 2016 BIMSB Bioinformatics Platform.
@@ -48,9 +65,14 @@ if(!("gff_file" %in% argsDF$V1)) {
   stop("provide the path to gtf/gff file\n")
 }
 
-if(!("peak_file" %in% argsDF$V1)) {
+if(!("peak_file" %in% argsDF$V1) && !("bed_dir" %in% argsDF$V1)) {
   cat(help_command, "\n")
-  stop("provide the path to input BED file\n")
+  stop("provide the path to input BED file(s) with --peak_file or --bed_dir\n")
+}
+
+if(("peak_file" %in% argsDF$V1) && ("bed_dir" %in% argsDF$V1)) {
+  cat(help_command, "\n")
+  stop("provide either --peak_file or --bed_dir, not both\n")
 }
 
 if(!("genome_version" %in% argsDF$V1)) {
@@ -58,20 +80,8 @@ if(!("genome_version" %in% argsDF$V1)) {
   stop("provide the genome version: choose between hg19, mm9, ce6 or dm3\n")
 }
 
-#load libraries#
-suppressMessages(library('tools'))
-suppressMessages(library('rtracklayer'))
-suppressMessages(library('GenomicFeatures'))
-
 gff_file = argsL$gff_file
-peak_file = argsL$peak_file
 genome_version = argsL$genome_version
-
-# The following variables are defined at configuration and build time:
-# libexecdir (containing scripts and executables)
-# basedir    (containing data files)
-#:MAKE
-Rscript = '@RSCRIPT@'
 
 if(!genome_version %in% c('hg19', 'ce6', 'mm9', 'dm3')){
   cat(help_command,"\n")
@@ -87,6 +97,49 @@ if(genome_version %in% c('hg19', 'hg38')){
 }else if(genome_version %in% c('dm3', 'dm6')){
   species = 'fly'
 }
+
+
+# Spawn multiple RCAS processes when --bed_dir is provided.
+if(("bed_dir" %in% argsDF$V1)) {
+  bed_dir = argsL$bed_dir
+  cores <- if ("cores" %in% argsDF$V1) { argsL$cores } else { 2 }
+
+  #load libraries#
+  suppressMessages(library(tools))
+  suppressMessages(library(foreach))
+  suppressMessages(library(doParallel))
+
+  bedfiles = list.files(path=bed_dir, pattern='*.bed', full.names = TRUE)
+  workdir = getwd()
+
+  ##register clusters for parallel executoin
+  registerDoParallel(cores = cores)
+
+  foreach (i=1:length(bedfiles)) %dopar% {
+    setwd(workdir)
+    f = bedfiles[i]
+    f = file_path_as_absolute(f)
+    base = sub(pattern = '.bed$', basename(f), replacement = '')
+    cat(f, base, '\n')
+    system(paste('mkdir', base))
+    setwd(base)
+    rcas_command = paste0(Rscript," ",bindir,"/RCAS --gff_file=",gff_file," --genome_version=",genome_version," --peak_file=",f)
+    cat('workdir=',getwd(),'\n')
+    cat('rcascommand',rcas_command,'\n')
+    system(rcas_command)
+  }
+  exit(0)
+}
+
+
+# Single file operations follow.
+
+#load libraries#
+suppressMessages(library('tools'))
+suppressMessages(library('rtracklayer'))
+suppressMessages(library('GenomicFeatures'))
+
+peak_file = argsL$peak_file
 
 out_prefix = sub(x = basename(peak_file), pattern = paste0('.',file_ext(peak_file)), replacement = '')
 
