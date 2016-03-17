@@ -40,16 +40,6 @@ cd rcas
 make install
 ~~~
 
-If your system provides both Python 2.x and Python 3.x and defaults to
-Python 3.x, you may need to pass `PYTHON=/path/to/python2` to the
-`configure` script to ensure that the Python 2.x interpreter is used,
-for example:
-
-~~~
-./configure PYTHON=/bin/python2 --prefix=/opt/rcas
-sudo make install
-~~~
-
 After the first official release we will also provide a Guix package
 definition for RCAS so that you can install the pipeline with a single
 command such as:
@@ -63,7 +53,7 @@ For development purposes we also provide a package expression for GNU
 Guix.  To enter a development shell in which all dependent tools are
 available run this:
 
-    guix environment -l package.scm
+    guix environment -l guix.scm
 
 In this shell you can configure and install RCAS as usual, but all
 tools and R packages will be handled by Guix.  There is no need to
@@ -79,10 +69,8 @@ following list for pointers:
 
 ### Tools
 
-- [snakemake](https://bitbucket.org/johanneskoester/snakemake/wiki/Documentation)
 - [R](https://www.r-project.org/)
 - fastaFromBed from [bedtools](http://bedtools.readthedocs.org/en/latest/content/installation.html)
-- [MEME-chip](http://meme-suite.org/meme-software/4.10.2/meme_4.10.2.tar.gz)
 - pandoc (>= 1.12.3)
 
 ### R packages
@@ -98,7 +86,7 @@ following list for pointers:
 - topGO
 - DT
 - plotly
-- dplyr
+- motifRG
 - genomation
 - GenomicFeatures
 
@@ -109,7 +97,7 @@ following list for pointers:
   [hg19 reference](http://hgdownload.cse.ucsc.edu/goldenPath/hg19/bigZips/chromFa.tar.gz)
 - [c2.cp.v5.0.entrez.gmt](http://software.broadinstitute.org/gsea/msigdb/download_file.jsp?filePath=/resources/msigdb/5.0/c2.cp.v5.0.entrez.gmt)
 
-## RCAS workflow is built with snakemake:
+## RCAS scripts
 
 Note that files containing placeholders that are substituted at
 configuration time end on `.in`.  Successful configuration generates
@@ -117,29 +105,17 @@ the target files without the `.in` extension.  In the lists below we
 omit `.in` for clarity.
 
 - The pipeline wrapper and entry point:
-  - `src/RCAS`
-
-- All snakemake rules end on `.snakefile`.
-  - `src/RCAS.snakefile`
-  - `src/RCAS.anot.snakefile`
-  - `src/RCAS.motif.snakefile`
-  - `src/RCAS.GOrich.snakefile`
-  - `src/RCAS.PATHrich.snakefile`
+  - `src/run.rcas.R`
 
 - Custom scripts that are called at runtime:
-  - `src/parse_anot.py`
-  - `src/top_motifs.py`
   - `src/rcas.GO.R`
   - `src/rcas.msigdb.R`
   - `src/rcas.Rmd`
-  - `src/generate_report.sh`
+  - `src/map_msigdb_orthologs.R`
+  - `src/rcas.motif.R`
 
 - Plain data files are located in `src/base`:
-  - `Homo_sapiens-U2T.meme`
-  - `Mus_musculus-U2T.meme`
-  - `Caenorhabditis_elegans-U2T.meme`
-  - `Drosophila_melanogaster-U2T.meme`
-  - `c2.cp.v5.0.entrez.gmt`
+  - `c2.cp.v5.0.entrez.hg19.gmt`
   - `c2.cp.v5.0.entrez.dm3.gmt`
   - `c2.cp.v5.0.entrez.mm9.gmt`
   - `c2.cp.v5.0.entrez.ce6.gmt`
@@ -150,9 +126,6 @@ omit `.in` for clarity.
 ## Test case
 
 Aim: generate analysis report for intervals in the target BED files.
-
-Besides the default annotation step, pathway enrichment is enabled via
-the `--run_PATHrich` flag.
 
 1. Install as per the instructions above, e.g.
     ~~~
@@ -170,10 +143,9 @@ the `--run_PATHrich` flag.
 
 5. sample command:
     ~~~
-    ./bin/RCAS --genome /path/to/hg19.fa                   \
-               --gff3 /path/to/gencode.v19.annotation.gff3 \
-               --run_PATHrich                              \
-               ./test/xaa.bed ./test/xab.bed
+    ./bin/RCAS --gff-file=142812_EnsemblFTP_hg19_EnsemblGenes.gtf \
+               --peak-file=./test/TIA1.bed                        \
+               --genome-version=hg19
     ~~~
 
 6. output: `xaa.rcas.html`, `xab.rcas.html`
