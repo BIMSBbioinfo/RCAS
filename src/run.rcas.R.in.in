@@ -25,7 +25,7 @@ help_command = "
 RCAS: run RCAS pipeline for a given ENSEMBL annotation file and BED formatted input file 
 
 Arguments:
-  --gff_file=annotation.{gft,gff}     ENSEMBL GTF or GFF annotation file
+  --gff_file=annotation.{gft,gff}     ENSEMBL GTF file
   --peak_file=regions.bed             path to query regions in BED format, e.g. Hafner2009.bed
   --bed_dir=./bed_files/              location of directory of BED files
   --cores=NUMBER                      number of cores to use for parallel execution;
@@ -224,14 +224,13 @@ system(MSIGDB_command)
 work_dir = getwd()
 report_script = paste0(libexecdir,'/rcas.Rmd')
 output_filename = paste0(out_prefix, '.rcas.report.html')
-css = paste0(basedir,'/custom.css')
 header=paste0(basedir,'/header.html')
 REPORT_command = paste0(Rscript," -e \"library('rmarkdown'); rmarkdown::render('",report_script,"',",
                           " output_file = '",output_filename,"',",
                           " intermediates_dir = '",work_dir,"',",
                           " output_dir = '",work_dir,"',",
-                          " html_document(toc=TRUE, theme='cerulean', number_sections=TRUE, css='",css,"',",
-                          " includes=includes(before_body='",header,"')))\"",
+                          " html_document(toc=TRUE, toc_float=TRUE, theme='simplex', number_sections=TRUE,",
+                          " includes=includes(in_header='",header,"')))\"",
                           " ",work_dir," ",peak_file," ",paste0(gff_file,'.granges.rds')," ",
                           " ",paste0(gff_file,'.gfeatures.txdb'),
                           " ",paste0(out_prefix,".BP.GO.results.tsv"),
@@ -239,7 +238,8 @@ REPORT_command = paste0(Rscript," -e \"library('rmarkdown'); rmarkdown::render('
                           " ",paste0(out_prefix,".CC.GO.results.tsv"),
                           " ",paste0(out_prefix,".msigdb_results.tsv"),
                           " RUN",
-                          " ",paste0(out_prefix,".motif.results.rds")
+                          " ",paste0(out_prefix,".motif.results.rds"),
+                          " ",paste0(out_prefix,".foreground.fasta")
                         )
 
 cat(REPORT_command,"\n")
