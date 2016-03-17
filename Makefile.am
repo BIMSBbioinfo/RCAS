@@ -55,6 +55,9 @@ src/base/header.html: src/base/header.html.in
 	sed -e "s|@basedir|$(basedir)|" $< > $@
 
 all-local:
-	@echo "--- Successfully built RCAS! ---"
+	@echo -e "\n\nRCAS has successfully been built."
+
+install: install-am
+	@echo -e "\n\nRCAS has successfully been installed."
 
 CLEANFILES = src/base/header.html src/RCAS
