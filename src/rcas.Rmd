@@ -1,5 +1,5 @@
 ---
-date: "30 Nov 2015"
+title: "The RNA Centric Analysis System Report"
 ---
 
 ```{r load_libraries, results='hide', message=FALSE, warning=FALSE, echo=FALSE}
@@ -117,7 +117,7 @@ cat('## Top motifs discovered using motifRG \n')
 motif = readRDS(motif_results)
 peak_seqs = readDNAStringSet(peak_seqs_fasta)
 if(length(motif$motifs) > 0){
-  provide_motif_summary = TRUE
+  if(run_anot==TRUE) {provide_motif_summary = TRUE}
   cat(paste0("**Figure-",figure_count,":** Top motifs discovered in the sequences of the query regions"))
   par(mfrow=c(3,2), mar=c(2,2,2,2))
   for (i in 1:length(motif$motifs)){
@@ -239,12 +239,12 @@ figure_count = figure_count + 1
 ```
 
 
-```{r get_table_of_genes_tabcap, echo=FALSE, results='asis', eval=FALSE}
+```{r get_table_of_genes_tabcap, echo=FALSE, results='asis', eval=run_anot}
 cat("## Interactive table of genes that overlap query regions\n")
 cat("**Table",table_count,":** Interactive table of genes (top 500) that overlap query regions, grouped by gene features such as introns, exons, UTRs, etc.\n")
 ```
 
-```{r get_table_of_genes, echo=FALSE, message=FALSE, warning=FALSE, eval=FALSE}
+```{r get_table_of_genes, echo=FALSE, message=FALSE, warning=FALSE, eval=run_anot}
 
 process_hits = function(peaks, tx, type){
   o = findOverlaps(peaks, tx)
