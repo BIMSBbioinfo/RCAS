@@ -59,6 +59,11 @@ In this shell you can configure and install RCAS as usual, but all
 tools and R packages will be handled by Guix.  There is no need to
 manually install the tools.
 
+The configuration step checks that all needed R packages are
+installed.  This can take a while and be a little annoying when
+testing your changes.  When you are in a hurry, pass `HURRY=yes` to
+the configure script to skip the checks for R packages.
+
 
 ## RCAS dependencies
 
