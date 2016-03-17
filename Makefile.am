@@ -9,18 +9,13 @@ bin_SCRIPTS =					\
   src/RCAS
 
 dist_libexec_SCRIPTS =				\
-  src/RCAS.snakefile				\
-  src/RCAS.GOrich.snakefile			\
-  src/RCAS.PATHrich.snakefile			\
-  src/RCAS.anot.snakefile			\
-  src/RCAS.motif.snakefile			\
   src/rcas.Rmd					\
   src/rcas.msigdb.R				\
   src/rcas.GO.R					\
-  src/map_msigdb_orthologs.R			\
-  src/generate_report.sh			\
-  src/parse_anot.py				\
-  src/top_motifs.py
+  src/rcas.motif.R				\
+  src/run.rcas.R				\
+  src/run.rcas.parallel.R			\
+  src/map_msigdb_orthologs.R
 
 basedir = $(datadir)/RCAS/base
 dist_base_DATA = 				\
