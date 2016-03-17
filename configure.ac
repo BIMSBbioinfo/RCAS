@@ -66,6 +66,7 @@ else
   AX_TEST_R_PACKAGE([GenomicFeatures])
   AX_TEST_R_PACKAGE([rtracklayer])
   AX_TEST_R_PACKAGE([rmarkdown])
+  AX_TEST_R_PACKAGE([motifRG])
 fi
 
 # Substitute placeholders to generate these target files
