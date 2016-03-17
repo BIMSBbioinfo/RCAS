@@ -112,7 +112,7 @@ if(("bed_dir" %in% argsDF$V1)) {
   bedfiles = list.files(path=bed_dir, pattern='*.bed', full.names = TRUE)
   workdir = getwd()
 
-  ##register clusters for parallel executoin
+  ##register clusters for parallel execution
   registerDoParallel(cores = cores)
 
   foreach (i=1:length(bedfiles)) %dopar% {
