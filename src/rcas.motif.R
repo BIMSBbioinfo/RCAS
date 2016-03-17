@@ -46,8 +46,6 @@ suppressMessages(library('tools'))
 suppressMessages(library('rtracklayer'))
 suppressMessages(library('GenomicFeatures'))
 suppressMessages(library('motifRG'))
-#suppressMessages(library('rGADEM'))
-
 
 peak_file = argsL$peak_file
 genome_version = argsL$genome_version
@@ -55,7 +53,18 @@ genome_version = argsL$genome_version
 if(genome_version == 'hg19'){
   require('BSgenome.Hsapiens.UCSC.hg19')
   seq_fasta = Hsapiens
-  seq_fasta
+  seqlevelsStyle(seq_fasta) = 'UCSC'
+}else if(genome_version == 'mm9'){
+  require('BSgenome.Mmusculus.UCSC.mm9')
+  seq_fasta = Mmusculus
+  seqlevelsStyle(seq_fasta) = 'UCSC'
+}else if(genome_version == 'ce6'){
+  require('BSgenome.Celegans.UCSC.ce6')
+  seq_fasta = Celegans
+  seqlevelsStyle(seq_fasta) = 'UCSC'
+}else if(genome_version == 'dm3'){
+  require('BSgenome.Dmelanogaster.UCSC.dm3')
+  seq_fasta = Dmelanogaster
   seqlevelsStyle(seq_fasta) = 'UCSC'
 }
 
