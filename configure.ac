@@ -41,10 +41,15 @@ AS_IF([test -z "$R"],
 AC_DEFUN([AX_TEST_R_PACKAGE], [
     pushdef([PKG],$1)
     AC_MSG_CHECKING([for R package "PKG"])
-    TEST=$( R --silent --vanilla -e 'if(!require("PKG")) stop("not found")' 2>/dev/null )
-    AS_IF([test $? != 0],
-          [AC_MSG_ERROR([R package PKG could not be loaded])],
-          [AC_MSG_RESULT([OK])])
+    if test -z "$HURRY"
+    then
+      TEST=$( R --silent --vanilla -e 'if(!require("PKG")) stop("not found")' 2>/dev/null )
+      AS_IF([test $? != 0],
+            [AC_MSG_ERROR([R package PKG could not be loaded])],
+            [AC_MSG_RESULT([OK])])
+    else
+      AC_MSG_RESULT([OK])
+    fi
     popdef([PKG])
 ])
 
