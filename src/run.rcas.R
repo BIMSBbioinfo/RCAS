@@ -56,11 +56,11 @@ gff_file = argsL$gff_file
 peak_file = argsL$peak_file
 genome_version = argsL$genome_version
 
-### must be configured by configuration script 
-source_dir = '/home/buyar/projects/RCAS/src'
-base_dir = '/home/buyar/projects/RCAS/src/base'
-Rscript = '/usr/bin/Rscript'
-###
+# The following variables are defined at configuration and build time:
+# libexecdir (containing scripts and executables)
+# basedir    (containing data files)
+#:MAKE
+Rscript = '@RSCRIPT@'
 
 if(!genome_version %in% c('hg19', 'ce6', 'mm9', 'dm3')){
   cat(help_command,"\n")
@@ -130,7 +130,7 @@ targeted_geneset = paste0(out_prefix, '.targeted_genes.txt')
 write(x = targeted_gene_ids, file = targeted_geneset)
 
 #use the BED file to run rcas.motif.R module
-MOTIF_command = paste0(Rscript,' ',source_dir,'/rcas.motif.R',
+MOTIF_command = paste0(Rscript,' ',libexecdir,'/rcas.motif.R',
                        ' --peak_file=',peak_file,
                        ' --genome_version=',genome_version)
 
@@ -138,7 +138,7 @@ cat(MOTIF_command,'\n')
 system(MOTIF_command)
 
 #Use the gene lists to run GO term and msigdb analyses 
-GO_command = paste0(Rscript,' ',source_dir,'/rcas.GO.R',
+GO_command = paste0(Rscript,' ',libexecdir,'/rcas.GO.R',
                   ' --background_list=',background_geneset,
                   ' --targeted_list=',targeted_geneset,
                    ' --out_prefix=',out_prefix,
@@ -147,8 +147,8 @@ cat(GO_command,'\n')
 system(GO_command)
 
 #Use the gene lists to run MSIGDB module
-msigdb_gmt = paste0(base_dir,'/c2.cp.v5.0.entrez.',genome_version,'.gmt')
-MSIGDB_command = paste0(Rscript,' ',source_dir,'/rcas.msigdb.R',
+msigdb_gmt = paste0(basedir,'/c2.cp.v5.0.entrez.',genome_version,'.gmt')
+MSIGDB_command = paste0(Rscript,' ',libexecdir,'/rcas.msigdb.R',
                     ' --gmt=',msigdb_gmt,
                     ' --background_list=',background_geneset,
                     ' --targeted_list=',targeted_geneset,
@@ -158,10 +158,10 @@ cat(MSIGDB_command,'\n')
 system(MSIGDB_command)
 
 work_dir = getwd()
-report_script = paste0(source_dir,'/rcas.Rmd')
+report_script = paste0(libexecdir,'/rcas.Rmd')
 output_filename = paste0(out_prefix, '.rcas.report.html')
-css = paste0(base_dir,'/custom.css')
-header=paste0(base_dir,'/header.html')
+css = paste0(basedir,'/custom.css')
+header=paste0(basedir,'/header.html')
 REPORT_command = paste0(Rscript," -e \"library('rmarkdown'); rmarkdown::render('",report_script,"',",
                           " output_file = '",output_filename,"',",
                           " intermediates_dir = '",work_dir,"',",

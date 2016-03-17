@@ -76,8 +76,8 @@ AC_CONFIG_FILES([Makefile                     \
 basedir="$datadir/RCAS/base"
 AC_SUBST([basedir])
 
-# Create wrapper for snakemake.  This wrapper is appended to at "make"
+# Create pipeline wrapper.  This wrapper is modified at "make"
 # time, so we keep the ".in" ending.
-AC_CONFIG_FILES([src/RCAS.in], [chmod +x src/RCAS.in])
+AC_CONFIG_FILES([src/run.rcas.R.in], [chmod +x src/run.rcas.R.in])
 
 AC_OUTPUT

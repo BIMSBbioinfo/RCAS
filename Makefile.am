@@ -45,8 +45,8 @@ dist_doc_DATA =					\
 # where the base files and all other libexec scripts are located.  All
 # internal scripts called by snakemake rules and all snakefile parts
 # are located in libexecdir.
-src/RCAS: src/RCAS.in
-	sed -e "s|#:MAKE|\n_libexecdir = \"$(libexecdir)\"\n_basedir = \"$(basedir)\"|" -i $<
+src/RCAS: src/run.rcas.R.in
+	sed -e "s|#:MAKE|\nlibexecdir = \"$(libexecdir)\"\nbasedir = \"$(basedir)\"|" -i $<
 	mv $< $@
 
 # Pandoc expects images to be relative to the current working
