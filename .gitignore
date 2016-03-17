@@ -6,16 +6,8 @@ config.status
 aclocal.m4
 build-aux/
 src/generate_report.sh
-src/RCAS.snakefile
-src/RCAS.anot.snakefile
-src/RCAS.PATHrich.snakefile
-src/RCAS.GOrich.snakefile
-src/RCAS.motif.snakefile
 src/RCAS
-src/RCAS.in
-src/snakeconfig.json
+src/run.rcas.R.in
 src/base/header.html
 autom4te.cache/
-.snakemake/
-config.json
 *~
