@@ -8,7 +8,7 @@
 ;;; Run the following command to enter a development environment for
 ;;; RCAS:
 ;;;
-;;;  $ guix environment -l package.scm
+;;;  $ guix environment -l guix.scm
 
 (use-modules ((guix licenses) #:prefix license:)
              (guix packages)
