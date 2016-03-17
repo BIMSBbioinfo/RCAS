@@ -62,7 +62,6 @@ else
   AX_TEST_R_PACKAGE([topGO])
   AX_TEST_R_PACKAGE([DT])
   AX_TEST_R_PACKAGE([plotly])
-  AX_TEST_R_PACKAGE([dplyr])
   AX_TEST_R_PACKAGE([GenomicFeatures])
   AX_TEST_R_PACKAGE([rtracklayer])
   AX_TEST_R_PACKAGE([rmarkdown])
