@@ -1,3 +1,5 @@
+#!@RSCRIPT@
+
 #preprocess the gtf/gff files to 
 # 1. create GRanges object and write it to .rds file; 
 # 2. create txdb file using GenomicFeatures library and write to disk 
