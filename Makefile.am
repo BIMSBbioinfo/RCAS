@@ -13,15 +13,14 @@ dist_libexec_SCRIPTS =				\
   src/rcas.msigdb.R				\
   src/rcas.GO.R					\
   src/rcas.motif.R				\
-  src/run.rcas.R				\
   src/run.rcas.parallel.R			\
   src/map_msigdb_orthologs.R
 
 basedir = $(datadir)/RCAS/base
 dist_base_DATA = 				\
-  src/base/c2.cp.v5.0.entrez.ce10.gmt		\
+  src/base/c2.cp.v5.0.entrez.ce6.gmt		\
   src/base/c2.cp.v5.0.entrez.dm3.gmt		\
-  src/base/c2.cp.v5.0.entrez.gmt		\
+  src/base/c2.cp.v5.0.entrez.hg19.gmt		\
   src/base/c2.cp.v5.0.entrez.mm9.gmt		\
   src/base/header.html				\
   src/base/custom.css				\
