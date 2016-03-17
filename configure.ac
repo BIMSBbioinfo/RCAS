@@ -69,8 +69,7 @@ else
 fi
 
 # Substitute placeholders to generate these target files
-AC_CONFIG_FILES([Makefile                     \
-                 src/generate_report.sh])
+AC_CONFIG_FILES([Makefile])
 
 basedir="$datadir/RCAS/base"
 AC_SUBST([basedir])
