@@ -32,7 +32,6 @@ figure_count = 1
 table_count = 1
 ```
 
-`r cat('arguments:',args,'\n')`
 
 ```{r define_modules_to_run, echo=FALSE, warning=FALSE, eval=TRUE}
 ##based on the input options; define boolean parameters that are used in corresponding chunks to determine if chunk should be evaluated or not. 
@@ -140,7 +139,12 @@ motif = readRDS(motif_results)
 df = summaryMotif(motif$motifs, motif$category)
 df$scores = round(df$scores, 1)
 df$ratio = round(df$ratio, 1)
-datatable(df[,-c(2)])
+datatable(df[,-c(2)], extensions = 'FixedColumns',
+  options = list(
+    dom = 't',
+    scrollX = TRUE,
+    scrollCollapse = TRUE
+  ))
 table_count = table_count + 1
 ```
 
@@ -270,7 +274,12 @@ tbls = lapply(tbls, function(i) setkey(i, tx_name))
 merged <- Reduce(function(...) merge(..., all = T), tbls)
 merged$gene_name = gff[match(merged$tx_name, gff$transcript_id)]$gene_name
 merged = merged[order(transcript_total, decreasing=T)]
-datatable(merged[1:500], filter = 'top')
+datatable(merged[1:500], filter = 'top', extensions = 'FixedColumns',
+  options = list(
+    dom = 't',
+    scrollX = TRUE,
+    scrollCollapse = TRUE
+  ))
 table_count = table_count + 1
 ```
 
@@ -387,7 +396,12 @@ cat("**Table",table_count,":** Significant Biological Process GO terms (BH < 0.1
 go = fread(go_bp)
 results = go[bh < 0.1]
 if (nrow(results) > 0){
-  datatable(results, filter = 'top')
+  datatable(results, filter = 'top', extensions = 'FixedColumns',
+  options = list(
+    dom = 't',
+    scrollX = TRUE,
+    scrollCollapse = TRUE
+  ))
 }else{
     cat("**WARNING: Couldn't detect any enrichment/depletion of GO terms (BH < 0.001) related to biological processes**\n")
 }
@@ -404,7 +418,12 @@ cat("**Table",table_count,":** Significant Molecular Function GO terms (BH < 0.1
 go = fread(go_mf)
 results = go[bh < 0.1]
 if (nrow(results) > 0){
-  datatable(results,   filter = 'top')
+  datatable(results,   filter = 'top', extensions = 'FixedColumns',
+  options = list(
+    dom = 't',
+    scrollX = TRUE,
+    scrollCollapse = TRUE
+  ))
 }else{
   cat("**WARNING: Couldn't detect any enrichment/depletion of GO terms (BH < 0.1) related to molecular functions**\n")
 }
@@ -421,7 +440,12 @@ cat("**Table",table_count,":** Significant Cellular Compartment GO terms (BH < 0
 go = fread(go_cc)
 results = go[bh < 0.1]
 if (nrow(results) > 0){
-  datatable(results,  filter = 'top')
+  datatable(results,  filter = 'top', extensions = 'FixedColumns',
+  options = list(
+    dom = 't',
+    scrollX = TRUE,
+    scrollCollapse = TRUE
+  ))
 }else{
   cat("**WARNING: Couldn't detect any enrichment/depletion of GO terms related to subcellular localisation**\n")
 }
@@ -436,7 +460,12 @@ cat("**Table",table_count,":** Significant MSigDB Gene Sets (BH < 0.1) enriched 
 ```{r GSEA_msigdb, results='asis', warning=FALSE,  echo=FALSE, eval=run_msigdb}
 msigdb = fread(msigdb)
 if (nrow(msigdb[BH < 0.1]) > 0){
-  datatable(msigdb[BH < 0.1], filter='top')
+  datatable(msigdb[BH < 0.1], filter='top', extensions = 'FixedColumns',
+  options = list(
+    dom = 't',
+    scrollX = TRUE,
+    scrollCollapse = TRUE
+  ))
 }else{
    cat("**WARNING: Couldn't detect any enrichment/depletion of MSIGDB gene sets**\n")
 }
