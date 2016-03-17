@@ -5,31 +5,20 @@ AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE([color-tests -Wall -Wno-portability foreign])
 AM_SILENT_RULES([yes])
 
-# Load Python support for Automake and ensure we have a Python
-# interpreter for at least version 3.  This sets the "PYTHON"
-# variable.
-# https://www.gnu.org/software/automake/manual/html_node/Python.html
-AM_PATH_PYTHON([3])
-
 # Check for any variant of "awk" and store path in "AWK" variable
 AC_PROG_AWK
 AC_PROG_SED
 
-AC_ARG_VAR(SNAKEMAKE, override location of "snakemake" executable)
 AC_ARG_VAR(BASH, override location of "bash" executable)
 AC_ARG_VAR(BEDTOOLS, override location of "bedtools" executable)
 AC_ARG_VAR(FASTA_FROM_BED, override location of "fastaFromBed" executable)
-AC_ARG_VAR(MEME_CHIP, override location of "meme-chip" executable)
 AC_ARG_VAR(PANDOC, override location of "pandoc" executable)
 AC_ARG_VAR(RSCRIPT, override location of "Rscript" executable)
 AC_ARG_VAR(R, override location of "R" executable)
 
 # Check for required programmes and store their full path in the given
 # variables.  The variables are used to substitute placeholders in the
-# scripts such as RCAS.snakemake.
-AS_IF([test -z "$SNAKEMAKE"],
-      [AC_PATH_PROG([SNAKEMAKE], [snakemake])],
-      [AC_MSG_NOTICE([Using $SNAKEMAKE as snakemake executable.])])
+# scripts.
 AS_IF([test -z "$BASH"],
       [AC_PATH_PROG([BASH], [bash])],
       [AC_MSG_NOTICE([Using $BASH as bash executable.])])
@@ -39,9 +28,6 @@ AS_IF([test -z "$BEDTOOLS"],
 AS_IF([test -z "$FASTA_FROM_BED"],
       [AC_PATH_PROG([FASTA_FROM_BED], [fastaFromBed])],
       [AC_MSG_NOTICE([Using $FASTA_FROM_BED as fastaFromBed executable.])])
-AS_IF([test -z "$MEME_CHIP"],
-      [AC_PATH_PROG([MEME_CHIP], [meme-chip])],
-      [AC_MSG_NOTICE([Using $MEME_CHIP as meme-chip executable.])])
 AS_IF([test -z "$PANDOC"],
       [AC_PATH_PROG([PANDOC], [pandoc])],
       [AC_MSG_NOTICE([Using $PANDOC as pandoc executable.])])
@@ -84,11 +70,6 @@ fi
 
 # Substitute placeholders to generate these target files
 AC_CONFIG_FILES([Makefile                     \
-                 src/RCAS.snakefile           \
-                 src/RCAS.anot.snakefile      \
-                 src/RCAS.GOrich.snakefile    \
-                 src/RCAS.motif.snakefile     \
-                 src/RCAS.PATHrich.snakefile  \
                  src/generate_report.sh])
 
 basedir="$datadir/RCAS/base"
