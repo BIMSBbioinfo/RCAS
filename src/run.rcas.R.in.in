@@ -14,13 +14,15 @@ if(length(args) < 3) {
 }
 
 help_command = "
-run.rcas.R: run RCAS pipeline for a given ENSEMBL gtf file and BED formatted input file 
+RCAS: run RCAS pipeline for a given ENSEMBL annotation file and BED formatted input file 
 
 Arguments:
---gff_file=<path to ENSEMBL GTF/GFF file>  - e.g /data/akalin/Base/Annotation/hg19/EnsemblGenes/142812_EnsemblFTP_hg19_EnsemblGenes.gtf
---peak_file=<path to query regions in BED format> - e.g. Hafner2009.bed
---genome_version=<choose genome version: e.g. hg19; dm3; ce6; mm9>
---help              - print this text"
+  --gff_file=annotation.{gft,gff}     ENSEMBL GTF or GFF annotation file
+  --peak_file=regions.bed             path to query regions in BED format, e.g. Hafner2009.bed
+  --genome_version=VERSION            genome version; supported values for VERSION are
+                                       'hg19', 'dm3', 'ce6', and 'mm9'
+  --help                              display this help text and exit
+"
 
 ## Help section
 if("--help" %in% args) {
