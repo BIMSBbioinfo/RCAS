@@ -67,6 +67,7 @@
      ("r-topgo" ,r-topgo)
      ("r-dt" ,r-dt)
      ("r-plotly" ,r-plotly)
+     ("r-doparallel" ,r-doparallel)
      ("r-motifrg" ,r-motifrg)
      ("r-genomation" ,r-genomation)
      ("r-genomicfeatures" ,r-genomicfeatures)
