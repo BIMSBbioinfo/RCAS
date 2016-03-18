@@ -104,6 +104,7 @@ create_background_peaks = function(peaks, out_prefix){
 cat('importing peak data from',peak_file,'\n')
 peaks = import.bed(peak_file)
 seqlevelsStyle(peaks) = 'UCSC'
+peaks = keepStandardChromosomes(peaks)
 
 out_prefix = sub(pattern = paste0('.', file_ext(peak_file)), x = basename(peak_file), replacement = '')
 
