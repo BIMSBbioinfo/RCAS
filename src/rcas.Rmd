@@ -3,15 +3,15 @@ title: "The RNA Centric Analysis System Report"
 ---
 
 ```{r load_libraries, results='hide', message=FALSE, warning=FALSE, echo=FALSE}
-library('data.table')
-library('DT')
-library('plotly')
-library('genomation')
-library('rtracklayer')
-library('GenomicFeatures')
-library('knitr')
-library('motifRG')
-library('reshape2')
+suppressMessages(library('data.table'))
+suppressMessages(library('DT'))
+suppressMessages(library('plotly'))
+suppressMessages(library('genomation'))
+suppressMessages(library('rtracklayer'))
+suppressMessages(library('GenomicFeatures'))
+suppressMessages(library('knitr'))
+suppressMessages(library('motifRG'))
+suppressMessages(library('reshape2'))
 ```
 
 
@@ -136,22 +136,54 @@ cat("**Table",table_count,":** motifRG motif discovery statistics. fg: foregroun
 
 ```{r summarize_stats_table, echo=FALSE, warning=FALSE, eval=provide_motif_summary}
 motif = readRDS(motif_results)
-df = summaryMotif(motif$motifs, motif$category)
-df$scores = round(df$scores, 1)
-df$ratio = round(df$ratio, 1)
-datatable(df[,-c(2)], extensions = 'FixedColumns',
+
+##a repurposed version of summaryMotif function of the motifRG package. #needed a slimmer version because summaryMotif was doing some unnecessary calculations which had a bug that I couldn't find the reason why. 
+getMotifSummaryTable = function(motifs, category){ 
+  if(is.null(motifs)) {return(NULL)}
+  scores <- c()
+  motif_patterns <- c()
+  hits.counts1 <- c()
+  hits.counts2 <- c()
+  seq.counts1 <- c()
+  seq.counts2 <- c()  
+  fg.set <- category == 1
+  bg.set <- !fg.set
+  fg.size <- sum(fg.set)
+  bg.size <- sum(bg.set)
+                                        #summarize motif 
+  for(i in 1:length(motifs)){
+    motif_patterns <- motifs[[i]]@pattern
+    scores[i] <- motifs[[i]]@score
+    count <- motifs[[i]]@count
+    hits.counts1[i] <- sum(count[fg.set])
+    hits.counts2[i] <- sum(count[bg.set])
+    seq.counts1[i] <-  sum(count[fg.set] > 0)
+    seq.counts2[i] <-  sum(count[bg.set] > 0)
+  }
+  ratio <- (hits.counts1/hits.counts2)/(fg.size/bg.size)
+  frac1 <- seq.counts1/fg.size
+  frac2 <- seq.counts2/bg.size
+  summary <- data.frame(patterns=motif_patterns,
+                        scores=round(scores,1),
+                        fg.hits=hits.counts1, bg.hits= hits.counts2,
+                        fg.seq=seq.counts1, bg.seq = seq.counts2,
+                        ratio=round(ratio,1), fg.frac=round(frac1,4), bg.frac=round(frac2,4))       
+  summary
+}
+
+df = getMotifSummaryTable(motif$motifs, motif$category)
+datatable(df, extensions = 'FixedColumns',
   options = list(
     dom = 't',
     scrollX = TRUE,
     scrollCollapse = TRUE
   ))
 table_count = table_count + 1
-```
+``` 
 
 ```{r summarize_motif_hits_figcap, echo=FALSE, results='asis', eval=provide_motif_summary}
 cat('## Genomic features overlapping with discovered motifs \n')
 cat("**Figure",figure_count,":** The number of motif containing query regions in different gene features.\n")
-
 ```
 
 ```{r summarize_motif_hits, echo=FALSE, warning=FALSE, eval=provide_motif_summary}
@@ -273,13 +305,14 @@ tbls <- list(pr, futr, ex, cds, inr, tutr, tr)
 tbls = lapply(tbls, function(i) setkey(i, tx_name))
 merged <- Reduce(function(...) merge(..., all = T), tbls)
 merged$gene_name = gff[match(merged$tx_name, gff$transcript_id)]$gene_name
+merged[is.na(merged)] = 0
 merged = merged[order(transcript_total, decreasing=T)]
-datatable(merged[1:500], filter = 'top', extensions = 'FixedColumns',
-  options = list(
+datatable(merged[1:500], filter = 'top', extensions = 'FixedColumns', 
+    options = list(
     dom = 't',
     scrollX = TRUE,
     scrollCollapse = TRUE
-  ))
+  )) 
 table_count = table_count + 1
 ```
 
@@ -291,7 +324,7 @@ cat("# Coverage Profiles\n")
 ```{r coverage_profiles_read_input, echo=FALSE, warning=FALSE, message=FALSE, eval=run_coverage_profile}
 
 calculate_coverage = function (peaks, windows, type){
-  #windows = windows[width(windows) > 100] #remove windows shorter than 100 bp
+  windows = windows[width(windows) >= 100] #remove windows shorter than 100 bp
   if (length(windows) > 10000){
     windows = windows[sample(length(windows), 10000)] #if there are more than 10000 windows; downsample to 10000 
   }
@@ -332,7 +365,7 @@ cat("**Figure",figure_count,":** The query regions are overlaid with the genomic
 ```
 
 ```{r coverage_profiles_exon-introns, echo=FALSE, warning=FALSE, message=FALSE, eval=run_coverage_profile}
-myexons = txdb_exons[width(txdb_exons) > 100] #remove exons that are shorter than 100 bp
+myexons = txdb_exons[width(txdb_exons) >= 100] #remove exons that are shorter than 100 bp
 up_exon = flank(myexons, 50, start=TRUE, both=TRUE) #50 bp from upstream intron 50 bp from exon 
 down_exon = flank(myexons, 50, start=FALSE, both=TRUE) #50 bp from downstream intron, 50 bp from exon
 exon_intron_junctions = c(up_exon, down_exon)
