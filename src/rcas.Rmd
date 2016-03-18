@@ -459,6 +459,7 @@ cat("**Table",table_count,":** Significant MSigDB Gene Sets (BH < 0.1) enriched 
 
 ```{r GSEA_msigdb, results='asis', warning=FALSE,  echo=FALSE, eval=run_msigdb}
 msigdb = fread(msigdb)
+msigdb = msigdb[order(pval)]
 if (nrow(msigdb[BH < 0.1]) > 0){
   datatable(msigdb[BH < 0.1], filter='top', extensions = 'FixedColumns',
   options = list(
