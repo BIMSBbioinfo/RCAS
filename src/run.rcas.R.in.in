@@ -143,6 +143,11 @@ peak_file = argsL$peak_file
 
 out_prefix = sub(x = basename(peak_file), pattern = paste0('.',file_ext(peak_file)), replacement = '')
 
+logfile = paste0(out_prefix, '.log')
+ptm <- proc.time()
+cat('Started analysis on',out_prefix,'Date:',date(),'\n', file=logfile, append=TRUE)
+
+
 gff_version = file_ext(gff_file)
 
 if(file.exists(paste0(gff_file, ".granges.rds")))
@@ -199,7 +204,9 @@ MOTIF_command = paste0(Rscript,' ',libexecdir,'/rcas.motif.R',
                        ' --genome_version=',genome_version)
 
 cat(MOTIF_command,'\n')
-system(MOTIF_command)
+cat(MOTIF_command,'\n', file=logfile, append=TRUE)
+log = system(MOTIF_command, intern=TRUE)
+write(log, logfile, append=TRUE)
 
 #Use the gene lists to run GO term and msigdb analyses 
 GO_command = paste0(Rscript,' ',libexecdir,'/rcas.GO.R',
@@ -207,8 +214,10 @@ GO_command = paste0(Rscript,' ',libexecdir,'/rcas.GO.R',
                   ' --targeted_list=',targeted_geneset,
                    ' --out_prefix=',out_prefix,
                    ' --species=',species)
-cat(GO_command,'\n')
-system(GO_command)
+cat(GO_command, '\n')
+cat(GO_command,'\n', file=logfile, append=TRUE)
+log = system(GO_command, intern=TRUE)
+write(log, logfile, append=TRUE)
 
 #Use the gene lists to run MSIGDB module
 msigdb_gmt = paste0(basedir,'/c2.cp.v5.0.entrez.',genome_version,'.gmt')
@@ -219,7 +228,9 @@ MSIGDB_command = paste0(Rscript,' ',libexecdir,'/rcas.msigdb.R',
                     ' --out_prefix=',out_prefix,
                     ' --species=',species)
 cat(MSIGDB_command,'\n')
-system(MSIGDB_command)
+cat(MSIGDB_command,'\n', file=logfile, append=TRUE)
+log = system(MSIGDB_command, intern=TRUE)
+write(log, logfile, append=TRUE)
 
 work_dir = getwd()
 report_script = paste0(libexecdir,'/rcas.Rmd')
@@ -243,4 +254,8 @@ REPORT_command = paste0(Rscript," -e \"library('rmarkdown'); rmarkdown::render('
                         )
 
 cat(REPORT_command,"\n")
-system(REPORT_command)
+cat(REPORT_command,'\n', file=logfile, append=TRUE)
+log = system(REPORT_command, intern=TRUE)
+write(log, logfile, append=TRUE)
+
+cat('Finished analysis on',out_prefix,'Date:',date(),'Time elapsed', proc.time()-ptm,'\n', file=logfile, append=TRUE)
