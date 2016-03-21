@@ -60,18 +60,45 @@ importBed <- function (filePath, sampleN = 0, keepStandardChr = TRUE) {
 }
 
 #' @export
-getTxdbFeatures <- function (gff) {
+getTxdbFeatures <- function (txdb) {
+
+  transcripts = GenomicFeatures::transcripts(txdb) #has tx_name
+  exons = GenomicRanges::unlist(GenomicFeatures::exonsBy(txdb, by="tx", use.names=TRUE)) #row names are transcript_ids
+  introns = GenomicRanges::unlist(GenomicFeatures::intronsByTranscript(txdb, use.names=TRUE))#row names are transcript_ids
+  exonIntronBoundaries = c(GenomicRanges::flank(introns[GenomicRanges::width(introns) >= 100], 50, start=TRUE, both=TRUE),
+                           GenomicRanges::flank(introns[GenomicRanges::width(introns) >= 100], 50, start=FALSE, both=TRUE))
+  promoters = GenomicFeatures::promoters(txdb) #has tx_name
+  fiveUTRs = GenomicRanges::unlist(GenomicFeatures::fiveUTRsByTranscript(txdb,use.names=TRUE))#row names are transcript_ids
+  threeUTRs = GenomicRanges::unlist(GenomicFeatures::threeUTRsByTranscript(txdb,use.names=TRUE))#row names are transcript_ids
+  cds = GenomicRanges::unlist(GenomicFeatures::cdsBy(txdb, by="tx",use.names=TRUE))#row names are transcript_ids
+
+  txdbFeatures = list(
+    'transcripts' = transcripts,
+    'exons'       = exons,
+    'promoters'   = promoters,
+    'fiveUTRs'    = fiveUTRs,
+    'introns'     = introns,
+    'exonIntronBoundaries' = exonIntronBoundaries,
+    'cds'         = cds,
+    'threeUTRs'   = threeUTRs
+  )
+  return(txdbFeatures)
+}
+
+
+#' @export
+getTxdbFeaturesFromGff <- function (gff) {
 
   txdb = GenomicFeatures::makeTxDbFromGRanges(gff)
 
   transcripts = GenomicFeatures::transcripts(txdb) #has tx_name
   transcripts$gene_name = gff[match(transcripts$tx_name, gff$transcript_id)]$gene_name
 
-  exons = unlist(GenomicFeatures::exonsBy(txdb, by="tx", use.names=TRUE)) #row names are transcript_ids
+  exons = GenomicRanges::unlist(GenomicFeatures::exonsBy(txdb, by="tx", use.names=TRUE)) #row names are transcript_ids
   exons$tx_name = names(exons)
   exons$gene_name = gff[match(names(exons), gff$transcript_id)]$gene_name
 
-  introns = unlist(GenomicFeatures::intronsByTranscript(txdb, use.names=TRUE))#row names are transcript_ids
+  introns = GenomicRanges::unlist(GenomicFeatures::intronsByTranscript(txdb, use.names=TRUE))#row names are transcript_ids
   introns$tx_name = names(introns)
   introns$gene_name = gff[match(names(introns), gff$transcript_id)]$gene_name
 
@@ -81,15 +108,15 @@ getTxdbFeatures <- function (gff) {
   promoters = GenomicFeatures::promoters(txdb) #has tx_name
   promoters$gene_name = gff[match(promoters$tx_name, gff$transcript_id)]$gene_name
 
-  fiveUTRs = unlist(GenomicFeatures::fiveUTRsByTranscript(txdb,use.names=TRUE))#row names are transcript_ids
+  fiveUTRs = GenomicRanges::unlist(GenomicFeatures::fiveUTRsByTranscript(txdb,use.names=TRUE))#row names are transcript_ids
   fiveUTRs$tx_name = names(fiveUTRs)
   fiveUTRs$gene_name = gff[match(names(fiveUTRs), gff$transcript_id)]$gene_name
 
-  threeUTRs = unlist(GenomicFeatures::threeUTRsByTranscript(txdb,use.names=TRUE))#row names are transcript_ids
+  threeUTRs = GenomicRanges::unlist(GenomicFeatures::threeUTRsByTranscript(txdb,use.names=TRUE))#row names are transcript_ids
   threeUTRs$tx_name = names(threeUTRs)
   threeUTRs$gene_name = gff[match(names(threeUTRs), gff$transcript_id)]$gene_name
 
-  cds = unlist(GenomicFeatures::cdsBy(txdb, by="tx",use.names=TRUE))#row names are transcript_ids
+  cds = GenomicRanges::unlist(GenomicFeatures::cdsBy(txdb, by="tx",use.names=TRUE))#row names are transcript_ids
   cds$tx_name = names(cds)
   cds$gene_name = gff[match(names(cds), gff$transcript_id)]$gene_name
 
@@ -129,7 +156,7 @@ queryGff <- function(queryRegions, gff) {
 
 #' @export
 calculateCoverageProfile = function (queryRegions, targetRegions, sampleN = 0){
-  windows <- targetRegions[width(targetRegions) >= 100]#remove windows shorter than 100 bp
+  windows <- targetRegions[GenomicRanges::width(targetRegions) >= 100]#remove windows shorter than 100 bp
 
   if (length(windows) > 0) {
     if (sampleN > 0 && sampleN < length(windows)) {
@@ -146,10 +173,43 @@ calculateCoverageProfile = function (queryRegions, targetRegions, sampleN = 0){
 }
 
 #' @export
-calculateCoverageProfileList = function (queryRegions, targetRegionsList, sampleN = 0) {
+calculateCoverageProfileList <- function (queryRegions, targetRegionsList, sampleN = 0) {
   lapply(X = targetRegionsList, FUN=function(x) { calculateCoverageProfile(queryRegions, x, sampleN = sampleN) })
 }
 
+#' @export
+calculateCoverageProfileListFromTxdb <- function (queryRegions, txdb, sampleN = 0) {
+  txdbFeatures = getTxdbFeatures(txdb = txdb)
+  lapply(X = txdbFeatures, FUN=function(x) { calculateCoverageProfile(queryRegions, x, sampleN = sampleN) })
+}
+
+#' @export
+calculateCoverageProfileFromTxdb <- function (queryRegions, txdb, type, sampleN = 0) {
+
+  if (type == 'transcripts') {
+    targetRegions <- GenomicFeatures::transcripts(txdb) #has tx_name
+  } else if (type == 'exons') {
+    targetRegions = GenomicRanges::unlist(GenomicFeatures::exonsBy(txdb, by="tx", use.names=TRUE)) #row names are transcript_ids
+  } else if (type == 'introns') {
+    targetRegions <- GenomicRanges::unlist(GenomicFeatures::intronsByTranscript(txdb, use.names=TRUE))#row names are transcript_ids
+  } else if (type == 'exonIntronBoundaries') {
+    introns <- GenomicRanges::unlist(GenomicFeatures::intronsByTranscript(txdb, use.names=TRUE))#row names are transcript_ids
+    targetRegions <- c(GenomicRanges::flank(introns[GenomicRanges::width(introns) >= 100], 50, start=TRUE, both=TRUE),
+                             GenomicRanges::flank(introns[GenomicRanges::width(introns) >= 100], 50, start=FALSE, both=TRUE))
+  } else if (type == 'promoters') {
+    targetRegions <- GenomicFeatures::promoters(txdb) #has tx_name
+  } else if (type == 'fiveUTRs') {
+    targetRegions = GenomicRanges::unlist(GenomicFeatures::fiveUTRsByTranscript(txdb,use.names=TRUE))#row names are transcript_ids
+  } else if (type == 'threeUTRs') {
+    targetRegions = GenomicRanges::unlist(GenomicFeatures::threeUTRsByTranscript(txdb,use.names=TRUE))#row names are transcript_ids
+  } else if (type == 'cds') {
+    targetRegions = GenomicRanges::unlist(GenomicFeatures::cdsBy(txdb, by="tx",use.names=TRUE))#row names are transcript_ids
+  } else {
+    stop ("Can calculate coverage profiles for only: transcripts, exons, introns, exonIntronBoundaries, promoters, fiveUTRs, threeUTRs, and cds")
+  }
+  result = calculateCoverageProfile(queryRegions = queryRegions, targetRegions = targetRegions, sampleN = sampleN)
+  return (result)
+}
 
 
 
