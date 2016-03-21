@@ -75,6 +75,9 @@ getTxdbFeatures <- function (gff) {
   introns$tx_name = names(introns)
   introns$gene_name = gff[match(names(introns), gff$transcript_id)]$gene_name
 
+  exonIntronBoundaries = c(GenomicRanges::flank(introns[GenomicRanges::width(introns) >= 100], 50, start=TRUE, both=TRUE),
+                           GenomicRanges::flank(introns[GenomicRanges::width(introns) >= 100], 50, start=FALSE, both=TRUE))
+
   promoters = GenomicFeatures::promoters(txdb) #has tx_name
   promoters$gene_name = gff[match(promoters$tx_name, gff$transcript_id)]$gene_name
 
@@ -96,6 +99,7 @@ getTxdbFeatures <- function (gff) {
     'promoters'   = promoters,
     'fiveUTRs'    = fiveUTRs,
     'introns'     = introns,
+    'exonIntronBoundaries' = exonIntronBoundaries,
     'cds'         = cds,
     'threeUTRs'   = threeUTRs
   )
@@ -123,7 +127,28 @@ queryGff <- function(queryRegions, gff) {
   return (overlapsGff)
 }
 
+#' @export
+calculateCoverageProfile = function (queryRegions, targetRegions, sampleN = 0){
+  windows <- targetRegions[width(targetRegions) >= 100]#remove windows shorter than 100 bp
 
+  if (length(windows) > 0) {
+    if (sampleN > 0 && sampleN < length(windows)) {
+      windows <- windows[sample(length(windows), sampleN)]
+    }
+    sm <- genomation::ScoreMatrixBin(target = queryRegions, windows = windows, bin.num = 100, strand.aware = TRUE)
+    mdata <- as.data.frame(colSums(sm))
+    mdata$bins <- c(1:100)
+    colnames(mdata) <- c('coverage', 'bins')
+    return(mdata)
+    } else {
+    stop("Cannot compute coverage profile for target regions.\nThere are no target regions longer than 100 bp\n")
+  }
+}
+
+#' @export
+calculateCoverageProfileList = function (queryRegions, targetRegionsList, sampleN = 0) {
+  lapply(X = targetRegionsList, FUN=function(x) { calculateCoverageProfile(queryRegions, x, sampleN = sampleN) })
+}
 
 
 
