@@ -144,12 +144,12 @@ summarizeQueryRegions <- function(queryRegions, txdbFeatures) {
 #' @export
 queryGff <- function(queryRegions, gff) {
   overlaps = GenomicRanges::findOverlaps(queryRegions, gff) #find all overlapping pairs of intervals between the gff features and BED file (peaks)
-  overlapsQuery = as.data.frame(queryRegions[GenomicRanges::queryHits(overlaps)])
+  overlapsQuery = queryRegions[GenomicRanges::queryHits(overlaps)]
   overlapsGff = gff[GenomicRanges::subjectHits(overlaps)]
-  overlapsGff$overlappingQuery = paste(overlapsQuery$seqnames,
-                                       overlapsQuery$start,
-                                       overlapsQuery$end,
-                                       overlapsQuery$strand,
+  overlapsGff$overlappingQuery = paste(GenomicRanges::seqnames(overlapsQuery),
+                                       GenomicRanges::start(overlapsQuery),
+                                       GenomicRanges::end(overlapsQuery),
+                                       GenomicRanges::strand(overlapsQuery),
                                        sep=':')
   return (overlapsGff)
 }

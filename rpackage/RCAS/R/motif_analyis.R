@@ -43,9 +43,9 @@ extractSequences <- function (queryRegions, genomeVersion) {
   } else if(genome_version == 'dm3') {
     seqDb = BSgenome.Dmelanogaster.UCSC.dm3::Dmelanogaster
   } else {
-    stop ("Cannot do motif analysis for genome versions except: hg19, mm9, ce6, and dm3\n")
+    stop ("Cannot extract fasta sequences from genome versions except: hg19, mm9, ce6, and dm3\n")
   }
-  GenomeInfoDb::seqlevelsStyle(seqDb) = 'UCSC'
+  GenomeInfoDb::seqlevelsStyle(seqDb) =  GenomeInfoDb::seqlevelsStyle(queryRegions)
   sequences <- Biostrings::getSeq(seqDb, queryRegions)
   names(sequences) <- paste('seq',1:length(sequences), sep='_')
 
@@ -70,11 +70,11 @@ runMotifRG <- function (queryRegions, genomeVersion, motifN = 5) {
 }
 
 #' @export
-getMotifSummaryTable = function(motifResults){
+getMotifSummaryTable <- function(motifResults){
 
   if(is.null(motifResults)) {return(NULL)}
-  motifs = motifResults$motifs
-  category = motifResults$category
+  motifs <- motifResults$motifs
+  category <- motifResults$category
   scores <- c()
   motifPatterns <- c()
   hitsCounts1 <- c()
@@ -105,4 +105,9 @@ getMotifSummaryTable = function(motifResults){
                         ratio=round(ratio,1), fgFrac=round(frac1,4), bgFrac=round(frac2,4))
   return(summary)
 }
+
+
+
+
+
 
