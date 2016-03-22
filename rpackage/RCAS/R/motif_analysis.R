@@ -43,9 +43,15 @@ extractSequences <- function (queryRegions, genomeVersion) {
   } else if(genome_version == 'dm3') {
     seqDb = BSgenome.Dmelanogaster.UCSC.dm3::Dmelanogaster
   } else {
+<<<<<<< HEAD
     stop ("Cannot extract fasta sequences from genome versions except: hg19, mm9, ce6, and dm3\n")
   }
   GenomeInfoDb::seqlevelsStyle(seqDb) =  GenomeInfoDb::seqlevelsStyle(queryRegions)
+=======
+    stop ("Cannot do motif analysis for genome versions except: hg19, mm9, ce6, and dm3\n")
+  }
+  GenomeInfoDb::seqlevelsStyle(seqDb) = 'UCSC'
+>>>>>>> f57d624770064c9125aeed7d87012bb0caf2103a
   sequences <- Biostrings::getSeq(seqDb, queryRegions)
   names(sequences) <- paste('seq',1:length(sequences), sep='_')
 
@@ -67,6 +73,7 @@ runMotifRG <- function (queryRegions, genomeVersion, motifN = 5) {
   motifResults <- motifRG::findMotifFgBg(querySeqs, controlSeqs, enriched.only=T, max.motif=motifN , both.strand=FALSE)
 
   return(motifResults)
+<<<<<<< HEAD
 }
 
 #' @export
@@ -104,10 +111,44 @@ getMotifSummaryTable <- function(motifResults){
                         fgSeq=seqCounts1, bgSeq = seqCounts2,
                         ratio=round(ratio,1), fgFrac=round(frac1,4), bgFrac=round(frac2,4))
   return(summary)
+=======
+>>>>>>> f57d624770064c9125aeed7d87012bb0caf2103a
 }
 
+#' @export
+getMotifSummaryTable = function(motifResults){
 
-
-
-
+  if(is.null(motifResults)) {return(NULL)}
+  motifs = motifResults$motifs
+  category = motifResults$category
+  scores <- c()
+  motifPatterns <- c()
+  hitsCounts1 <- c()
+  hitsCounts2 <- c()
+  seqCounts1 <- c()
+  seqCounts2 <- c()
+  fgSet <- category == 1
+  bgSet <- !fgSet
+  fgSize <- sum(fgSet)
+  bgSize <- sum(bgSet)
+  #summarize motif
+  for(i in 1:length(motifs)){
+    motifPatterns <- c(motifPatterns, motifs[[i]]@pattern)
+    scores[i] <- motifs[[i]]@score
+    count <- motifs[[i]]@count
+    hitsCounts1[i] <- sum(count[fgSet])
+    hitsCounts2[i] <- sum(count[bgSet])
+    seqCounts1[i] <-  sum(count[fgSet] > 0)
+    seqCounts2[i] <-  sum(count[bgSet] > 0)
+  }
+  ratio <- (hitsCounts1/hitsCounts2)/(fgSize/bgSize)
+  frac1 <- seqCounts1/fgSize
+  frac2 <- seqCounts2/bgSize
+  summary <- data.frame(patterns=motifPatterns,
+                        scores=round(scores,1),
+                        fgHits=hitsCounts1, bgHits= hitsCounts2,
+                        fgSeq=seqCounts1, bgSeq = seqCounts2,
+                        ratio=round(ratio,1), fgFrac=round(frac1,4), bgFrac=round(frac2,4))
+  return(summary)
+}
 
