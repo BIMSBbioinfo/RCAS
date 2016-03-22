@@ -27,7 +27,7 @@ importGtf <- function (filePath, readFromRds = TRUE, saveObjectAsRds = TRUE, ove
           cat('Overwriting gff object in RDS file at',rdsFilePath,'\n')
           saveRDS(gff, file=rdsFilePath)
         } else {
-          message('File ',rdsFilePath,'already exists.\n Use overwriteObjectAsRds = TRUE to overwrite the file\n')
+          message('File ',rdsFilePath,' already exists.\n Use overwriteObjectAsRds = TRUE to overwrite the file\n')
         }
       }
     return (gff)
@@ -59,18 +59,18 @@ importBed <- function (filePath, sampleN = 0, keepStandardChr = TRUE) {
 
 }
 
-processHits = function(peaks, tx, type) {
-  o = GenomicRanges::findOverlaps(peaks, tx)
-  o.peak = peaks[GenomicRanges::queryHits(o)]
-  o.tx = tx[GenomicRanges::subjectHits(o)]
-  o.tx$overlappingPeak = paste(GenomicRanges::seqnames(o.peak),
-                                GenomicRanges::start(o.peak),
-                                GenomicRanges::end(o.peak),
-                                GenomicRanges::strand(o.peak),
+processHits <- function(queryRegions, tx, type) {
+  overlaps <- GenomicRanges::findOverlaps(queryRegions, tx)
+  overlapsQuery <- queryRegions[GenomicRanges::queryHits(overlaps)]
+  overlapsTX <- tx[GenomicRanges::subjectHits(overlaps)]
+  overlapsTX$overlappingQuery <- paste(GenomicRanges::seqnames(overlapsQuery),
+                                GenomicRanges::start(overlapsQuery),
+                                GenomicRanges::end(overlapsQuery),
+                                GenomicRanges::strand(overlapsQuery),
                                 sep=':')
-  dt = data.table::data.table(tx_name = o.tx$tx_name, overlappingPeak = o.tx$overlappingPeak)
-  summary = dt[,length(unique(overlappingPeak)), by='tx_name']
-  colnames(summary) = c('tx_name', type)
+  dt <- data.table::data.table(tx_name = overlapsTX$tx_name, overlappingQuery = overlapsTX$overlappingQuery)
+  summary <- dt[,length(unique(overlappingQuery)), by='tx_name']
+  colnames(summary) <- c('tx_name', type)
   return(summary)
 }
 
@@ -78,8 +78,8 @@ processHits = function(peaks, tx, type) {
 getTargetedGenesTable <- function (queryRegions, txdbFeatures) {
 
   tbls <- lapply(X=seq_along(txdbFeatures),
-               FUN=function(i) { processHits(queryRegions,
-                                 txdbFeatures[[names(txdbFeatures)[i]]],
+               FUN=function(i) { processHits(queryRegions = queryRegions,
+                                 tx = txdbFeatures[[names(txdbFeatures)[i]]],
                                  type = names(txdbFeatures)[i])})
 
   tbls <- lapply(tbls, function(i) setkey(i, tx_name))
