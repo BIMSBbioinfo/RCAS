@@ -1,5 +1,6 @@
 #functions for GO term and MSIGDB gene set enrichment analyses
 
+#' @export
 runTopGO <- function (ontology = 'BP', species = 'human', backgroundGenes, targetedGenes) {
 
   category <- data.frame(geneId = backgroundGenes)
