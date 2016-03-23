@@ -2,21 +2,21 @@
 
 runTopGO <- function (ontology = 'BP', species = 'human', backgroundGenes, targetedGenes) {
 
-  category = data.frame(geneId = backgroundGenes)
-  category$targeted = 0
-  category[category$geneId %in% targetedGenes,]$targeted = 1
-  category$geneId = gsub("\\..*$", "", category$geneId)
-  allGenes = category$targeted
-  names(allGenes) = category$geneId
+  category <- data.frame(geneId = backgroundGenes)
+  category$targeted <- 0
+  category[category$geneId %in% targetedGenes,]$targeted <- 1
+  category$geneId <- gsub("\\..*$", "", category$geneId)
+  allGenes <- category$targeted
+  names(allGenes) <- category$geneId
 
   if (species == 'human') {
-    speciesOrgdb = 'org.Hs.eg.db'
+    speciesOrgdb <- 'org.Hs.eg.db'
   } else if (species == 'mouse') {
-    speciesOrgdb = 'org.Mm.eg.db'
+    speciesOrgdb <- 'org.Mm.eg.db'
   } else if (species == 'fly') {
-    speciesOrgdb = 'org.Dm.eg.db'
+    speciesOrgdb <- 'org.Dm.eg.db'
   } else if (species == 'worm') {
-    speciesOrgdb = 'org.Ce.eg.db'
+    speciesOrgdb <- 'org.Ce.eg.db'
   } else {
     stop ("Cannot do GO term analysis for species except human, worm, fly, and mouse\n")
   }
@@ -24,30 +24,31 @@ runTopGO <- function (ontology = 'BP', species = 'human', backgroundGenes, targe
   GOdata <- new("topGOdata", ontology = ontology, allGenes = allGenes, geneSel = function (x){ return(x == 1) }, nodeSize=20, description = "Test", annot = annFUN.org, mapping=speciesOrgdb, ID="Ensembl")
 
   resultFisher <- topGO::runTest(GOdata, algorithm = "classic", statistic = "fisher")
-  goResults = topGO::GenTable(GOdata, classicFisher = resultFisher, topNodes = length(usedGO(GOdata)))
+  goResults <- topGO::GenTable(GOdata, classicFisher = resultFisher, topNodes = length(usedGO(GOdata)))
 
   #Do multiple-testing correction
-  goResults$classicFisher = gsub("<", "", goResults$classicFisher) #some p-values have the "less than" sign ("<"), which causes the numeric column to be interpreted as character.
-  goResults$bonferroni = p.adjust(goResults$classicFisher, method="bonferroni")
-  goResults$bh = p.adjust(goResults$classicFisher, method="BH")
+  goResults$classicFisher <- gsub("<", "", goResults$classicFisher) #some p-values have the "less than" sign ("<"), which causes the numeric column to be interpreted as character.
+  goResults$bonferroni <- p.adjust(goResults$classicFisher, method="bonferroni")
+  goResults$bh <- p.adjust(goResults$classicFisher, method="BH")
   return(goResults)
 }
 
-parseMsigdb = function(filePath){
-  data = readLines(filePath)
-  geneLists = list()
-  geneListNames = c()
+#' @export
+parseMsigdb <- function(filePath){
+  data <- readLines(filePath)
+  geneLists <- list()
+  geneListNames <- c()
   for (i in 1:length(data)){
-    info = unlist(strsplit(data[i], "\t"))
-    geneLists = c(geneLists, list(paste(info[3:length(info)], sep= "\t")))
-    geneListNames = c(geneListNames, info[1])
+    info <- unlist(strsplit(data[i], "\t"))
+    geneLists <- c(geneLists, list(paste(info[3:length(info)], sep= "\t")))
+    geneListNames <- c(geneListNames, info[1])
   }
-  names(geneLists) = geneListNames
+  names(geneLists) <- geneListNames
   return(geneLists)
 }
 
 #given two biomart connections and a set of entrez gene identifiers; retrieve orthologs between mart1 and mart2 for the given list of genes
-retrieveOrthologs = function(mart1, mart2, geneSet){
+retrieveOrthologs <- function(mart1, mart2, geneSet){
   biomaRt::getLDS(attributes = c("entrezgene"),
          filters = "entrezgene", values = geneSet, mart = mart1,
          attributesL = c("entrezgene"), martL = mart2)
@@ -73,11 +74,11 @@ getBioMartConnection <- function (genomeVersion) {
 #' @export
 createOrthologousMsigdbDataset <- function(refMsigdbFilePath, refGenomeVersion, targetGenomeVersion){
   #parse lists of genes from MSigDB
-  referenceGeneSets = parseMsigdb(refMsigdbFilePath)
+  referenceGeneSets <- parseMsigdb(refMsigdbFilePath)
   cat("got",length(names(referenceGeneSets)),"gene lists from",refMsigdbFilePath,"\n")
 
   #define all available reference genes in all the given gene sets
-  refGenes = unique(paste(unlist(referenceGeneSets)))
+  refGenes <- unique(paste(unlist(referenceGeneSets)))
   cat('Retrieved',length(refGenes),'genes for reference genome in the MSIGDB input file\n')
 
   # to be able to retrieve orthologs of the genes in the input gene sets - use biomaRt to get ortholog data from Ensembl
@@ -86,71 +87,65 @@ createOrthologousMsigdbDataset <- function(refMsigdbFilePath, refGenomeVersion, 
   cat('Created the database connections to biomart for',refGenomeVersion,'and',targetGenomeVersion,'\n')
 
   #retrieve orthologs lists for all human genes found in the MSIGDB gene sets
-  orthologs = retrieveOrthologs(mart1 = refMart, mart2 = targetMart, refGenes)
+  orthologs <- retrieveOrthologs(mart1 = refMart, mart2 = targetMart, refGenes)
   cat('Retrieved',nrow(orthologs),'orthologous relations between',length(unique(orthologs[,1])),"genes from",refGenomeVersion,'and',length(unique(orthologs[,2])),"genes from",targetGenomeVersion,"\n")
 
-  orthMsigdbDataset = list()
-  counts1 = c()
-  counts2 = c()
+  orthMsigdbDataset <- list()
   for (i in 1:length(referenceGeneSets)){
-    refSet = unique(as.numeric(paste(unlist(referenceGeneSets[i]))))
-    orthologSet = unique(orthologs[orthologs$EntrezGene.ID %in% refSet,]$EntrezGene.ID.1)
-    refSetName = names(referenceGeneSets)[i]
-    orthMsigdbDataset[[refSetName]] = orthologSet
-    counts1 = c(counts1, length(refSet))
-    counts2 = c(counts2, length(orthologSet))
+    refSet <- unique(as.numeric(paste(unlist(referenceGeneSets[i]))))
+    orthologSet <- unique(orthologs[orthologs$EntrezGene.ID %in% refSet,]$EntrezGene.ID.1)
+    refSetName <- names(referenceGeneSets)[i]
+    orthMsigdbDataset[[refSetName]] <- orthologSet
   }
   return(orthMsigdbDataset)
 }
 
+calculateEnrichment <- function (targetedGenes, backgroundGenes, geneSet) {
+
+  #we need to know the number of all genes in the compared sets
+  tSize <- length(targetedGenes)
+  bSize <- length(backgroundGenes)
+
+  #we need to know how many genes from targeted and background lists are members of the given gene set
+  t <- sum(targetedGenes %in% geneSet)
+  b <- sum(backgroundGenes %in% geneSet)
+
+  #how many genes do we expect find in the given gene set, based on the number of genes in targeted gene sets relative to the background
+  exp <- round(tSize * (b/bSize), 1)
+
+  contingencyTable <- matrix(c(t, b, tSize - t, bSize - b), nrow = 2, dimnames = list(c("treatment", "background"), c("found", "not_found")))
+  pval  <- fisher.test(contingencyTable, alternative = "greater")$p.value
+
+  result <- data.frame('treatment' = t, 'treatmentSize' = tSize, 'expectedInTreatment' = exp, 'fisherPVal' = pval)
+  return (result)
+}
+
+#' @export
 runMSIGDB <- function (msigDB, species = 'human', backgroundGenes, targetedGenes) {
   #map ENSEMBL gene ids to Entrez Gene Ids
   if (species == 'human'){
-    mappingDict = org.Hs.egENSEMBL2EG
+    mappingDict <- org.Hs.egENSEMBL2EG
   }else if (species == 'mouse'){
-    mappingDict = org.Mm.egENSEMBL2EG
+    mappingDict <- org.Mm.egENSEMBL2EG
   }else if (species == 'fly'){
-    mappingDict = org.Dm.egENSEMBL2EG
+    mappingDict <- org.Dm.egENSEMBL2EG
   }else if (species == 'worm'){
-    mappingDict = org.Ce.egENSEMBL2EG
+    mappingDict <- org.Ce.egENSEMBL2EG
   }
-  ens2eg <- as.list(mappingDict) #mapping dictionary from ENSEMBL to ENTREZ
-  treatment = get_unique_items_from_list(ens2eg[gsub("\\..*$", "", targeted_gene_ids)])
-  background = get_unique_items_from_list(ens2eg[gsub("\\..*$", "", all_gene_ids)])
-  i = 0
-  mynames = names(gene_lists)
-  t_size = length(treatment)
-  b_size = length(background)
-  t_counts = c()
-  b_counts = c()
-  exp_vals = c()
-  pval_calc = c()
-  for (l in gene_lists){
-    i = i + 1
-    name = mynames[i]
-    t = sum(treatment %in% l)
-    b = sum(background %in% l)
-    exp = t_size * (b/b_size)
-    comparison =  matrix(c(t, b, t_size - t, b_size - b), nrow = 2, dimnames = list(c("treatment", "background"), c("found", "not_found")))
-    pval  = fisher.test(comparison, alternative = "greater")$p.value
+  ens2eg <- AnnotationDbi::as.list(mappingDict) #mapping dictionary from ENSEMBL to ENTREZ
+  #map gene ids from ENSEMBL to ENTREZ
+  targetedGenes <- unique(paste(unlist(ens2eg[targetedGenes])))
+  backgroundGenes <- unique(paste(unlist(ens2eg[backgroundGenes])))
 
-    t_counts = c(t_counts, t)
-    b_counts = c(b_counts, b)
-    exp_vals = c(exp_vals, exp)
-    pval_calc = c(pval_calc, pval)
-  }
-  #for debugging#
-  #results = cbind.data.frame(mynames, t_counts, rep(t_size, length(mynames)), b_counts, rep(b_size, length(mynames)), exp_vals, pval_calc)
-  #colnames(results) = c("list_name", "treatment_count", "treatment_size", "background_count", "background_size", "expected_in_treatment", "pval")
-
-  results = cbind.data.frame(mynames, t_counts, rep(t_size, length(mynames)), round(exp_vals, 1), pval_calc)
-  colnames(results) = c("list_name", "treatment_count", "treatment_size", "expected_in_treatment", "pval")
-
-  results$bonferroni = format.pval(p.adjust(results$pval, method = "bonferroni"))
-  results$BH = format.pval(p.adjust(results$pval, method = "BH"))
-  results$pval = format.pval(results$pval)
-  return(data.table(results))
-
+  results <- lapply(X = msigDB,
+                   FUN = function(x) {
+                     calculateEnrichment(targetedGenes=targetedGenes,
+                                         backgroundGenes=backgroundGenes,
+                                         geneSet = x )})
+  results <- do.call("rbind", results)
+  results$BH <- p.adjust(results$fisherPVal, method = "BH")
+  results$bonferroni <- p.adjust(results$fisherPVal, method = "bonferroni")
+  return(results[order(results$fisherPVal),])
 }
 
 
