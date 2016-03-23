@@ -68,8 +68,8 @@ processHits <- function(queryRegions, tx, type) {
                                 GenomicRanges::end(overlapsQuery),
                                 GenomicRanges::strand(overlapsQuery),
                                 sep=':')
-  dt <- data.table::data.table(tx_name = overlapsTX$tx_name, overlappingQuery = overlapsTX$overlappingQuery)
-  summary <- dt[,length(unique(overlappingQuery)), by='tx_name']
+  dt <- data.table::data.table('tx_name' = overlapsTX$tx_name, 'query' = overlapsTX$overlappingQuery)
+  summary <- dt[,length(unique(query)), by=tx_name]
   colnames(summary) <- c('tx_name', type)
   return(summary)
 }
