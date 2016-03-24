@@ -14,6 +14,10 @@ regions imported by the \code{\link{importBed}} function.}
 genomic coordinates of gene features such as promoters, introns, exons, intron-exon boundaries, 5'/3' UTRs, and whole transcripts.
 This list of GRanges objects is obtained by the function \code{\link{getTxdbFeaturesFromGff}} or \code{\link{getTxdbFeatures}}}
 }
+\value{
+A data.frame object where rows correspond to genes and columns
+correspond to gene features
+}
 \description{
 This function finds out which genes are targeted by how many query regions
 from the input BED file. Then, the hits are categorized by the gene features

@@ -140,6 +140,9 @@ processHits <- function(queryRegions, tx, type) {
 #' txdb <- GenomicFeatures::makeTxDbFromGFF(file='annotation.gtf', format='gtf')
 #' txdbFeatures <- getTxdbFeatures(txdb)
 #' featuresTable <- getTargetedGenesTable(queryRegions=bed, txdbFeatures=txdbFeatures)
+#' @return A data.frame object where rows correspond to genes and columns
+#' correspond to gene features
+#'
 #' @export
 getTargetedGenesTable <- function (queryRegions, txdbFeatures) {
 
@@ -155,6 +158,21 @@ getTargetedGenesTable <- function (queryRegions, txdbFeatures) {
   return(merged)
 }
 
+
+#' getTxdbFeatures
+#'
+#' This function takes as input a txdb object from GenomicFeatures library.
+#' Then extracts the coordinates of gene features such as promoters, introns,
+#' exons, intron-exon boundaries, 5'/3' UTRs, and whole transcripts.
+#'
+#' @param txdb A txdb object imported by GenomicFeatures::makeTxDb family of functions
+#'
+#' @examples
+#'
+#' txdb <- GenomicFeatures::makeTxDbFromGFF(file='annotation.gtf', format='gtf')
+#' txdbFeatures <- getTxdbFeatures(txdb)
+#'
+#' @return A list of GRanges objects
 #' @export
 getTxdbFeatures <- function (txdb) {
 
@@ -181,7 +199,20 @@ getTxdbFeatures <- function (txdb) {
   return(txdbFeatures)
 }
 
-
+#' getTxdbFeaturesFromGff
+#'
+#' This function takes as input a GRanges object from the output of
+#' \code{importGtf} function.
+#' Then extracts the coordinates of gene features such as promoters, introns,
+#' exons, intron-exon boundaries, 5'/3' UTRs, and whole transcripts.
+#'
+#' @param gff A GRanges object imported by \code{importGtf} function
+#'
+#' @examples
+#' gff <- importGtf(file='annotation.gtf')
+#' txdbFeatures <- getTxdbFeaturesFromGff(gff)
+#'
+#' @return A list of GRanges objects
 #' @export
 getTxdbFeaturesFromGff <- function (gff) {
 
