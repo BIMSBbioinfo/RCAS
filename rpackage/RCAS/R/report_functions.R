@@ -1,3 +1,28 @@
+#' Import GTF file
+#'
+#' \code{importGtf} uses \code{rtracklayer::import.gff()} function to import genome annoatation data from Ensembl gtf files
+#'
+#' @param filePath Path to the GTF file
+#' @param saveObjectAsRds TRUE/FALSE (default:TRUE). If set to TRUE, will create a GRanges object
+#' and save it in an .Rds file (<filePath>.granges.rds) so that in the next run, importing can re-use this .Rds file.
+#' @param readFromRds TRUE/FALSE (default:TRUE). If set to TRUE, will import the annotation data
+#' from previously generated .Rds file (<filePath>.granges.rds)
+#' @param overwriteObjectAsRds TRUE/FALSE (default:FALSE). If set to TRUE, will overwrite an existing
+#' .Rds file (<filePath>.granges.rds)
+#' @param keepStandardChr TRUE/FALSE (default:TRUE). If set to TRUE, will convert the \code{seqlevelsStyle} to 'UCSC' and
+#' apply \code{keepStandardChromosomes} function to only keep data from the standard chromosomes
+#'
+#' @return A \code{GRanges} object containing the coordinates of the
+#' annotated genomic features in the input GTF file
+#'
+#' @examples
+#' download.file(url = 'ftp://ftp.ensembl.org/pub/release-75/gtf/homo_sapiens/Homo_sapiens.GRCh37.75.gtf.gz', destfile = 'Ensembl75.hg19.gtf.gz')
+#' R.utils::gunzip('Ensembl75.hg19.gtf.gz')
+#' importGtf(filePath='./Ensembl75.hg19.gtf') #import the data an write it into an .Rds file
+#' importGtf(filePath='./Ensembl75.hg19.gtf', saveObjectAsRds = FALSE) #import the data but don't save it as RDS
+#' importGtf(filePath='./Ensembl75.hg19.gtf', overwriteObjectAsRds = TRUE) #import the data and overwrite the previously generated
+#' .Rds file
+#'
 #' @export
 importGtf <- function (filePath, readFromRds = TRUE, saveObjectAsRds = TRUE, overwriteObjectAsRds = FALSE, keepStandardChr = TRUE) {
 
@@ -37,6 +62,10 @@ importGtf <- function (filePath, readFromRds = TRUE, saveObjectAsRds = TRUE, ove
   }
 }
 
+
+#' import BED file
+#'
+#'
 #' @export
 importBed <- function (filePath, sampleN = 0, keepStandardChr = TRUE) {
 
