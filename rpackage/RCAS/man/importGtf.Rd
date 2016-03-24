@@ -10,16 +10,16 @@ importGtf(filePath, readFromRds = TRUE, saveObjectAsRds = TRUE,
 \arguments{
 \item{filePath}{Path to the GTF file}
 
-\item{readFromRds}{TRUE/FALSE (default:TRUE) If set to TRUE, will import the annotation data
+\item{readFromRds}{TRUE/FALSE (default:TRUE). If set to TRUE, will import the annotation data
 from previously generated .Rds file (<filePath>.granges.rds)}
 
-\item{saveObjectAsRds}{TRUE/FALSE (default:TRUE), will create a GRanges object
+\item{saveObjectAsRds}{TRUE/FALSE (default:TRUE). If set to TRUE, will create a GRanges object
 and save it in an .Rds file (<filePath>.granges.rds) so that in the next run, importing can re-use this .Rds file.}
 
-\item{overwriteObjectAsRds}{TRUE/FALSE (default: FALSE) If set to TRUE, will overwrite an existing
+\item{overwriteObjectAsRds}{TRUE/FALSE (default:FALSE). If set to TRUE, will overwrite an existing
 .Rds file (<filePath>.granges.rds)}
 
-\item{keepStandardChr}{TRUE/FALSE (default:TRUE) If set to TRUE, will convert the \code{seqlevelsStyle} to 'UCSC' and
+\item{keepStandardChr}{TRUE/FALSE (default:TRUE). If set to TRUE, will convert the \code{seqlevelsStyle} to 'UCSC' and
 apply \code{keepStandardChromosomes} function to only keep data from the standard chromosomes}
 }
 \value{

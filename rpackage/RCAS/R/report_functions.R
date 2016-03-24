@@ -63,8 +63,22 @@ importGtf <- function (filePath, readFromRds = TRUE, saveObjectAsRds = TRUE, ove
 }
 
 
-#' import BED file
+#' Import BED file
 #'
+#' \code{importBed} uses \code{rtracklayer::import.bed()} function to import BED files
+#'
+#' @param filePath Path to the GTF file
+#' @param sampleN A positive integer value. The number of intervals in the
+#' input BED file are randomly downsampled to include intervals as many as \code{sampleN}. The input will be downsampled only if
+#' this value is larger than zero and less than the total number of input intervals
+#' @param keepStandardChr TRUE/FALSE (default:TRUE). If set to TRUE, will convert the \code{seqlevelsStyle} to 'UCSC' and
+#' apply \code{keepStandardChromosomes} function to only keep data from the standard chromosomes
+#'
+#' @return A \code{GRanges} object containing the coordinates of the
+#' intervals from the input BED file
+#'
+#' @examples
+#' importBed(filePath='./myfile.BED', keepStandardChr = TRUE)
 #'
 #' @export
 importBed <- function (filePath, sampleN = 0, keepStandardChr = TRUE) {
@@ -85,7 +99,6 @@ importBed <- function (filePath, sampleN = 0, keepStandardChr = TRUE) {
   } else {
     stop("Cannot import BED file because it does not exist at the given location:",filePath,"\n")
   }
-
 }
 
 processHits <- function(queryRegions, tx, type) {
