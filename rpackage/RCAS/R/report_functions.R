@@ -260,6 +260,21 @@ getTxdbFeaturesFromGff <- function (gff) {
   return(txdbFeatures)
 }
 
+
+#' summarizeQueryRegions
+#'
+#' This function is used to count how many query regions overlap with different types of gene features
+#'
+#' @param queryRegions GRanges object imported from a BED file using \code{importBed} function
+#' @param txdbFeatures List of GRanges objects - output of \code{getTxdbFeaturesFromGff} and \code{getTxdbFeatures} functions
+#' @return A data frame with two columns where first column holds the features and second column holds the counts
+#' @examples
+#'
+#' peaks <- importBed('input.BED')
+#' gff <- importGtf('annotation.gtf')
+#' txdbFeatures <- getTxdbFeaturesFromGff(gff)
+#' summary <- summarizeQueryRegions(queryRegions=peaks, txdbFeatures=txdbFeatures)
+#'
 #' @export
 summarizeQueryRegions <- function(queryRegions, txdbFeatures) {
   results = lapply(X = txdbFeatures, FUN = function (x) { length(unique(GenomicRanges::queryHits(GenomicRanges::findOverlaps(queryRegions, x)))) } )
