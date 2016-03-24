@@ -311,6 +311,17 @@ queryGff <- function(queryRegions, gff) {
   return (overlapsGff)
 }
 
+#' calculateCoverageProfile
+#'
+#' This function overlaps the input query regions with a target annotation features and
+#' calculates the coverage profile along the target regions.
+#'
+#' @param queryRegions GRanges object imported from a BED file using \code{importBed} function
+#' @param targetRegions GRanges object containing genomic coordinates of the target feature (e.g. exons)
+#' @param sampleN If set to a positive integer, the targetRegions will be downsampled to \code{sampleN} regions
+#'
+#' @return A data.frame object consisting of two columns: 1. coverage level 2. bins. The target regions are divided into
+#' 100 equal sized bins and coverage level is summarized in a strand-specific manner using the \code{genomation::ScoreMatrixBin} function
 #' @export
 calculateCoverageProfile = function (queryRegions, targetRegions, sampleN = 0){
   windows <- targetRegions[GenomicRanges::width(targetRegions) >= 100]#remove windows shorter than 100 bp
@@ -329,17 +340,51 @@ calculateCoverageProfile = function (queryRegions, targetRegions, sampleN = 0){
   }
 }
 
+#' calculateCoverageProfileList
+#'
+#' This function overlaps the input query regions with a target list of annotation features and
+#' calculates the coverage profile along the target regions.
+#'
+#' @param queryRegions GRanges object imported from a BED file using \code{importBed} function
+#' @param targetRegionsList A list of GRanges objects containing genomic coordinates of the target feature (e.g. transcripts, exons, introns)
+#' @param sampleN If set to a positive integer, the targetRegions will be downsampled to \code{sampleN} regions
+#'
+#' @return A list of data.frame objects consisting of two columns: 1. coverage level 2. bins. The target regions are divided into
+#' 100 equal sized bins and coverage level is summarized in a strand-specific manner using the \code{genomation::ScoreMatrixBin} function
 #' @export
 calculateCoverageProfileList <- function (queryRegions, targetRegionsList, sampleN = 0) {
   lapply(X = targetRegionsList, FUN=function(x) { calculateCoverageProfile(queryRegions, x, sampleN = sampleN) })
 }
 
+#' calculateCoverageProfileListFromTxdb
+#'
+#' This function overlaps the input query regions with a target list of annotation features and
+#' calculates the coverage profile along the target regions.
+#'
+#' @param queryRegions GRanges object imported from a BED file using \code{importBed} function
+#' @param txdb A txdb object obtained by using \code{GenomicFeatures::makeTxDb} family of functions
+#' @param sampleN If set to a positive integer, the targetRegions will be downsampled to \code{sampleN} regions
+#'
+#' @return A list of data.frame objects consisting of two columns: 1. coverage level 2. bins. The target regions are divided into
+#' 100 equal sized bins and coverage level is summarized in a strand-specific manner using the \code{genomation::ScoreMatrixBin} function
 #' @export
 calculateCoverageProfileListFromTxdb <- function (queryRegions, txdb, sampleN = 0) {
   txdbFeatures = getTxdbFeatures(txdb = txdb)
   lapply(X = txdbFeatures, FUN=function(x) { calculateCoverageProfile(queryRegions, x, sampleN = sampleN) })
 }
 
+#' calculateCoverageProfileFromTxdb
+#'
+#' This function overlaps the input query regions with a target list of annotation features and
+#' calculates the coverage profile along the target regions.
+#'
+#' @param queryRegions GRanges object imported from a BED file using \code{importBed} function
+#' @param txdb A txdb object obtained by using \code{GenomicFeatures::makeTxDb} family of functions
+#' @param sampleN If set to a positive integer, the targetRegions will be downsampled to \code{sampleN} regions
+#' @param type A character string defining the type of gene feature for which a profile should be calculated
+#'  The options are: transcripts, exons, introns, exonIntronBoundaries, promoters, fiveUTRs, threeUTRs, and cds
+#' @return A data.frame object consisting of two columns: 1. coverage level 2. bins. The target regions are divided into
+#' 100 equal sized bins and coverage level is summarized in a strand-specific manner using the \code{genomation::ScoreMatrixBin} function
 #' @export
 calculateCoverageProfileFromTxdb <- function (queryRegions, txdb, type, sampleN = 0) {
 
