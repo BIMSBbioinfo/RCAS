@@ -7,7 +7,7 @@
 summarizeQueryRegions(queryRegions, txdbFeatures)
 }
 \arguments{
-\item{queryRegions}{GRanges object imported from a BED file using}
+\item{queryRegions}{GRanges object imported from a BED file using \code{importBed} function}
 
 \item{txdbFeatures}{List of GRanges objects - output of \code{getTxdbFeaturesFromGff} and \code{getTxdbFeatures} functions}
 }

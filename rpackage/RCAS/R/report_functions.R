@@ -283,6 +283,21 @@ summarizeQueryRegions <- function(queryRegions, txdbFeatures) {
   return(df)
 }
 
+#' queryGff
+#'
+#' This function is used to overlap the input query regions (from a BED file) with a target
+#' GTF file imported as a GRanges object
+#'
+#' @param queryRegions GRanges object imported from a BED file using \code{importBed} function
+#' @param gff GRanges object imported from a GTF file using \code{importGtf} function
+#' @return a GRanges object (a subset of input gff) with an additional column 'overlappingQuery' that
+#' contains the coordinates of query regions that overlap the target annotation features
+#'
+#' @examples
+#' peaks <- importBed('input.BED')
+#' gff <- importGtf('annotation.gtf')
+#' overlaps <- queryGff(queryRegions=peaks, gff=gff)
+#'
 #' @export
 queryGff <- function(queryRegions, gff) {
   overlaps = GenomicRanges::findOverlaps(queryRegions, gff) #find all overlapping pairs of intervals between the gff features and BED file (peaks)
