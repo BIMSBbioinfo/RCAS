@@ -116,6 +116,30 @@ processHits <- function(queryRegions, tx, type) {
   return(summary)
 }
 
+#' getTargetedGenesTable
+#'
+#' This function finds out which genes are targeted by how many query regions
+#' from the input BED file. Then, the hits are categorized by the gene features
+#' such as promoters, introns, exons, intron-exon boundaries, 5'/3' UTRs, and whole transcripts.
+#'
+#' @param queryRegions GRanges object containing coordinates of input query
+#' regions imported by the \code{\link{importBed}} function.
+#' @param txdbFeatures A list of GRanges objects where each GRanges object corresponds to the
+#' genomic coordinates of gene features such as promoters, introns, exons, intron-exon boundaries, 5'/3' UTRs, and whole transcripts.
+#' This list of GRanges objects is obtained by the function \code{\link{getTxdbFeaturesFromGff}} or \code{\link{getTxdbFeatures}}
+#'
+#' @examples
+#' gff <- importGtf('annotation.gtf')
+#' bed <- importBed('input.bed')
+#' txdbFeatures <- getTxdbFeaturesFromGff(gff)
+#' featuresTable <- getTargetedGenesTable(queryRegions=bed, txdbFeatures=txdbFeatures)
+#'
+#' or
+#'
+#' bed <- importBed('input.bed')
+#' txdb <- GenomicFeatures::makeTxDbFromGFF(file='annotation.gtf', format='gtf')
+#' txdbFeatures <- getTxdbFeatures(txdb)
+#' featuresTable <- getTargetedGenesTable(queryRegions=bed, txdbFeatures=txdbFeatures)
 #' @export
 getTargetedGenesTable <- function (queryRegions, txdbFeatures) {
 
