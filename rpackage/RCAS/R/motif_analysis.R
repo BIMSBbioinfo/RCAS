@@ -31,6 +31,23 @@ createControlRegions <- function (queryRegions) {
   return(controlRegions)
 }
 
+#' Extract genomice sequences from BSgenome libraries
+#'
+#' Given a GRanges object and a genome version (hg19, mm9, ce6, or mm9), this function will
+#' extract the DNA sequences for all the genomic regions found in the input object.
+#'
+#' @param queryRegions GRanges object containing coordinates of input query
+#' regions imported by the \code{\link{importBed}} function.
+#' @param genomeVersion A character string to denote which BS genome library should be used to
+#' extract the sequences. Available options are hg19, mm9, ce6, and mm9
+#'
+#' @return DNAStringSet object will be returned
+#'
+#' @examples
+#'
+#' bed <- importBed('input.bed')
+#' sequences <- extractSequences(queryRegions=bed, genomeVersion='hg19')
+#'
 #' @export
 extractSequences <- function (queryRegions, genomeVersion) {
 
@@ -52,6 +69,9 @@ extractSequences <- function (queryRegions, genomeVersion) {
   return (sequences)
 }
 
+#' runMotifRG
+#'
+#'
 #' @export
 runMotifRG <- function (queryRegions, genomeVersion, motifN = 5) {
 
