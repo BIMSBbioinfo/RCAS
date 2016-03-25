@@ -1,15 +1,29 @@
 Package: RCAS
 Type: Package
-Title: What the Package Does (Title Case)
+Title: RNA Centric Annotation System
 Version: 0.1
 Date: 2016-03-22
-Author: Who wrote it
-Maintainer: Who to complain to <yourfault@somewhere.net>
-Description: More about what it does (maybe more than one line)
+Authors@R: person("Bora", "Uyar", email='bora.uyar@mdc-berlin.de', role=c("aut", "cre"))
+Description: RNA Centric Annotation System is an automated system that provides
+    dynamic annotations for custom input files that contain transcriptomic target
+    regions. Such transcriptomic target regions could be, for instance, peak regions
+    detected by CLIP-Seq analysis that detect protein-RNA interactions, MeRIP-Seq
+    analysis that detect RNA modifications (alias the epitranscriptome), or any
+    collection of target regions at the level of the transcriptome. RCAS contains
+    wrapper functions to do de novo motif discovery using functions from the motifRG
+    package. RCAS overlays the input target regions with the annotated protein-
+    coding genes and calculates the Gene Ontology (GO) terms that may be enriched or
+    depleted in the input target regions compared to the background list of protein-
+    coding genes. A Classical Fisher's Exact Test is applied for each GO term and
+    the p-values obtained for each GO term is corrected for multiple testing using
+    both the False Discovery Rate and the Family-Wise Error Rate. Similarly to the
+    GO term enrichment analysis, RCAS also detects sets of genes as annotated in
+    the Molecular Signatures Database that are enriched or depleted in the queried
+    target regions. Results are corrected for multiple-testing according to both the
+    False Discovery Rate and the Family-Wise Error Rate.
 License: What license is it under?
 LazyData: TRUE
-Depends: 
-    data.table,
+Depends: data.table,
     topGO,
     biomaRt,
     AnnotationDbi,
