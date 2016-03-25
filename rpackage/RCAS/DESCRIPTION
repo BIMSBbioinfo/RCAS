@@ -41,3 +41,6 @@ Depends: data.table,
     rtracklayer,
     GenomicFeatures
 RoxygenNote: 5.0.1
+Suggests: knitr,
+    rmarkdown
+VignetteBuilder: knitr
