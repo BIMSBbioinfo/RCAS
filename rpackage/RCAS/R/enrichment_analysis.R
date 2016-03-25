@@ -1,5 +1,20 @@
-#functions for GO term and MSIGDB gene set enrichment analyses
-
+#' runTopGO
+#'
+#' A wrapper function to facilitate GO term enrichment analysis using \code{topGO} package
+#'
+#' @param ontology A character string denoting which type of GO ontology to use.
+#'  Options are BP: biological processes; MF: molecular functions; CC: cellular compartments
+#' @param species A character string denoting which species is under analysis.
+#'  Options are 'human', 'mouse', 'fly' and 'worm'
+#' @param backgroundGenes A vector of Ensembl gene ids that serve as background set of genes for
+#'  GO term enrichment. In the context of RCAS, this should be the whole set of genes found in
+#'  the input Gtf file.
+#' @param targetedGenes A vector of Ensembl gene ids that serve as the set for which GO term enrichment
+#'  should be carried out. In the context of RCAS, this should be the set of genes that overlap with
+#'  the query regions in the input BED file.
+#'
+#' @return A data.frame object containing enriched GO terms and associated statistics
+#'
 #' @export
 runTopGO <- function (ontology = 'BP', species = 'human', backgroundGenes, targetedGenes) {
 
@@ -71,6 +86,7 @@ getBioMartConnection <- function (genomeVersion) {
   }
   return (mart)
 }
+
 
 #' @export
 createOrthologousMsigdbDataset <- function(refMsigdbFilePath, refGenomeVersion, targetGenomeVersion){
