@@ -3,7 +3,10 @@ Type: Package
 Title: RNA Centric Annotation System
 Version: 0.1
 Date: 2016-03-22
-Authors@R: person("Bora", "Uyar", email='bora.uyar@mdc-berlin.de', role=c("aut", "cre"))
+Authors@R: c(person("Bora", "Uyar", email='bora.uyar@mdc-berlin.de', role=c("aut", "cre")),
+              person("Dilmurat", "Yusuf", role=c("aut")),
+              person("Ricardo", "Wurmus", role=c("aut")),
+              person("Altuna", "Akalin", role=c("aut")))
 Description: RNA Centric Annotation System is an automated system that provides
     dynamic annotations for custom input files that contain transcriptomic target
     regions. Such transcriptomic target regions could be, for instance, peak regions
