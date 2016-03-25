@@ -1,6 +1,6 @@
 ---
 title: "The RNA Centric Analysis System Report"
-author: "Bora Uyar"
+author: "Bora Uyar, Dilmurat Yusuf, Ricardo Wurmus, Altuna Akalin"
 date: "`r Sys.Date()`"
 output: 
   html_document:
