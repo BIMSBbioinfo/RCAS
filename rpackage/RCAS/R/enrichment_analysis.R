@@ -1,3 +1,5 @@
+.datatable.aware=TRUE
+
 #' runTopGO
 #'
 #' A wrapper function to facilitate GO term enrichment analysis using \code{topGO} package

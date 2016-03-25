@@ -1,3 +1,5 @@
+.datatable.aware=TRUE
+
 #' Import GTF file
 #'
 #' \code{importGtf} uses \code{rtracklayer::import.gff()} function to import genome annoatation data from Ensembl gtf files
