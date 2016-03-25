@@ -71,7 +71,22 @@ extractSequences <- function (queryRegions, genomeVersion) {
 
 #' runMotifRG
 #'
+#' This function makes use of \code{motifRG} library to carry out de novo motif discovery
+#' from the input query regions
 #'
+#' @param queryRegions GRanges object containing coordinates of input query
+#' regions imported by the \code{\link{importBed}} function.
+#' @param genomeVersion A character string to denote which BS genome library should be used to
+#' extract the sequences. Available options are hg19, mm9, ce6, and mm9
+#' @param motifN A positive integer (default:5) denoting the maximum number of motifs that
+#' should be sought by the \code{motifRG::findMotifFgBg} function
+#'
+#' @return a list of objects returned by the \code{motifRG::findMotif} function
+#' @examples
+#'
+#' bed <- importBed('input.bed')
+#' motifResults <- runMotifRG(queryRegions=bed, genomeVersion='hg19')
+
 #' @export
 runMotifRG <- function (queryRegions, genomeVersion, motifN = 5) {
 
@@ -89,6 +104,18 @@ runMotifRG <- function (queryRegions, genomeVersion, motifN = 5) {
   return(motifResults)
 }
 
+#' getMotifSummaryTable
+#'
+#' A repurposed/simplified version of the \code{motifRG::summaryMotif} function.
+#'
+#' @param motifResults Output object of \code{runMotifRG} function
+#' @return A data.frame object containing summary statistics about the discovered motifs
+#' @examples
+#'
+#' bed <- importBed('input.bed')
+#' motifResults <- runMotifRG(queryRegions=bed, genomeVersion='hg19')
+#' motifSummary <- getMotifSummaryTable(motifResults)
+#'
 #' @export
 getMotifSummaryTable <- function(motifResults){
 
@@ -125,41 +152,3 @@ getMotifSummaryTable <- function(motifResults){
                         ratio=round(ratio,1), fgFrac=round(frac1,4), bgFrac=round(frac2,4))
   return(summary)
 }
-
-#' @export
-getMotifSummaryTable = function(motifResults){
-
-  if(is.null(motifResults)) {return(NULL)}
-  motifs = motifResults$motifs
-  category = motifResults$category
-  scores <- c()
-  motifPatterns <- c()
-  hitsCounts1 <- c()
-  hitsCounts2 <- c()
-  seqCounts1 <- c()
-  seqCounts2 <- c()
-  fgSet <- category == 1
-  bgSet <- !fgSet
-  fgSize <- sum(fgSet)
-  bgSize <- sum(bgSet)
-  #summarize motif
-  for(i in 1:length(motifs)){
-    motifPatterns <- c(motifPatterns, motifs[[i]]@pattern)
-    scores[i] <- motifs[[i]]@score
-    count <- motifs[[i]]@count
-    hitsCounts1[i] <- sum(count[fgSet])
-    hitsCounts2[i] <- sum(count[bgSet])
-    seqCounts1[i] <-  sum(count[fgSet] > 0)
-    seqCounts2[i] <-  sum(count[bgSet] > 0)
-  }
-  ratio <- (hitsCounts1/hitsCounts2)/(fgSize/bgSize)
-  frac1 <- seqCounts1/fgSize
-  frac2 <- seqCounts2/bgSize
-  summary <- data.frame(patterns=motifPatterns,
-                        scores=round(scores,1),
-                        fgHits=hitsCounts1, bgHits= hitsCounts2,
-                        fgSeq=seqCounts1, bgSeq = seqCounts2,
-                        ratio=round(ratio,1), fgFrac=round(frac1,4), bgFrac=round(frac2,4))
-  return(summary)
-}
-
