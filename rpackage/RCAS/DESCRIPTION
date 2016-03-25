@@ -8,4 +8,19 @@ Maintainer: Who to complain to <yourfault@somewhere.net>
 Description: More about what it does (maybe more than one line)
 License: What license is it under?
 LazyData: TRUE
+Depends: 
+    data.table,
+    topGO,
+    biomaRt,
+    AnnotationDbi,
+    GenomicRanges,
+    BSgenome.Hsapiens.UCSC.hg19,
+    BSgenome.Mmusculus.UCSC.mm9,
+    BSgenome.Celegans.UCSC.ce6,
+    BSgenome.Dmelanogaster.UCSC.dm3,
+    GenomeInfoDb,
+    Biostrings,
+    motifRG,
+    rtracklayer,
+    GenomicFeatures
 RoxygenNote: 5.0.1
