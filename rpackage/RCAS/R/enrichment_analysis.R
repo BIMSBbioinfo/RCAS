@@ -49,6 +49,15 @@ runTopGO <- function (ontology = 'BP', species = 'human', backgroundGenes, targe
   return(goResults)
 }
 
+#' parseMsigdb
+#'
+#' A function to import gene sets downloaded from the Molecular Signatures Database (MSIGDB)
+#'
+#' @param filePath Path to the file containing gene sets from MSIGDB. The gene ids must be
+#' in Entrez format.
+#'
+#' @return A list of vectors where each vector consists of a set of Entrez gene ids
+#'
 #' @export
 parseMsigdb <- function(filePath){
   data <- readLines(filePath)
@@ -63,7 +72,22 @@ parseMsigdb <- function(filePath){
   return(geneLists)
 }
 
-#given two biomart connections and a set of entrez gene identifiers; retrieve orthologs between mart1 and mart2 for the given list of genes
+#' Retrieve Orthologous Genes from Ensembl Biomart
+#'
+#' Given two biomart connections and a set of entrez gene identifiers; retrieve orthologs between mart1 and mart2 for the given list of genes
+#'
+#' @param mart1 An Ensembl biomart connection for the reference species created using the \code{biomaRt::useMart()} function
+#' @param mart2 An Ensembl biomart connection for the target species created using the \code{biomaRt::useMart()} function
+#' @param geneSet A vector of Entrez gene ids from the reference species (should be available at the biomart object mart1)
+#' @return A data.frame object containing a mapping of orthologouse genes from two mart objects
+#'
+#' @examples
+#' mart1_hg19 <- biomaRt::useMart(biomart='ENSEMBL_MART_ENSEMBL', host='feb2014.archive.ensembl.org', dataset = "hsapiens_gene_ensembl")
+#' mart2_mm9 <- biomaRt::useMart(biomart='ENSEMBL_MART_ENSEMBL', host='may2012.archive.ensembl.org', dataset = "mmusculus_gene_ensembl")
+#'
+#' orthologs <- retrieveOrthologs(mart1=mart1_hg19, mart2=mart2_mm9)
+#'
+#' @export
 retrieveOrthologs <- function(mart1, mart2, geneSet){
   biomaRt::getLDS(attributes = c("entrezgene"),
          filters = "entrezgene", values = geneSet, mart = mart1,
