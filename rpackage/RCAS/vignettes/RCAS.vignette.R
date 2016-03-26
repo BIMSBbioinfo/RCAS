@@ -5,16 +5,13 @@ library(plotly)
 library(DT)
 library(motifRG)
 
-## ----get_inputs, warning=FALSE, message=FALSE----------------------------
-peaksFile <- '/Users/buyar/Desktop/data/bed/HITSCLIP_LIN28AWilbert2012a_hg19.bed'
-gtfFile <- '/Users/buyar/Desktop/data/gff/hg19/Homo_sapiens.GRCh37.75.gtf'
-msigdbFile <- '/Users/buyar/RCAS/src/base/c2.cp.v5.0.entrez.hg19.gmt'
-
 ## ----importGtf, warning=FALSE, message=FALSE-----------------------------
-gff = importGtf(filePath = gtfFile)
+#gff = importGtf(filePath = gtfFile)
+gff <- readRDS('../data/hg19.chr1.gtf.granges.rds')
 
 ## ----importBed, warning=FALSE, message=FALSE-----------------------------
-queryRegions = importBed(filePath = peaksFile, sampleN = 10000)
+#queryRegions = importBed(filePath = peaksFile, sampleN = 10000)
+queryRegions <- readRDS('../data/sample.bed.rds')
 
 ## ----queryGFF, warning=FALSE, message=FALSE------------------------------
 overlaps = queryGff(queryRegions = queryRegions, gff = gff)
@@ -70,7 +67,7 @@ p = plot_ly(data = mdf, x=bins, y=coverage, color = feature)
 layout(p)
 
 ## ----motif_analysis, warning=FALSE, message=FALSE------------------------
-motifResults <- runMotifRG(queryRegions = queryRegions, genomeVersion = 'hg19', motifN = 3)
+motifResults <- runMotifRG(queryRegions = queryRegions, genomeVersion = 'hg19', motifN = 4)
 
 par(mfrow=c(2,2), mar=c(2,2,2,2))
 for (i in 1:length(motifResults$motifs)){
@@ -107,7 +104,8 @@ datatable(goResults[goResults$bh < 0.1,], extensions = 'FixedColumns',
 
 
 ## ----msigdb_analysis, warning=FALSE, message=FALSE-----------------------
-msigDB <- parseMsigdb(msigdbFile) 
+#msigDB <- parseMsigdb(msigdbFile) 
+msigDB <- readRDS('../data/msigdb.sample.rds')
 msigdbResults <- runMSIGDB(msigDB = msigDB, backgroundGenes = backgroundGenes, targetedGenes = targetedGenes)
 
 datatable(msigdbResults[msigdbResults$BH < 0.1,], extensions = 'FixedColumns',

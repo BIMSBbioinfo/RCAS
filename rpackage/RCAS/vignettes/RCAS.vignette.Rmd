@@ -42,26 +42,22 @@ the Molecular Signatures Database that are enriched or depleted in the queried
 target regions. Results are corrected for multiple-testing according to both the
 False Discovery Rate and the Family-Wise Error Rate.
 
-```{r get_inputs, warning=FALSE, message=FALSE}
-peaksFile <- '/Users/buyar/Desktop/data/bed/HITSCLIP_LIN28AWilbert2012a_hg19.bed'
-gtfFile <- '/Users/buyar/Desktop/data/gff/hg19/Homo_sapiens.GRCh37.75.gtf'
-msigdbFile <- '/Users/buyar/RCAS/src/base/c2.cp.v5.0.entrez.hg19.gmt'
-```
-
 # Getting Input
 
 ## Importing GTF files
 
 Import the contents of the input GTF file as a GRanges object. 
 ```{r importGtf, warning=FALSE, message=FALSE}
-gff = importGtf(filePath = gtfFile)
+#gff = importGtf(filePath = gtfFile)
+data(gff)
 ```
 
 
 ## Importing query regions from BED files 
 Import the contents of the input BED file as a GRanges object. Use sampleN=<integer> to randomly down-sample the number of intervals so that the analysis doesn't take too much memory and time in case the input contains too many intervals. A reasonable value for this parameter (sampleN) is 10000.  
 ```{r importBed, warning=FALSE, message=FALSE}
-queryRegions = importBed(filePath = peaksFile, sampleN = 10000)
+#queryRegions = importBed(filePath = peaksFile, sampleN = 10000)
+data(queryRegions)
 ```
 
 # Summarizing Overlaps
@@ -120,7 +116,7 @@ datatable(dt[order(transcripts, decreasing = T)][1:500], extensions = 'FixedColu
 
 ## Querying TxDB: Coverage Profiles
 
-### Querying TxDB: Coverage Profile for Exons
+### Querying TxDB: Coverage Profile for 3' UTRs
 To calculate the coverage profiles of query Regions across gene features. It might be a good idea to use sampleN parameter to randomly downsample the target regions to speed up the calculations. 
 ```{r coverageprofile, warning=FALSE, message=FALSE}
 cov = calculateCoverageProfile(queryRegions = queryRegions, targetRegions = txdbFeatures$threeUTRs, sampleN = 10000)
@@ -152,7 +148,7 @@ layout(p)
 ## Calculating enriched motifs
 With the RCAS package, a motif analysis is also possible. RCAS uses motifRG library to find enriched motifs among the query regions. 
 ```{r motif_analysis, warning=FALSE, message=FALSE}
-motifResults <- runMotifRG(queryRegions = queryRegions, genomeVersion = 'hg19', motifN = 3)
+motifResults <- runMotifRG(queryRegions = queryRegions, genomeVersion = 'hg19', motifN = 4)
 
 par(mfrow=c(2,2), mar=c(2,2,2,2))
 for (i in 1:length(motifResults$motifs)){
@@ -204,7 +200,8 @@ datatable(goResults[goResults$bh < 0.1,], extensions = 'FixedColumns',
 ## MSIGDB gene sets enriched among targeted genes 
 RCAS can use gene sets from Molecular Signatures Database and calculate gene set enrichment analysis to find out which gene sets are enriched among the genes targeted by the query regions 
 ```{r msigdb_analysis, warning=FALSE, message=FALSE}
-msigDB <- parseMsigdb(msigdbFile) 
+#msigDB <- parseMsigdb(msigdbFile) 
+data(msigDB) 
 msigdbResults <- runMSIGDB(msigDB = msigDB, backgroundGenes = backgroundGenes, targetedGenes = targetedGenes)
 
 datatable(msigdbResults[msigdbResults$BH < 0.1,], extensions = 'FixedColumns',
