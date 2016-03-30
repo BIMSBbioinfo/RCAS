@@ -7,11 +7,11 @@ library(motifRG)
 
 ## ----importGtf, warning=FALSE, message=FALSE-----------------------------
 #gff = importGtf(filePath = gtfFile)
-gff <- readRDS('../data/hg19.chr1.gtf.granges.rds')
+data(gff)
 
 ## ----importBed, warning=FALSE, message=FALSE-----------------------------
 #queryRegions = importBed(filePath = peaksFile, sampleN = 10000)
-queryRegions <- readRDS('../data/sample.bed.rds')
+data(queryRegions)
 
 ## ----queryGFF, warning=FALSE, message=FALSE------------------------------
 overlaps = queryGff(queryRegions = queryRegions, gff = gff)
@@ -105,7 +105,7 @@ datatable(goResults[goResults$bh < 0.1,], extensions = 'FixedColumns',
 
 ## ----msigdb_analysis, warning=FALSE, message=FALSE-----------------------
 #msigDB <- parseMsigdb(msigdbFile) 
-msigDB <- readRDS('../data/msigdb.sample.rds')
+data(msigDB) 
 msigdbResults <- runMSIGDB(msigDB = msigDB, backgroundGenes = backgroundGenes, targetedGenes = targetedGenes)
 
 datatable(msigdbResults[msigdbResults$BH < 0.1,], extensions = 'FixedColumns',
