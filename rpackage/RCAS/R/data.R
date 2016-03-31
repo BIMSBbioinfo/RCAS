@@ -1,8 +1,8 @@
-#' Sample GTF file imported as a GRanges object
+#' Sample GFF file imported as a GRanges object
 #'
 #' This dataset contains genomic annotation data from Ensembl version 75 for Homo sapiens
 #' downloaded from Ensembl.
-#' The gtf file is imported via the \code{importGtf} function and a subset of the data
+#' The GFF file is imported via the \code{importGtf} function and a subset of the data
 #' is selected by choosing features found on 'chr1'.
 #'
 #' @format GRanges object with 238010 ranges and 16 metadata columns
