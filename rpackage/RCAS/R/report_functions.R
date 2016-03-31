@@ -1,32 +1,32 @@
 .datatable.aware=TRUE
 
-#' Import GTF file
+#' importGtf
 #'
-#' \code{importGtf} uses \code{rtracklayer::import.gff()} function to import genome annoatation data from Ensembl gtf files
+#' This function uses \code{rtracklayer::import.gff()} function to import genome annoatation data from an Ensembl gtf file
 #'
-#' @param filePath Path to the GTF file
-#' @param saveObjectAsRds TRUE/FALSE (default:TRUE). If set to TRUE, will create a GRanges object
-#' and save it in an .Rds file (<filePath>.granges.rds) so that in the next run, importing can re-use this .Rds file.
-#' @param readFromRds TRUE/FALSE (default:TRUE). If set to TRUE, will import the annotation data
-#' from previously generated .Rds file (<filePath>.granges.rds)
-#' @param overwriteObjectAsRds TRUE/FALSE (default:FALSE). If set to TRUE, will overwrite an existing
-#' .Rds file (<filePath>.granges.rds)
-#' @param keepStandardChr TRUE/FALSE (default:TRUE). If set to TRUE, will convert the \code{seqlevelsStyle} to 'UCSC' and
-#' apply \code{keepStandardChromosomes} function to only keep data from the standard chromosomes
+#' @param filePath Path to a GTF file
+#' @param saveObjectAsRds TRUE/FALSE (default:TRUE). If it is set to TRUE, a GRanges object will be created
+#' and saved in RDS format (<filePath>.granges.rds) so that importing can re-use this .rds file in next run.
+#' @param readFromRds TRUE/FALSE (default:TRUE). If it is set to TRUE, annotation data will be imported
+#' from previously generated .rds file (<filePath>.granges.rds).
+#' @param overwriteObjectAsRds TRUE/FALSE (default:FALSE). If it is set to TRUE, existing
+#' .rds file (<filePath>.granges.rds) will overwritten.
+#' @param keepStandardChr TRUE/FALSE (default:TRUE). If it is set to TRUE, \code{seqlevelsStyle} will be converted to 'UCSC' and
+#' \code{keepStandardChromosomes} function  will be applied to only keep data from the standard chromosomes.
 #'
 #' @return A \code{GRanges} object containing the coordinates of the
-#' annotated genomic features in the input GTF file
+#' annotated genomic features in an input GTF file
 #'
 #' @examples
 #' download.file(url = 'ftp://ftp.ensembl.org/pub/release-75/gtf/homo_sapiens/Homo_sapiens.GRCh37.75.gtf.gz', destfile = 'Ensembl75.hg19.gtf.gz')
 #' R.utils::gunzip('Ensembl75.hg19.gtf.gz')
-#' importGtf(filePath='./Ensembl75.hg19.gtf') #import the data an write it into an .Rds file
+#' importGtf(filePath='./Ensembl75.hg19.gtf') #import the data and write it into a .rds file
 #' importGtf(filePath='./Ensembl75.hg19.gtf', saveObjectAsRds = FALSE) #import the data but don't save it as RDS
 #' importGtf(filePath='./Ensembl75.hg19.gtf', overwriteObjectAsRds = TRUE) #import the data and overwrite the previously generated
-#' .Rds file
+#' .rds file
 #'
 #' @export
-importGtf <- function (filePath, readFromRds = TRUE, saveObjectAsRds = TRUE, overwriteObjectAsRds = FALSE, keepStandardChr = TRUE) {
+importGtf <- function (filePath,  saveObjectAsRds = TRUE, readFromRds = TRUE, overwriteObjectAsRds = FALSE, keepStandardChr = TRUE) {
 
   rdsFilePath <- paste0(filePath, ".granges.rds")
 
@@ -65,19 +65,19 @@ importGtf <- function (filePath, readFromRds = TRUE, saveObjectAsRds = TRUE, ove
 }
 
 
-#' Import BED file
+#' importBed
 #'
-#' \code{importBed} uses \code{rtracklayer::import.bed()} function to import BED files
+#' This function uses \code{rtracklayer::import.bed()} function to import BED files
 #'
-#' @param filePath Path to the GTF file
+#' @param filePath Path to a GTF file
 #' @param sampleN A positive integer value. The number of intervals in the
 #' input BED file are randomly downsampled to include intervals as many as \code{sampleN}. The input will be downsampled only if
-#' this value is larger than zero and less than the total number of input intervals
+#' this value is larger than zero and less than the total number of input intervals.
 #' @param keepStandardChr TRUE/FALSE (default:TRUE). If set to TRUE, will convert the \code{seqlevelsStyle} to 'UCSC' and
 #' apply \code{keepStandardChromosomes} function to only keep data from the standard chromosomes
 #'
 #' @return A \code{GRanges} object containing the coordinates of the
-#' intervals from the input BED file
+#' intervals from an input BED file
 #'
 #' @examples
 #' importBed(filePath='./myfile.BED', keepStandardChr = TRUE)
@@ -120,25 +120,26 @@ processHits <- function(queryRegions, tx, type) {
 
 #' getTargetedGenesTable
 #'
-#' This function finds out which genes are targeted by how many query regions
-#' from the input BED file. Then, the hits are categorized by the gene features
-#' such as promoters, introns, exons, intron-exon boundaries, 5'/3' UTRs, and whole transcripts.
+#' This function provides a list of genes which are targeted by query regions
+#' and their corresponding numbers
+#' from an input BED file. Then, the hits are categorized by the gene features
+#' such as promoters, introns, exons, intron-exon boundaries, 5'/3' UTRs and whole transcripts.
 #'
 #' @param queryRegions GRanges object containing coordinates of input query
-#' regions imported by the \code{\link{importBed}} function.
+#' regions imported by the \code{\link{importBed}} function
 #' @param txdbFeatures A list of GRanges objects where each GRanges object corresponds to the
-#' genomic coordinates of gene features such as promoters, introns, exons, intron-exon boundaries, 5'/3' UTRs, and whole transcripts.
-#' This list of GRanges objects is obtained by the function \code{\link{getTxdbFeaturesFromGff}} or \code{\link{getTxdbFeatures}}
+#' genomic coordinates of gene features such as promoters, introns, exons, intron-exon boundaries, 5'/3' UTRs and whole transcripts.
+#' This list of GRanges objects are obtained by the function \code{\link{getTxdbFeaturesFromGff}} or \code{\link{getTxdbFeatures}}.
 #'
 #' @examples
-#' gff <- importGtf('annotation.gtf')
-#' bed <- importBed('input.bed')
+#' gff <- importGtf(filePath = 'annotation.gtf')
+#' bed <- importBed(filePath = 'input.bed')
 #' txdbFeatures <- getTxdbFeaturesFromGff(gff)
 #' featuresTable <- getTargetedGenesTable(queryRegions=bed, txdbFeatures=txdbFeatures)
 #'
 #' or
 #'
-#' bed <- importBed('input.bed')
+#' bed <- importBed(filePath = 'input.bed')
 #' txdb <- GenomicFeatures::makeTxDbFromGFF(file='annotation.gtf', format='gtf')
 #' txdbFeatures <- getTxdbFeatures(txdb)
 #' featuresTable <- getTargetedGenesTable(queryRegions=bed, txdbFeatures=txdbFeatures)
@@ -206,7 +207,7 @@ getTxdbFeatures <- function (txdb) {
 #' This function takes as input a GRanges object from the output of
 #' \code{importGtf} function.
 #' Then extracts the coordinates of gene features such as promoters, introns,
-#' exons, intron-exon boundaries, 5'/3' UTRs, and whole transcripts.
+#' exons, intron-exon boundaries, 5'/3' UTRs and whole transcripts.
 #'
 #' @param gff A GRanges object imported by \code{importGtf} function
 #'
@@ -265,11 +266,11 @@ getTxdbFeaturesFromGff <- function (gff) {
 
 #' summarizeQueryRegions
 #'
-#' This function is used to count how many query regions overlap with different types of gene features
+#' This function counts number of query regions that overlap with different types of gene features.
 #'
 #' @param queryRegions GRanges object imported from a BED file using \code{importBed} function
-#' @param txdbFeatures List of GRanges objects - output of \code{getTxdbFeaturesFromGff} and \code{getTxdbFeatures} functions
-#' @return A data frame with two columns where first column holds the features and second column holds the counts
+#' @param txdbFeatures List of GRanges objects - outputs of \code{getTxdbFeaturesFromGff} and \code{getTxdbFeatures} functions
+#' @return A data frame with two columns where first column holds features and second column holds corresponding counts
 #' @examples
 #'
 #' peaks <- importBed('input.BED')
@@ -287,8 +288,9 @@ summarizeQueryRegions <- function(queryRegions, txdbFeatures) {
 
 #' queryGff
 #'
-#' This function is used to overlap the input query regions (from a BED file) with a target
-#' GTF file imported as a GRanges object
+#' This function checks overlaps between the regions in input query and in reference.
+#' Input query should be in BED format and reference should be in GFF format.
+#' Both data are imported as GRanges object.
 #'
 #' @param queryRegions GRanges object imported from a BED file using \code{importBed} function
 #' @param gff GRanges object imported from a GTF file using \code{importGtf} function
@@ -298,7 +300,7 @@ summarizeQueryRegions <- function(queryRegions, txdbFeatures) {
 #' @examples
 #' peaks <- importBed('input.BED')
 #' gff <- importGtf('annotation.gtf')
-#' overlaps <- queryGff(queryRegions=peaks, gff=gff)
+#' overlaps <- queryGff(queryRegions=queryRegions, gff=gff)
 #'
 #' @export
 queryGff <- function(queryRegions, gff) {
@@ -315,15 +317,17 @@ queryGff <- function(queryRegions, gff) {
 
 #' calculateCoverageProfile
 #'
-#' This function overlaps the input query regions with a target annotation features and
-#' calculates the coverage profile along the target regions.
+#' This function checks overlaps betwenn input query regions and annotation features,
+#' and then calculates coverage profile along target regions.
 #'
 #' @param queryRegions GRanges object imported from a BED file using \code{importBed} function
-#' @param targetRegions GRanges object containing genomic coordinates of the target feature (e.g. exons)
-#' @param sampleN If set to a positive integer, the targetRegions will be downsampled to \code{sampleN} regions
+#' @param targetRegions GRanges object containing genomic coordinates of a target feature (e.g. exons)
+#' @param sampleN If set to a positive integer, \code{targetRegions} will be downsampled to \code{sampleN} regions
 #'
-#' @return A data.frame object consisting of two columns: 1. coverage level 2. bins. The target regions are divided into
-#' 100 equal sized bins and coverage level is summarized in a strand-specific manner using the \code{genomation::ScoreMatrixBin} function
+#' @return A data.frame object consisting of two columns: 1. coverage level 2. bins. Target regions are divided into
+#' 100 equal sized bins and coverage level is summarized in a strand-specific manner using the \code{genomation::ScoreMatrixBin} function.
+#' @examples missing
+#'
 #' @export
 calculateCoverageProfile = function (queryRegions, targetRegions, sampleN = 0){
   windows <- targetRegions[GenomicRanges::width(targetRegions) >= 100]#remove windows shorter than 100 bp
@@ -344,15 +348,16 @@ calculateCoverageProfile = function (queryRegions, targetRegions, sampleN = 0){
 
 #' calculateCoverageProfileList
 #'
-#' This function overlaps the input query regions with a target list of annotation features and
+#' This function checks overlaps between input query regions and a target list of annotation features, and then
 #' calculates the coverage profile along the target regions.
 #'
 #' @param queryRegions GRanges object imported from a BED file using \code{importBed} function
-#' @param targetRegionsList A list of GRanges objects containing genomic coordinates of the target feature (e.g. transcripts, exons, introns)
-#' @param sampleN If set to a positive integer, the targetRegions will be downsampled to \code{sampleN} regions
+#' @param targetRegionsList A list of GRanges objects containing genomic coordinates of target features (e.g. transcripts, exons, introns)
+#' @param sampleN If set to a positive integer, \code{targetRegions} will be downsampled to \code{sampleN} regions
 #'
-#' @return A list of data.frame objects consisting of two columns: 1. coverage level 2. bins. The target regions are divided into
-#' 100 equal sized bins and coverage level is summarized in a strand-specific manner using the \code{genomation::ScoreMatrixBin} function
+#' @return A list of data.frame objects consisting of two columns: 1. coverage level 2. bins. Target regions are divided into
+#' 100 equal sized bins and coverage level is summarized in a strand-specific manner using the \code{genomation::ScoreMatrixBin} function.
+#' @examples missing
 #' @export
 calculateCoverageProfileList <- function (queryRegions, targetRegionsList, sampleN = 0) {
   lapply(X = targetRegionsList, FUN=function(x) { calculateCoverageProfile(queryRegions, x, sampleN = sampleN) })
@@ -365,10 +370,12 @@ calculateCoverageProfileList <- function (queryRegions, targetRegionsList, sampl
 #'
 #' @param queryRegions GRanges object imported from a BED file using \code{importBed} function
 #' @param txdb A txdb object obtained by using \code{GenomicFeatures::makeTxDb} family of functions
-#' @param sampleN If set to a positive integer, the targetRegions will be downsampled to \code{sampleN} regions
+#' @param sampleN If set to a positive integer, \code{targetRegions} will be downsampled to \code{sampleN} regions
 #'
 #' @return A list of data.frame objects consisting of two columns: 1. coverage level 2. bins. The target regions are divided into
-#' 100 equal sized bins and coverage level is summarized in a strand-specific manner using the \code{genomation::ScoreMatrixBin} function
+#' 100 equal sized bins and coverage level is summarized in a strand-specific manner using the \code{genomation::ScoreMatrixBin} function.
+#' @examples  missing
+#'
 #' @export
 calculateCoverageProfileListFromTxdb <- function (queryRegions, txdb, sampleN = 0) {
   txdbFeatures = getTxdbFeatures(txdb = txdb)
@@ -383,10 +390,11 @@ calculateCoverageProfileListFromTxdb <- function (queryRegions, txdb, sampleN = 
 #' @param queryRegions GRanges object imported from a BED file using \code{importBed} function
 #' @param txdb A txdb object obtained by using \code{GenomicFeatures::makeTxDb} family of functions
 #' @param sampleN If set to a positive integer, the targetRegions will be downsampled to \code{sampleN} regions
-#' @param type A character string defining the type of gene feature for which a profile should be calculated
-#'  The options are: transcripts, exons, introns, exonIntronBoundaries, promoters, fiveUTRs, threeUTRs, and cds
+#' @param type A character string defining the type of gene feature for which a profile should be calculated.
+#'  The options are: transcripts, exons, introns, exonIntronBoundaries, promoters, fiveUTRs, threeUTRs, and cds.
 #' @return A data.frame object consisting of two columns: 1. coverage level 2. bins. The target regions are divided into
-#' 100 equal sized bins and coverage level is summarized in a strand-specific manner using the \code{genomation::ScoreMatrixBin} function
+#' 100 equal sized bins and coverage level is summarized in a strand-specific manner using the \code{genomation::ScoreMatrixBin} function.
+#' @examples missing
 #' @export
 calculateCoverageProfileFromTxdb <- function (queryRegions, txdb, type, sampleN = 0) {
 
