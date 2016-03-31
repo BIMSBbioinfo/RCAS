@@ -5,17 +5,19 @@
 #' A wrapper function to facilitate GO term enrichment analysis using \code{topGO} package
 #'
 #' @param ontology A character string denoting which type of GO ontology to use.
-#'  Options are BP: biological processes; MF: molecular functions; CC: cellular compartments
+#'  Options are BP (biological processes), MF (molecular functions) and CC (cellular compartments).
 #' @param species A character string denoting which species is under analysis.
-#'  Options are 'human', 'mouse', 'fly' and 'worm'
+#'  Options are 'human', 'mouse', 'fly' and 'worm'.
 #' @param backgroundGenes A vector of Ensembl gene ids that serve as background set of genes for
 #'  GO term enrichment. In the context of RCAS, this should be the whole set of genes found in
-#'  the input Gtf file.
+#'  an input GTF data.
 #' @param targetedGenes A vector of Ensembl gene ids that serve as the set for which GO term enrichment
 #'  should be carried out. In the context of RCAS, this should be the set of genes that overlap with
-#'  the query regions in the input BED file.
+#'  the query regions in an input BED file.
 #'
 #' @return A data.frame object containing enriched GO terms and associated statistics
+#'
+#' @examples missing
 #'
 #' @export
 runTopGO <- function (ontology = 'BP', species = 'human', backgroundGenes, targetedGenes) {
@@ -55,10 +57,12 @@ runTopGO <- function (ontology = 'BP', species = 'human', backgroundGenes, targe
 #'
 #' A function to import gene sets downloaded from the Molecular Signatures Database (MSIGDB)
 #'
-#' @param filePath Path to the file containing gene sets from MSIGDB. The gene ids must be
+#' @param filePath Path to a file containing gene sets from MSIGDB. The gene ids must be
 #' in Entrez format.
 #'
 #' @return A list of vectors where each vector consists of a set of Entrez gene ids
+#'
+#' @examples missing
 #'
 #' @export
 parseMsigdb <- function(filePath){
@@ -74,13 +78,13 @@ parseMsigdb <- function(filePath){
   return(geneLists)
 }
 
-#' Retrieve Orthologous Genes from Ensembl Biomart
+#' retrieveOrthologs
 #'
 #' Given two biomart connections and a set of entrez gene identifiers; retrieve orthologs between mart1 and mart2 for the given list of genes
 #'
-#' @param mart1 An Ensembl biomart connection for the reference species created using the \code{biomaRt::useMart()} function
-#' @param mart2 An Ensembl biomart connection for the target species created using the \code{biomaRt::useMart()} function
-#' @param geneSet A vector of Entrez gene ids from the reference species (should be available at the biomart object mart1)
+#' @param mart1 An Ensembl biomart connection for reference species created using the \code{biomaRt::useMart()} function
+#' @param mart2 An Ensembl biomart connection for target species created using the \code{biomaRt::useMart()} function
+#' @param geneSet A vector of Entrez gene ids from a reference species (should be available at the biomart object, mart1)
 #' @return A data.frame object containing a mapping of orthologouse genes from two mart objects
 #'
 #' @examples
@@ -96,6 +100,10 @@ retrieveOrthologs <- function(mart1, mart2, geneSet){
          attributesL = c("entrezgene"), martL = mart2)
 }
 
+#' getBioMartConnection
+#'
+#' documentation should be redo since the available one is actually for retrieveOrthologs.
+#'
 getBioMartConnection <- function (genomeVersion) {
   if (genomeVersion == 'hg19') {
     mart <- biomaRt::useMart(biomart='ENSEMBL_MART_ENSEMBL', host='feb2014.archive.ensembl.org', dataset = "hsapiens_gene_ensembl")
@@ -113,18 +121,20 @@ getBioMartConnection <- function (genomeVersion) {
   return (mart)
 }
 
-#' Create Orthologous Msigdb Dataset
+#' createOrthologousMsigdbDataset
 #'
 #' MSIGDB curates gene sets for human but not for other species. This function is
 #' used to create such gene sets for other species such as mouse, fly, and worm via
 #' orthologous relationships to human genes.
 #'
-#' @param refMsigdbFilePath Path to the file containing gene sets from MSIGDB. The gene ids must be
+#' @param refMsigdbFilePath Path to a file containing gene sets from MSIGDB. The gene ids must be
 #'  in Entrez format.
-#' @param refGenomeVersion Genome version of the reference species. (default:hg19)
-#' @param targetGenomeVersion Genome version of the target species. Available options are mm9, dm3, and ce6
+#' @param refGenomeVersion Genome version of a reference species. (default:hg19)
+#' @param targetGenomeVersion Genome version of a target species. Available options are mm9, dm3, and ce6
 #'
 #' @return A list of vectors where each vector consists of a set of Entrez gene ids
+#'
+#' @examples missing
 #'
 #' @export
 createOrthologousMsigdbDataset <- function(refMsigdbFilePath, refGenomeVersion = 'hg19', targetGenomeVersion){
@@ -175,24 +185,24 @@ calculateEnrichment <- function (targetedGenes, backgroundGenes, geneSet) {
   return (result)
 }
 
-#' Run MSIGDB gene set enrichment analysis module
+#' runMSIGDB
 #'
-#' MSIGDB is a database of curated gene sets. This function is designed used to facilitate
+#' MSIGDB is a database of curated gene sets. This function is used to facilitate
 #' gene set enrichment for genes that are found to overlap query regions.
 #'
 #' @param msigDB A list of vectors where each vector consists of a set of Entrez gene ids
 #'  returned by \code{parseMsigdb} function
-#' @param ontology A character string denoting which type of GO ontology to use.
-#'  Options are BP: biological processes; MF: molecular functions; CC: cellular compartments
-#' @param species A character string denoting which species is under analysis.
-#'  Options are 'human', 'mouse', 'fly' and 'worm'
+#' @param species A character string denoting the species under analysis.
+#'  Options are 'human', 'mouse', 'fly' and 'worm'.
 #' @param backgroundGenes A vector of Ensembl gene ids that serve as background set of genes for
 #'  GO term enrichment. In the context of RCAS, this should be the whole set of genes found in
-#'  the input Gtf file.
+#'  an input GTF file.
 #' @param targetedGenes A vector of Ensembl gene ids that serve as the set for which GO term enrichment
 #'  should be carried out. In the context of RCAS, this should be the set of genes that overlap with
-#'  the query regions in the input BED file.
+#'  the query regions in an input BED file.
 #' @return A data.frame object containing enriched MSIGDB gene sets and associated statistics
+#'
+#' @example missing
 #'
 #' @export
 runMSIGDB <- function (msigDB, species = 'human', backgroundGenes, targetedGenes) {
