@@ -1,10 +1,7 @@
 #' createControlRegions
 #'
 #' Given a GRanges object of query regions, create a background set of peaks that have
-#' the same length distribution based on the flanking regions of the peaks based on the desription in motifRG's paper:  "For each peak in each dataset, we
-#' first chose one corresponding background sequence from the flanking regions, randomly
-#' chosen from either side <200 nt from the edge of the peak, and with the same width as
-#' the peak."
+#' the same length distribution based on the flanking regions of the peaks.
 #'
 #' @param queryRegions GRanges object containing coordinates of input query
 #' regions imported by the \code{\link{importBed}} function.
@@ -47,15 +44,15 @@ createControlRegions <- function (queryRegions) {
   return(controlRegions)
 }
 
-#' Extract genomice sequences from BSgenome libraries
+#' extractSequences
 #'
-#' Given a GRanges object and a genome version (hg19, mm9, ce6, or mm9), this function will
-#' extract the DNA sequences for all the genomic regions found in the input object.
+#' Given a GRanges object and a genome version (hg19, mm9, ce6 or dm3), this function
+#' extracts the DNA sequences for all genomic regions found in an input object.
 #'
 #' @param queryRegions GRanges object containing coordinates of input query
-#' regions imported by the \code{\link{importBed}} function.
-#' @param genomeVersion A character string to denote which BS genome library should be used to
-#' extract the sequences. Available options are hg19, mm9, ce6, and mm9
+#' regions imported by the \code{\link{importBed}} function
+#' @param genomeVersion A character string to denote the BS genome library required to
+#' extract sequences. Available options are hg19, mm9, ce6 and dm3.
 #'
 #' @return DNAStringSet object will be returned
 #'
@@ -76,7 +73,7 @@ extractSequences <- function (queryRegions, genomeVersion) {
   } else if(genome_version == 'dm3') {
     seqDb = BSgenome.Dmelanogaster.UCSC.dm3::Dmelanogaster
   } else {
-    stop ("Cannot extract fasta sequences from genome versions except: hg19, mm9, ce6, and dm3\n")
+    stop ("Cannot extract fasta sequences from genome versions except: hg19, mm9, ce6 and dm3\n")
   }
   GenomeInfoDb::seqlevelsStyle(seqDb) =  GenomeInfoDb::seqlevelsStyle(queryRegions)
   sequences <- Biostrings::getSeq(seqDb, queryRegions)
@@ -88,12 +85,12 @@ extractSequences <- function (queryRegions, genomeVersion) {
 #' runMotifRG
 #'
 #' This function makes use of \code{motifRG} library to carry out de novo motif discovery
-#' from the input query regions
+#' from input query regions
 #'
 #' @param queryRegions GRanges object containing coordinates of input query
-#' regions imported by the \code{\link{importBed}} function.
-#' @param genomeVersion A character string to denote which BS genome library should be used to
-#' extract the sequences. Available options are hg19, mm9, ce6, and mm9
+#' regions imported by the \code{\link{importBed}} function
+#' @param genomeVersion A character string to denote the BS genome library required to
+#' extract sequences. Available options are hg19, mm9, ce6 and dm3.
 #' @param motifN A positive integer (default:5) denoting the maximum number of motifs that
 #' should be sought by the \code{motifRG::findMotifFgBg} function
 #'
