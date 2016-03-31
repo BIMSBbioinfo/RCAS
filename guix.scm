@@ -64,6 +64,14 @@
      ("r-org-ce-eg-db" ,r-org-ce-eg-db)
      ("r-org-dm-eg-db" ,r-org-dm-eg-db)
      ("r-org-mm-eg-db" ,r-org-mm-eg-db)
+     ("r-bsgenome-hsapiens-ucsc-hg19"
+      ,r-bsgenome-hsapiens-ucsc-hg19)
+     ("r-bsgenome-mmusculus-ucsc-mm9"
+      ,r-bsgenome-mmusculus-ucsc-mm9)
+     ("r-bsgenome-celegans-ucsc-ce6"
+      ,r-bsgenome-celegans-ucsc-ce6)
+     ("r-bsgenome-dmelanogaster-ucsc-dm3"
+      ,r-bsgenome-dmelanogaster-ucsc-dm3)
      ("r-topgo" ,r-topgo)
      ("r-dt" ,r-dt)
      ("r-plotly" ,r-plotly)

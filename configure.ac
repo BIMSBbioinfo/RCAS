@@ -72,6 +72,11 @@ else
   AX_TEST_R_PACKAGE([rtracklayer])
   AX_TEST_R_PACKAGE([rmarkdown])
   AX_TEST_R_PACKAGE([motifRG])
+
+  AX_TEST_R_PACKAGE([BSgenome.Hsapiens.UCSC.hg19])
+  AX_TEST_R_PACKAGE([BSgenome.Mmusculus.UCSC.mm9])
+  AX_TEST_R_PACKAGE([BSgenome.Celegans.UCSC.ce6])
+  AX_TEST_R_PACKAGE([BSgenome.Dmelanogaster.UCSC.dm3])
 fi
 
 # Substitute placeholders to generate these target files
