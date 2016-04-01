@@ -17,8 +17,7 @@
 #'
 #' @return A data.frame object containing enriched GO terms and associated statistics
 #'
-#' @examples missing
-#'
+#' @examples
 #' @export
 runTopGO <- function (ontology = 'BP', species = 'human', backgroundGenes, targetedGenes) {
 
@@ -62,8 +61,7 @@ runTopGO <- function (ontology = 'BP', species = 'human', backgroundGenes, targe
 #'
 #' @return A list of vectors where each vector consists of a set of Entrez gene ids
 #'
-#' @examples missing
-#'
+#' @examples
 #' @export
 parseMsigdb <- function(filePath){
   data <- readLines(filePath)
@@ -100,13 +98,11 @@ retrieveOrthologs <- function(mart1, mart2, geneSet){
          attributesL = c("entrezgene"), martL = mart2)
 }
 
-#' getBioMartConnection
-#'
-#' documentation should be redo since the available one is actually for retrieveOrthologs.
-#'
 getBioMartConnection <- function (genomeVersion) {
   if (genomeVersion == 'hg19') {
-    mart <- biomaRt::useMart(biomart='ENSEMBL_MART_ENSEMBL', host='feb2014.archive.ensembl.org', dataset = "hsapiens_gene_ensembl")
+    mart <- biomaRt::useMart(biomart='ENSEMBL_MART_ENSEMBL',
+                             host='feb2014.archive.ensembl.org',
+                             dataset = "hsapiens_gene_ensembl")
   } else if (genomeVersion == 'mm9') {
     mart <- biomaRt::useMart(biomart='ENSEMBL_MART_ENSEMBL', host='may2012.archive.ensembl.org', dataset = "mmusculus_gene_ensembl")
   } else if (genomeVersion == 'dm3') {
@@ -134,8 +130,7 @@ getBioMartConnection <- function (genomeVersion) {
 #'
 #' @return A list of vectors where each vector consists of a set of Entrez gene ids
 #'
-#' @examples missing
-#'
+#' @examples
 #' @export
 createOrthologousMsigdbDataset <- function(refMsigdbFilePath, refGenomeVersion = 'hg19', targetGenomeVersion){
   #parse lists of genes from MSigDB
@@ -202,8 +197,7 @@ calculateEnrichment <- function (targetedGenes, backgroundGenes, geneSet) {
 #'  the query regions in an input BED file.
 #' @return A data.frame object containing enriched MSIGDB gene sets and associated statistics
 #'
-#' @example missing
-#'
+#' @example
 #' @export
 runMSIGDB <- function (msigDB, species = 'human', backgroundGenes, targetedGenes) {
   #map ENSEMBL gene ids to Entrez Gene Ids
