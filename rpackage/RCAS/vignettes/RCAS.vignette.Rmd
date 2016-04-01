@@ -2,7 +2,8 @@
 title: "The RNA Centric Analysis System Report"
 author: "Bora Uyar, Dilmurat Yusuf, Ricardo Wurmus, Altuna Akalin"
 date: "`r Sys.Date()`"
-output: 
+bibliography: bibliography.bib
+output:
   html_document:
     toc: true
     toc_float: true
@@ -15,6 +16,7 @@ vignette: >
 ---
 
 
+
 ```{r load_libraries, results='hide', message=FALSE, warning=FALSE, echo=FALSE}
 library(RCAS)
 library(data.table)
@@ -24,53 +26,100 @@ library(motifRG)
 ```
 
 # Introduction
-RNA Centric Annotation System is an automated system that provides
-dynamic annotations for custom input files that contain transcriptomic target
-regions. Such transcriptomic target regions could be, for instance, peak regions
-detected by CLIP-Seq analysis that detect protein-RNA interactions, MeRIP-Seq
-analysis that detect RNA modifications (alias the epitranscriptome), or any
-collection of target regions at the level of the transcriptome. RCAS contains
-wrapper functions to do de novo motif discovery using functions from the motifRG
-package. RCAS overlays the input target regions with the annotated protein-
-coding genes and calculates the Gene Ontology (GO) terms that may be enriched or
-depleted in the input target regions compared to the background list of protein-
-coding genes. A Classical Fisher's Exact Test is applied for each GO term and
-the p-values obtained for each GO term is corrected for multiple testing using
-both the False Discovery Rate and the Family-Wise Error Rate. Similarly to the
-GO term enrichment analysis, RCAS also detects sets of genes as annotated in
-the Molecular Signatures Database that are enriched or depleted in the queried
-target regions. Results are corrected for multiple-testing according to both the
-False Discovery Rate and the Family-Wise Error Rate.
 
-# Getting Input
+High-throughput sequencing (HTS) has brought a profound impact
+on biological research at various levels.
+At the level of transcriptome,
+various HTS methods have been applied to study different aspects of
+the complete set of transcripts that are produced by the genome.
+On such method is
+cross-linking immunoprecipitation-high-throughput
+sequencing (CLIP-Seq) [@Konig2011]
+that is used to
+study RNA binding sites for a protein of interest on a genome-wide scale,
+thereby increasing the understanding of post-transcriptional regulatory networks.
+In order to facilitate biological discovery
+from transcriptomic regions located by Clip-Seq or other methods,
+we have developed an automatic annotation system called
+RNA Centric Annotation System (RCAS) that provides
+dynamic annotations for custom input files
+that contain transcriptomic target regions.
+Provided with target regions in
+[BED](http://www.ensembl.org/info/website/upload/bed.html) format
+and annotation references in
+[GFF/GTF](http://www.ensembl.org/info/website/upload/gff.html) format,
+RCAS automatically summarizes annotated features that overlap with targets,
+and perform enrichment analysis of
+motifs, Gene Ontology (GO) terms and gene set.
+The summary of annotated features
+consists of intuitive reports in terms of
+distributions of gene types, genomic features, gene names
+and coverage profiles.
+Motif discovery is also one key component of RCAS automatic system.
+RCAS can provide users list of motifs
+that are enriched comparing with background sequences.
+In addition,
+RCAS generates lists of enriched gene sets and functions
+to shed light on the functional aspects of target regions.
+The final report of RCAS consists of high-qulaity dynamic figures and tables,
+which are readily applicable for publications or other academic usage.
 
-## Importing GTF files
 
-Import the contents of the input GTF file as a GRanges object. 
-```{r importGtf, warning=FALSE, message=FALSE}
-#gff = importGtf(filePath = gtfFile)
-data(gff)
+#  Data input
+
+RCAS requires inputs of a BED file and a GFF/GTF file.
+The BED file should contain coordinates/intervals
+of target transcriptomic regions
+which are located via transcriptomics method such as Clip-Seq.
+The GFF/GTF file should provide reference annotation.
+The usual source of GFF/GTF file are
+[ENSEMBLE](http://www.ensembl.org/info/data/ftp/index.html) and
+[GENCODE](http://www.gencodegenes.org/releases/).
+Meanwhile user can also provide customized GFF/GTF file.
+
+For this vignette.
+to demonstrate RCAS functionality,
+we  provide sample BED and GFF file via RCAS library,
+which are accessible using a common R function, data().
+However to import user-defined
+BED and GFF/GTF files,
+user should execute two RCAS functions called importBed() and importGtf()
+
+## Using RCAS sample data
+```{r sample_data, warning=FALSE, message=FALSE}
+library(RCAS)
+data(queryRegions) #sample queryRegions in BED format
+data(gff)          #sample GFF file
+```
+
+## Using RCAS functions
+To use importBed() and importGtf(),
+user should provide file paths to the respective
+BED file and GFF/GTF file.
+To reduce memory usage and time consumption,
+we advise user to set `sampleN=10000` to avoid
+huge input of intervals.
+
+Before running following codes in your R interpreter,
+please remove `#` comment sign.
+```{r RCAS_import_data, warning=FALSE, message=FALSE}
+#library(RCAS)
+#queryRegions = importBed(filePath = BED_file, sampleN = 10000)
+#gff = importGtf(filePath = GFF_file)
 ```
 
 
-## Importing query regions from BED files 
-Import the contents of the input BED file as a GRanges object. Use sampleN=<integer> to randomly down-sample the number of intervals so that the analysis doesn't take too much memory and time in case the input contains too many intervals. A reasonable value for this parameter (sampleN) is 10000.  
-```{r importBed, warning=FALSE, message=FALSE}
-#queryRegions = importBed(filePath = peaksFile, sampleN = 10000)
-data(queryRegions)
-```
 
 # Summarizing Overlaps
 
-## Querying the GFF 
-Given the query regions from BED file and the genomic annotation from the GTF file, we can do some overlap operations to find out the annotation properties of the input query regions. 
+## Querying the GFF
 ```{r queryGFF, warning=FALSE, message=FALSE}
 overlaps = queryGff(queryRegions = queryRegions, gff = gff)
-overlaps.dt = data.table(as.data.frame(overlaps)) #data.table is used to do quick summary operations 
+overlaps.dt = data.table(as.data.frame(overlaps)) #data.table is used to do quick summary operations
 ```
 
 
-## Querying the GFF: targeted gene types 
+## Querying the GFF: targeted gene types
 To find out the distribution of the query regions across gene types:
 ```{r query_gene_types, warning=FALSE, message=FALSE}
 biotype_col = grep('biotype', colnames(overlaps.dt), value=T)
@@ -82,7 +131,7 @@ p = plot_ly(df, type="bar", x = feature, y = percent, text=paste("count:", count
 layout(p, margin = list(l=100, r=100, b=150), xaxis = list(showticklabels = TRUE,  tickangle = 90), yaxis = list(title = paste("percentage of query regions,", "n =",length(queryRegions))))
 ```
 
-## Querying the GFF: targeted chromosomes 
+## Querying the GFF: targeted chromosomes
 To find out the distribution of the query regions across chromosomes:
 ```{r chromosomes_gene_features, warning=FALSE, message=FALSE}
 df = overlaps.dt[,length(unique(overlappingQuery)), by=c('seqnames', 'type')]
@@ -94,15 +143,15 @@ layout(p, margin = list(b=150), xaxis = list(showticklabels = TRUE,  tickangle =
 
 
 # Querying TxDB
-Here we use the makeTxDb functions of GenomicFeatures library to find out about the distribution of query regions across gene features. 
+Here we use the makeTxDb functions of GenomicFeatures library to find out about the distribution of query regions across gene features.
 
-## Querying TxDB: creating txdbFeatures 
-First we create a list of GRanges objects, where each list element contains all the available coordinates of gene features such as transcripts, exons, introns, 5'/3' UTRs, exon-intron boundaries, and promoter regions. 
+## Querying TxDB: creating txdbFeatures
+First we create a list of GRanges objects, where each list element contains all the available coordinates of gene features such as transcripts, exons, introns, 5'/3' UTRs, exon-intron boundaries, and promoter regions.
 ```{r getTxdbFeatures, warning=FALSE, message=FALSE}
 txdbFeatures = getTxdbFeaturesFromGff(gff)
 ```
 
-## Querying TxDB: targeted genes table 
+## Querying TxDB: targeted genes table
 To find out which genes overlap with how many queries and categorise overlaps by gene features; we use getTargetedGenesTable function, which returns a data.frame object. Then we use datatable function from 'DT' library to print an interactive table of genes that overlap query Regions.   
 ```{r getTargetedGenesTable, warning=FALSE, message=FALSE}
 dt = getTargetedGenesTable(queryRegions = queryRegions, txdbFeatures = txdbFeatures)
@@ -117,7 +166,7 @@ datatable(dt[order(transcripts, decreasing = T)][1:500], extensions = 'FixedColu
 ## Querying TxDB: Coverage Profiles
 
 ### Querying TxDB: Coverage Profile for 3' UTRs
-To calculate the coverage profiles of query Regions across gene features. It might be a good idea to use sampleN parameter to randomly downsample the target regions to speed up the calculations. 
+To calculate the coverage profiles of query Regions across gene features. It might be a good idea to use sampleN parameter to randomly downsample the target regions to speed up the calculations.
 ```{r coverageprofile, warning=FALSE, message=FALSE}
 cov = calculateCoverageProfile(queryRegions = queryRegions, targetRegions = txdbFeatures$threeUTRs, sampleN = 10000)
 
@@ -128,8 +177,8 @@ layout(title = paste("Coverage along 3'UTRs (5' -> 3' direction)", sep=" "), sho
 
 ```
 
-### Querying TxDB: Coverage profile for all gene features 
-To calculate the coverage profiles of query regions across all possible types of gene features. It might be a good idea to use sampleN parameter to randomly downsample the target regions to speed up the calculations. 
+### Querying TxDB: Coverage profile for all gene features
+To calculate the coverage profiles of query regions across all possible types of gene features. It might be a good idea to use sampleN parameter to randomly downsample the target regions to speed up the calculations.
 ```{r coverageprofilelist, warning=FALSE, message=FALSE}
 covList = calculateCoverageProfileList(queryRegions = queryRegions, targetRegionsList = txdbFeatures, sampleN = 10000)
 
@@ -146,7 +195,7 @@ layout(p)
 # Motif Analysis using motifRG
 
 ## Calculating enriched motifs
-With the RCAS package, a motif analysis is also possible. RCAS uses motifRG library to find enriched motifs among the query regions. 
+With the RCAS package, a motif analysis is also possible. RCAS uses motifRG library to find enriched motifs among the query regions.
 ```{r motif_analysis, warning=FALSE, message=FALSE}
 motifResults <- runMotifRG(queryRegions = queryRegions, genomeVersion = 'hg19', motifN = 4)
 
@@ -171,18 +220,18 @@ datatable(summary, extensions = 'FixedColumns',
 ```
 
 
-# GO term analysis 
+# GO term analysis
 
-## Biological processes enriched among targeted genes 
-RCAS can perform GO term enrichment analysis to find out enriched functions in genes that overlap the query regions 
+## Biological processes enriched among targeted genes
+RCAS can perform GO term enrichment analysis to find out enriched functions in genes that overlap the query regions
 ```{r GO analysis, warning=FALSE, message=FALSE}
 
-#get all genes from the gff data
+#get all genes from the GTF data
 backgroundGenes = unique(gff$gene_id)
 #get genes that overlap query regions
 targetedGenes = unique(overlaps$gene_id)
 
-#run TopGO 
+#run TopGO
 goResults = runTopGO(ontology = 'BP', species = 'human', backgroundGenes = backgroundGenes, targetedGenes = targetedGenes)
 
 datatable(goResults[goResults$bh < 0.1,], extensions = 'FixedColumns',
@@ -195,13 +244,13 @@ datatable(goResults[goResults$bh < 0.1,], extensions = 'FixedColumns',
 ```
 
 
-# Gene Set Enrichment Analysis 
+# Gene Set Enrichment Analysis
 
-## MSIGDB gene sets enriched among targeted genes 
-RCAS can use gene sets from Molecular Signatures Database and calculate gene set enrichment analysis to find out which gene sets are enriched among the genes targeted by the query regions 
+## MSIGDB gene sets enriched among targeted genes
+RCAS can use gene sets from Molecular Signatures Database and calculate gene set enrichment analysis to find out which gene sets are enriched among the genes targeted by the query regions
 ```{r msigdb_analysis, warning=FALSE, message=FALSE}
-#msigDB <- parseMsigdb(msigdbFile) 
-data(msigDB) 
+#msigDB <- parseMsigdb(msigdbFile)
+data(msigDB)
 msigdbResults <- runMSIGDB(msigDB = msigDB, backgroundGenes = backgroundGenes, targetedGenes = targetedGenes)
 
 datatable(msigdbResults[msigdbResults$BH < 0.1,], extensions = 'FixedColumns',
@@ -216,7 +265,9 @@ datatable(msigdbResults[msigdbResults$BH < 0.1,], extensions = 'FixedColumns',
 
 # Acknowledgements
 
-RCAS is developed by [Dr. Altuna Akalin](http://bioinformatics.mdc-berlin.de/team.html#altuna-akalin-phd) (head of the Scientific Bioinformatics Platform), [Dr. Dilmurat Yusuf](http://bioinformatics.mdc-berlin.de/team.html#dilmurat-yusuf-phd) (Bioinformatics Scientist), [Dr. Bora Uyar](http://bioinformatics.mdc-berlin.de/team.html#bora-uyar-phd)  (Bioinformatics Scientist), and [Ricardo Wurmus](http://bioinformatics.mdc-berlin.de/team.html#ricardo-wurmus) (System Administrator) at the Berlin Institute of Medical Systems Biology ([BIMSB](https://www.mdc-berlin.de/13800178/en/bimsb)) at the Max-Delbrueck-Center for Molecular Medicine ([MDC](https://www.mdc-berlin.de)) in Berlin. 
+RCAS is developed by [Dr. Altuna Akalin](http://bioinformatics.mdc-berlin.de/team.html#altuna-akalin-phd) (head of the Scientific Bioinformatics Platform), [Dr. Bora Uyar](http://bioinformatics.mdc-berlin.de/team.html#bora-uyar-phd)  (Bioinformatics Scientist),
+[Dr. Dilmurat Yusuf](http://bioinformatics.mdc-berlin.de/team.html#dilmurat-yusuf-phd) (Bioinformatics Scientist) and [Ricardo Wurmus](http://bioinformatics.mdc-berlin.de/team.html#ricardo-wurmus) (System Administrator) at the Berlin Institute of Medical Systems Biology ([BIMSB](https://www.mdc-berlin.de/13800178/en/bimsb)) at the Max-Delbrueck-Center for Molecular Medicine ([MDC](https://www.mdc-berlin.de)) in Berlin.
 
 RCAS is developed as a bioinformatics service as part of the [RNA Bioinformatics Center](http://www.denbi.de/index.php/rbc), which is one of the eight centers of the German Network for Bioinformatics Infrastructure ([de.NBI](http://www.denbi.de/)).  
 
+# References
