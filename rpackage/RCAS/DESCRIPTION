@@ -39,8 +39,12 @@ Depends: data.table,
     Biostrings,
     motifRG,
     rtracklayer,
-    GenomicFeatures
+    GenomicFeatures,
+    genomation,
+    org.Hs.eg.db
 RoxygenNote: 5.0.1
 Suggests: knitr,
-    rmarkdown
+    rmarkdown,
+    plotly,
+    DT
 VignetteBuilder: knitr
