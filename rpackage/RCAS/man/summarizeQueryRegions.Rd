@@ -7,22 +7,27 @@
 summarizeQueryRegions(queryRegions, txdbFeatures)
 }
 \arguments{
-\item{queryRegions}{GRanges object imported from a BED file using \code{importBed} function}
+\item{queryRegions}{GRanges object imported from a BED file using
+\code{importBed} function}
 
-\item{txdbFeatures}{List of GRanges objects - output of \code{getTxdbFeaturesFromGff} and \code{getTxdbFeatures} functions}
+\item{txdbFeatures}{List of GRanges objects - outputs of
+\code{getTxdbFeaturesFromGff} and \code{getTxdbFeatures} functions}
 }
 \value{
-A data frame with two columns where first column holds the features and second column holds the counts
+A data frame with two columns where first column holds features and
+  second column holds corresponding counts
 }
 \description{
-This function is used to count how many query regions overlap with different types of gene features
+This function counts number of query regions that overlap with different
+types of gene features.
 }
 \examples{
 
 peaks <- importBed('input.BED')
 gff <- importGtf('annotation.gtf')
 txdbFeatures <- getTxdbFeaturesFromGff(gff)
-summary <- summarizeQueryRegions(queryRegions=peaks, txdbFeatures=txdbFeatures)
+summary <- summarizeQueryRegions(queryRegions=peaks,
+                                 txdbFeatures=txdbFeatures)
 
 }
 

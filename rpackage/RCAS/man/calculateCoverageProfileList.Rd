@@ -7,18 +7,36 @@
 calculateCoverageProfileList(queryRegions, targetRegionsList, sampleN = 0)
 }
 \arguments{
-\item{queryRegions}{GRanges object imported from a BED file using \code{importBed} function}
+\item{queryRegions}{GRanges object imported from a BED file using
+\code{importBed} function}
 
-\item{targetRegionsList}{A list of GRanges objects containing genomic coordinates of the target feature (e.g. transcripts, exons, introns)}
+\item{targetRegionsList}{A list of GRanges objects containing genomic
+coordinates of target features (e.g. transcripts, exons, introns)}
 
-\item{sampleN}{If set to a positive integer, the targetRegions will be downsampled to \code{sampleN} regions}
+\item{sampleN}{If set to a positive integer, \code{targetRegions} will be
+downsampled to \code{sampleN} regions}
 }
 \value{
-A list of data.frame objects consisting of two columns: 1. coverage level 2. bins. The target regions are divided into
-100 equal sized bins and coverage level is summarized in a strand-specific manner using the \code{genomation::ScoreMatrixBin} function
+A list of data.frame objects consisting of two columns: 1. coverage
+  level 2. bins. Target regions are divided into 100 equal sized bins and
+  coverage level is summarized in a strand-specific manner using the
+  \code{genomation::ScoreMatrixBin} function.
 }
 \description{
-This function overlaps the input query regions with a target list of annotation features and
-calculates the coverage profile along the target regions.
+This function checks overlaps between input query regions and a target list
+of annotation features, and then calculates the coverage profile along the
+target regions.
+}
+\examples{
+#load the test gff data
+data(gff)
+#load test query regions
+data(queryRegions)
+#get gene features' coordinates as a list of GRanges objects
+txdbFeatures <- getTxdbFeaturesFromGff(gff)
+#calculate coverage profile of query regions on exons
+list.df <- calculateCoverageProfileList(queryRegions = queryRegions,
+                              targetRegionsList = txdbFeatures,
+                                    sampleN = 10000)
 }
 

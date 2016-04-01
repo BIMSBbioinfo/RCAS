@@ -2,7 +2,7 @@
 % Please edit documentation in R/enrichment_analysis.R
 \name{runMSIGDB}
 \alias{runMSIGDB}
-\title{Run MSIGDB gene set enrichment analysis module}
+\title{runMSIGDB}
 \usage{
 runMSIGDB(msigDB, species = "human", backgroundGenes, targetedGenes)
 }
@@ -10,25 +10,22 @@ runMSIGDB(msigDB, species = "human", backgroundGenes, targetedGenes)
 \item{msigDB}{A list of vectors where each vector consists of a set of Entrez gene ids
 returned by \code{parseMsigdb} function}
 
-\item{species}{A character string denoting which species is under analysis.
-Options are 'human', 'mouse', 'fly' and 'worm'}
+\item{species}{A character string denoting the species under analysis.
+Options are 'human', 'mouse', 'fly' and 'worm'.}
 
 \item{backgroundGenes}{A vector of Ensembl gene ids that serve as background set of genes for
 GO term enrichment. In the context of RCAS, this should be the whole set of genes found in
-the input Gtf file.}
+an input GTF file.}
 
 \item{targetedGenes}{A vector of Ensembl gene ids that serve as the set for which GO term enrichment
 should be carried out. In the context of RCAS, this should be the set of genes that overlap with
-the query regions in the input BED file.}
-
-\item{ontology}{A character string denoting which type of GO ontology to use.
-Options are BP: biological processes; MF: molecular functions; CC: cellular compartments}
+the query regions in an input BED file.}
 }
 \value{
 A data.frame object containing enriched MSIGDB gene sets and associated statistics
 }
 \description{
-MSIGDB is a database of curated gene sets. This function is designed used to facilitate
+MSIGDB is a database of curated gene sets. This function is used to facilitate
 gene set enrichment for genes that are found to overlap query regions.
 }
 

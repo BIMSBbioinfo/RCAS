@@ -2,23 +2,23 @@
 % Please edit documentation in R/motif_analysis.R
 \name{extractSequences}
 \alias{extractSequences}
-\title{Extract genomice sequences from BSgenome libraries}
+\title{extractSequences}
 \usage{
 extractSequences(queryRegions, genomeVersion)
 }
 \arguments{
 \item{queryRegions}{GRanges object containing coordinates of input query
-regions imported by the \code{\link{importBed}} function.}
+regions imported by the \code{\link{importBed}} function}
 
-\item{genomeVersion}{A character string to denote which BS genome library should be used to
-extract the sequences. Available options are hg19, mm9, ce6, and mm9}
+\item{genomeVersion}{A character string to denote the BS genome library required to
+extract sequences. Available options are hg19, mm9, ce6 and dm3.}
 }
 \value{
 DNAStringSet object will be returned
 }
 \description{
-Given a GRanges object and a genome version (hg19, mm9, ce6, or mm9), this function will
-extract the DNA sequences for all the genomic regions found in the input object.
+Given a GRanges object and a genome version (hg19, mm9, ce6 or dm3), this function
+extracts the DNA sequences for all genomic regions found in an input object.
 }
 \examples{
 

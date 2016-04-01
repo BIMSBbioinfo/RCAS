@@ -2,18 +2,18 @@
 % Please edit documentation in R/enrichment_analysis.R
 \name{createOrthologousMsigdbDataset}
 \alias{createOrthologousMsigdbDataset}
-\title{Create Orthologous Msigdb Dataset}
+\title{createOrthologousMsigdbDataset}
 \usage{
 createOrthologousMsigdbDataset(refMsigdbFilePath, refGenomeVersion = "hg19",
   targetGenomeVersion)
 }
 \arguments{
-\item{refMsigdbFilePath}{Path to the file containing gene sets from MSIGDB. The gene ids must be
+\item{refMsigdbFilePath}{Path to a file containing gene sets from MSIGDB. The gene ids must be
 in Entrez format.}
 
-\item{refGenomeVersion}{Genome version of the reference species. (default:hg19)}
+\item{refGenomeVersion}{Genome version of a reference species. (default:hg19)}
 
-\item{targetGenomeVersion}{Genome version of the target species. Available options are mm9, dm3, and ce6}
+\item{targetGenomeVersion}{Genome version of a target species. Available options are mm9, dm3, and ce6}
 }
 \value{
 A list of vectors where each vector consists of a set of Entrez gene ids

@@ -7,21 +7,31 @@
 calculateCoverageProfileFromTxdb(queryRegions, txdb, type, sampleN = 0)
 }
 \arguments{
-\item{queryRegions}{GRanges object imported from a BED file using \code{importBed} function}
+\item{queryRegions}{GRanges object imported from a BED file using
+\code{importBed} function}
 
-\item{txdb}{A txdb object obtained by using \code{GenomicFeatures::makeTxDb} family of functions}
+\item{txdb}{A txdb object obtained by using \code{GenomicFeatures::makeTxDb}
+family of functions}
 
-\item{type}{A character string defining the type of gene feature for which a profile should be calculated
-The options are: transcripts, exons, introns, exonIntronBoundaries, promoters, fiveUTRs, threeUTRs, and cds}
+\item{type}{A character string defining the type of gene feature for which a
+profile should be calculated. The options are: transcripts, exons, introns,
+exonIntronBoundaries, promoters, fiveUTRs, threeUTRs, and cds.}
 
-\item{sampleN}{If set to a positive integer, the targetRegions will be downsampled to \code{sampleN} regions}
+\item{sampleN}{If set to a positive integer, the targetRegions will be
+downsampled to \code{sampleN} regions}
 }
 \value{
-A data.frame object consisting of two columns: 1. coverage level 2. bins. The target regions are divided into
-100 equal sized bins and coverage level is summarized in a strand-specific manner using the \code{genomation::ScoreMatrixBin} function
+A data.frame object consisting of two columns: 1. coverage level 2.
+  bins. The target regions are divided into 100 equal sized bins and coverage
+  level is summarized in a strand-specific manner using the
+  \code{genomation::ScoreMatrixBin} function.
 }
 \description{
-This function overlaps the input query regions with a target list of annotation features and
-calculates the coverage profile along the target regions.
+This function overlaps the input query regions with a target list of
+annotation features and calculates the coverage profile along the target
+regions.
+}
+\examples{
+
 }
 

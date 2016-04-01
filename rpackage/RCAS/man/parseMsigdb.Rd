@@ -7,7 +7,7 @@
 parseMsigdb(filePath)
 }
 \arguments{
-\item{filePath}{Path to the file containing gene sets from MSIGDB. The gene ids must be
+\item{filePath}{Path to a file containing gene sets from MSIGDB. The gene ids must be
 in Entrez format.}
 }
 \value{

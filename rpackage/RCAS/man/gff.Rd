@@ -3,7 +3,7 @@
 \docType{data}
 \name{gff}
 \alias{gff}
-\title{Sample GTF file imported as a GRanges object}
+\title{Sample GFF file imported as a GRanges object}
 \format{GRanges object with 238010 ranges and 16 metadata columns}
 \source{
 \url{ftp://ftp.ensembl.org/pub/release-75/gtf/homo_sapiens/Homo_sapiens.GRCh37.75.gtf.gz}
@@ -14,7 +14,7 @@ gff
 \description{
 This dataset contains genomic annotation data from Ensembl version 75 for Homo sapiens
 downloaded from Ensembl.
-The gtf file is imported via the \code{importGtf} function and a subset of the data
+The GFF file is imported via the \code{importGtf} function and a subset of the data
 is selected by choosing features found on 'chr1'.
 }
 \keyword{datasets}

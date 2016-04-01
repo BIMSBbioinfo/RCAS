@@ -2,26 +2,30 @@
 % Please edit documentation in R/report_functions.R
 \name{importBed}
 \alias{importBed}
-\title{Import BED file}
+\title{importBed}
 \usage{
 importBed(filePath, sampleN = 0, keepStandardChr = TRUE)
 }
 \arguments{
-\item{filePath}{Path to the GTF file}
+\item{filePath}{Path to a GTF file}
 
-\item{sampleN}{A positive integer value. The number of intervals in the
-input BED file are randomly downsampled to include intervals as many as \code{sampleN}. The input will be downsampled only if
-this value is larger than zero and less than the total number of input intervals}
+\item{sampleN}{A positive integer value. The number of intervals in the input
+BED file are randomly downsampled to include intervals as many as
+\code{sampleN}. The input will be downsampled only if this value is larger
+than zero and less than the total number of input intervals.}
 
-\item{keepStandardChr}{TRUE/FALSE (default:TRUE). If set to TRUE, will convert the \code{seqlevelsStyle} to 'UCSC' and
-apply \code{keepStandardChromosomes} function to only keep data from the standard chromosomes}
+\item{keepStandardChr}{TRUE/FALSE (default:TRUE). If set to TRUE, will
+convert the \code{seqlevelsStyle} to 'UCSC' and apply
+\code{keepStandardChromosomes} function to only keep data from the standard
+chromosomes}
 }
 \value{
-A \code{GRanges} object containing the coordinates of the
-intervals from the input BED file
+A \code{GRanges} object containing the coordinates of the intervals
+  from an input BED file
 }
 \description{
-\code{importBed} uses \code{rtracklayer::import.bed()} function to import BED files
+This function uses \code{rtracklayer::import.bed()} function to import BED
+files
 }
 \examples{
 importBed(filePath='./myfile.BED', keepStandardChr = TRUE)

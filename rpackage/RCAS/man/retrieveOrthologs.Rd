@@ -2,16 +2,16 @@
 % Please edit documentation in R/enrichment_analysis.R
 \name{retrieveOrthologs}
 \alias{retrieveOrthologs}
-\title{Retrieve Orthologous Genes from Ensembl Biomart}
+\title{retrieveOrthologs}
 \usage{
 retrieveOrthologs(mart1, mart2, geneSet)
 }
 \arguments{
-\item{mart1}{An Ensembl biomart connection for the reference species created using the \code{biomaRt::useMart()} function}
+\item{mart1}{An Ensembl biomart connection for reference species created using the \code{biomaRt::useMart()} function}
 
-\item{mart2}{An Ensembl biomart connection for the target species created using the \code{biomaRt::useMart()} function}
+\item{mart2}{An Ensembl biomart connection for target species created using the \code{biomaRt::useMart()} function}
 
-\item{geneSet}{A vector of Entrez gene ids from the reference species (should be available at the biomart object mart1)}
+\item{geneSet}{A vector of Entrez gene ids from a reference species (should be available at the biomart object, mart1)}
 }
 \value{
 A data.frame object containing a mapping of orthologouse genes from two mart objects
