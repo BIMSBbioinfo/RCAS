@@ -36,11 +36,15 @@ Depends: data.table,
     Biostrings,
     motifRG,
     rtracklayer,
+    org.Hs.eg.db,
     GenomicFeatures
 RoxygenNote: 5.0.1
 Suggests: knitr,
     rmarkdown,
     BSgenome.Mmusculus.UCSC.mm9,
     BSgenome.Celegans.UCSC.ce6,
-    BSgenome.Dmelanogaster.UCSC.dm3
+    BSgenome.Dmelanogaster.UCSC.dm3,
+    org.Mm.eg.db,
+    org.Ce.eg.db,
+    org.Dm.eg.db
 VignetteBuilder: knitr
