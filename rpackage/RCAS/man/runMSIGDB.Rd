@@ -7,25 +7,43 @@
 runMSIGDB(msigDB, species = "human", backgroundGenes, targetedGenes)
 }
 \arguments{
-\item{msigDB}{A list of vectors where each vector consists of a set of Entrez gene ids
-returned by \code{parseMsigdb} function}
+\item{msigDB}{A list of vectors where each vector consists of a set of Entrez
+gene ids returned by \code{parseMsigdb} function}
 
 \item{species}{A character string denoting the species under analysis.
 Options are 'human', 'mouse', 'fly' and 'worm'.}
 
-\item{backgroundGenes}{A vector of Ensembl gene ids that serve as background set of genes for
-GO term enrichment. In the context of RCAS, this should be the whole set of genes found in
-an input GTF file.}
+\item{backgroundGenes}{A vector of Ensembl gene ids that serve as background
+set of genes for GO term enrichment. In the context of RCAS, this should be
+the whole set of genes found in an input GTF file.}
 
-\item{targetedGenes}{A vector of Ensembl gene ids that serve as the set for which GO term enrichment
-should be carried out. In the context of RCAS, this should be the set of genes that overlap with
-the query regions in an input BED file.}
+\item{targetedGenes}{A vector of Ensembl gene ids that serve as the set for
+which GO term enrichment should be carried out. In the context of RCAS,
+this should be the set of genes that overlap with the query regions in an
+input BED file.}
 }
 \value{
-A data.frame object containing enriched MSIGDB gene sets and associated statistics
+A data.frame object containing enriched MSIGDB gene sets and
+  associated statistics
 }
 \description{
-MSIGDB is a database of curated gene sets. This function is used to facilitate
-gene set enrichment for genes that are found to overlap query regions.
+MSIGDB is a database of curated gene sets. This function is used to
+facilitate gene set enrichment for genes that are found to overlap query
+regions.
+}
+\examples{
+
+#load test data
+data(msigDB)
+data(gff)
+#get all genes from the gff data
+backgroundGenes <- unique(gff$gene_id)
+#get genes that overlap query regions
+overlaps <- queryGff(queryRegions, gff)
+targetedGenes <- unique(overlaps$gene_id)
+runMSIGDB(msigDB = msigDB,
+          species = 'human',
+          backgroundGenes = backgroundGenes
+          targetedGenes = targetedGenes)
 }
 

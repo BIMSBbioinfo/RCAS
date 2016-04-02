@@ -8,19 +8,31 @@ createOrthologousMsigdbDataset(refMsigdbFilePath, refGenomeVersion = "hg19",
   targetGenomeVersion)
 }
 \arguments{
-\item{refMsigdbFilePath}{Path to a file containing gene sets from MSIGDB. The gene ids must be
-in Entrez format.}
+\item{refMsigdbFilePath}{Path to a file containing gene sets from MSIGDB. The
+gene ids must be in Entrez format.}
 
 \item{refGenomeVersion}{Genome version of a reference species. (default:hg19)}
 
-\item{targetGenomeVersion}{Genome version of a target species. Available options are mm9, dm3, and ce6}
+\item{targetGenomeVersion}{Genome version of a target species. Available
+options are mm9, dm3, and ce6}
 }
 \value{
-A list of vectors where each vector consists of a set of Entrez gene ids
+A list of vectors where each vector consists of a set of Entrez gene
+  ids
 }
 \description{
-MSIGDB curates gene sets for human but not for other species. This function is
-used to create such gene sets for other species such as mouse, fly, and worm via
-orthologous relationships to human genes.
+MSIGDB curates gene sets for human but not for other species. This function
+is used to create such gene sets for other species such as mouse, fly, and
+worm via orthologous relationships to human genes.
+}
+\examples{
+#First Download gene sets (with Entrez Ids) from MSIGDB database
+#from \\url{http://software.broadinstitute.org/gsea/msigdb/collections.jsp#C2}
+
+#Map the gene sets to a target genome (supported genomes: mm9, dm3, or ce6)
+createOrthologousMsigdbDataset(refMsigdbFilePath = 'msigdb.entrez.txt',
+                               refGenomeVersion = 'hg19',
+                               targetGenomeVersion = 'mm9')
+
 }
 
