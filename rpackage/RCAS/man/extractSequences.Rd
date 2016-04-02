@@ -10,15 +10,17 @@ extractSequences(queryRegions, genomeVersion)
 \item{queryRegions}{GRanges object containing coordinates of input query
 regions imported by the \code{\link{importBed}} function}
 
-\item{genomeVersion}{A character string to denote the BS genome library required to
-extract sequences. Available options are hg19, mm9, ce6 and dm3.}
+\item{genomeVersion}{A character string to denote the BS genome library
+required to extract sequences. Available options are hg19, mm9, ce6 and
+dm3.}
 }
 \value{
 DNAStringSet object will be returned
 }
 \description{
-Given a GRanges object and a genome version (hg19, mm9, ce6 or dm3), this function
-extracts the DNA sequences for all genomic regions found in an input object.
+Given a GRanges object and a genome version (hg19, mm9, ce6 or dm3), this
+function extracts the DNA sequences for all genomic regions found in an input
+object.
 }
 \examples{
 

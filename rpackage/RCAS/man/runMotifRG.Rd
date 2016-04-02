@@ -10,21 +10,21 @@ runMotifRG(queryRegions, genomeVersion, motifN = 5)
 \item{queryRegions}{GRanges object containing coordinates of input query
 regions imported by the \code{\link{importBed}} function}
 
-\item{genomeVersion}{A character string to denote the BS genome library required to
-extract sequences. Available options are hg19, mm9, ce6 and dm3.}
+\item{genomeVersion}{A character string to denote the BS genome library
+required to extract sequences. Available options are hg19, mm9, ce6 and
+dm3.}
 
-\item{motifN}{A positive integer (default:5) denoting the maximum number of motifs that
-should be sought by the \code{motifRG::findMotifFgBg} function}
+\item{motifN}{A positive integer (default:5) denoting the maximum number of
+motifs that should be sought by the \code{motifRG::findMotifFgBg} function}
 }
 \value{
 a list of objects returned by the \code{motifRG::findMotif} function
 }
 \description{
-This function makes use of \code{motifRG} library to carry out de novo motif discovery
-from input query regions
+This function makes use of \code{motifRG} library to carry out de novo motif
+discovery from input query regions
 }
 \examples{
-
 bed <- importBed('input.bed')
 motifResults <- runMotifRG(queryRegions=bed, genomeVersion='hg19')
 }

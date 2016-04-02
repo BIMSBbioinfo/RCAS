@@ -585,7 +585,7 @@ calculateCoverageProfileFromTxdb <- function (queryRegions,
   return (result)
 }
 
-findLongLinges <- function (myfile, lineLimit = 80) {
+findLongLines <- function (myfile, lineLimit = 80) {
   counts <- lapply(X = readLines(myfile), FUN = function (x) {l=nchar(x)})
   names(counts) <- c(1:length(counts))
   return(names(counts)[counts > lineLimit])

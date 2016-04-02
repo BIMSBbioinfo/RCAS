@@ -11,11 +11,13 @@ createControlRegions(queryRegions)
 regions imported by the \code{\link{importBed}} function.}
 }
 \value{
-GRanges object that contains the same number of regions as query regions
+GRanges object that contains the same number of regions as query
+  regions
 }
 \description{
-Given a GRanges object of query regions, create a background set of peaks that have
-the same length distribution based on the flanking regions of the peaks.
+Given a GRanges object of query regions, create a background set of peaks
+that have the same length distribution based on the flanking regions of the
+peaks.
 }
 \examples{
 bed <- importBed('input.bed')
