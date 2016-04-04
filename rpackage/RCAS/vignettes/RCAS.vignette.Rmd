@@ -51,13 +51,13 @@ RCAS automatically provides
 dynamic annotations for custom input files
 that contain transcriptomic target regions.
 Provided with target regions in
-[BED](http://www.ensembl.org/info/website/upload/bed.html) format
+[BED](http://www.ensembl.org/info/website/upload/bed.html) format(
 and annotation references in
 [GFF/GTF](http://www.ensembl.org/info/website/upload/gff.html) format,
 RCAS automatically summarizes annotated features that overlap with targets,
 and perform enrichment analysis of
 motifs, Gene Ontology (GO) terms and gene set.
-The summary of annotated features
+The summary of annotated features)
 consists of intuitive reports in terms of
 distributions of gene types, genomic features, gene names
 and coverage profiles.
@@ -81,24 +81,23 @@ The GFF/GTF file should provide reference annotation.
 The usual source of GFF/GTF file are
 [ENSEMBLE](http://www.ensembl.org/info/data/ftp/index.html) and
 [GENCODE](http://www.gencodegenes.org/releases/).
-Meanwhile user can also provide customized GFF/GTF file.
+Meanwhile user can also provide custom GFF/GTF file.
 
 For this vignette.
 to demonstrate RCAS functionality,
 we  provide sample BED and GFF file via RCAS library,
-which are accessible using a common R function, data().
-However to import user-defined
-BED and GFF/GTF files,
-user should execute two RCAS functions called importBed() and importGtf()
+which can be imported using a common R function, data().
+To import custom BED and GFF/GTF files,
+user should execute two RCAS functions called importBed() and importGtf().
 
-## Using RCAS sample data
+## Importing sample data
 ```{r sample_data, warning=FALSE, message=FALSE}
 library(RCAS)
-data(queryRegions) #sample queryRegions in BED format
+data(queryRegions) #sample queryRegions in BED format()
 data(gff)          #sample GFF file
 ```
 
-## Using RCAS functions
+## Importing custom data
 To use importBed() and importGtf(),
 user should provide file paths to the respective
 BED file and GFF/GTF file.
@@ -113,8 +112,6 @@ please remove `#` comment sign.
 #queryRegions = importBed(filePath = BED_file, sampleN = 10000)
 #gff = importGtf(filePath = GFF_file)
 ```
-
-
 
 # Summarizing Overlaps
 
@@ -201,16 +198,18 @@ layout(p)
 # Motif Analysis using motifRG
 
 ## Calculating enriched motifs
-With the RCAS package, a motif analysis is also possible. RCAS uses motifRG library to find enriched motifs among the query regions.
+With the RCAS package, a motif analysis is also possible.
+RCAS uses motifRG library to find enriched motifs among the query regions.
 ```{r motif_analysis, warning=FALSE, message=FALSE}
-motifResults <- runMotifRG(queryRegions = queryRegions, genomeVersion = 'hg19', motifN = 4)
+motifResults <- runMotifRG(queryRegions = queryRegions,
+    genomeVersion = 'hg19', motifN = 4)
 
 par(mfrow=c(2,2), mar=c(2,2,2,2))
 for (i in 1:length(motifResults$motifs)){
   motifPattern = motifResults$motifs[[i]]@pattern
-  motifRG::plotMotif(motifResults$motifs[[i]]@match$pattern, main=paste0('Motif-',i,': ',motifPattern), entropy = T)
+  motifRG::plotMotif(motifResults$motifs[[i]]@match$pattern,
+      main=paste0('Motif-',i,': ',motifPattern), entropy = T)
 }
-
 ```
 
 ## motif analysis: getting motif summary statistics
@@ -229,7 +228,8 @@ datatable(summary, extensions = 'FixedColumns',
 # GO term analysis
 
 ## Biological processes enriched among targeted genes
-RCAS can perform GO term enrichment analysis to find out enriched functions in genes that overlap the query regions
+RCAS can perform GO term enrichment analysis to find out
+enriched functions in genes that overlap the query regions
 ```{r GO analysis, warning=FALSE, message=FALSE}
 
 #get all genes from the GTF data
@@ -238,7 +238,8 @@ backgroundGenes = unique(gff$gene_id)
 targetedGenes = unique(overlaps$gene_id)
 
 #run TopGO
-goResults = runTopGO(ontology = 'BP', species = 'human', backgroundGenes = backgroundGenes, targetedGenes = targetedGenes)
+goResults = runTopGO(ontology = 'BP', species = 'human',
+backgroundGenes = backgroundGenes, targetedGenes = targetedGenes)
 
 datatable(goResults[goResults$bh < 0.1,], extensions = 'FixedColumns',
   options = list(
@@ -253,13 +254,18 @@ datatable(goResults[goResults$bh < 0.1,], extensions = 'FixedColumns',
 # Gene Set Enrichment Analysis
 
 ## MSIGDB gene sets enriched among targeted genes
-RCAS can use gene sets from Molecular Signatures Database and calculate gene set enrichment analysis to find out which gene sets are enriched among the genes targeted by the query regions
+RCAS can use gene sets from Molecular Signatures Database
+and calculate gene set enrichment analysis
+to find out which gene sets are enriched
+among the genes targeted by the query regions
 ```{r msigdb_analysis, warning=FALSE, message=FALSE}
 #msigDB <- parseMsigdb(msigdbFile)
 data(msigDB)
-msigdbResults <- runMSIGDB(msigDB = msigDB, backgroundGenes = backgroundGenes, targetedGenes = targetedGenes)
+msigdbResults <- runMSIGDB(msigDB = msigDB,
+    backgroundGenes = backgroundGenes, targetedGenes = targetedGenes)
 
-datatable(msigdbResults[msigdbResults$BH < 0.1,], extensions = 'FixedColumns',
+datatable(msigdbResults[msigdbResults$BH < 0.1,],
+    extensions = 'FixedColumns',
   options = list(
     dom = 't',
     scrollX = TRUE,
@@ -271,9 +277,26 @@ datatable(msigdbResults[msigdbResults$BH < 0.1,], extensions = 'FixedColumns',
 
 # Acknowledgements
 
-RCAS is developed by [Dr. Altuna Akalin](http://bioinformatics.mdc-berlin.de/team.html#altuna-akalin-phd) (head of the Scientific Bioinformatics Platform), [Dr. Bora Uyar](http://bioinformatics.mdc-berlin.de/team.html#bora-uyar-phd)  (Bioinformatics Scientist),
-[Dr. Dilmurat Yusuf](http://bioinformatics.mdc-berlin.de/team.html#dilmurat-yusuf-phd) (Bioinformatics Scientist) and [Ricardo Wurmus](http://bioinformatics.mdc-berlin.de/team.html#ricardo-wurmus) (System Administrator) at the Berlin Institute of Medical Systems Biology ([BIMSB](https://www.mdc-berlin.de/13800178/en/bimsb)) at the Max-Delbrueck-Center for Molecular Medicine ([MDC](https://www.mdc-berlin.de)) in Berlin.
+RCAS is developed by
+[Dr. Altuna Akalin]
+(http://bioinformatics.mdc-berlin.de/team.html#altuna-akalin-phd)
+(head of the Scientific Bioinformatics Platform),
+[Dr. Bora Uyar](http://bioinformatics.mdc-berlin.de/team.html#bora-uyar-phd)
+(Bioinformatics Scientist),
+[Dr. Dilmurat Yusuf]
+(http://bioinformatics.mdc-berlin.de/team.html#dilmurat-yusuf-phd)
+(Bioinformatics Scientist)
+and [Ricardo Wurmus]
+(http://bioinformatics.mdc-berlin.de/team.html#ricardo-wurmus)
+(System Administrator) at the Berlin Institute of Medical Systems Biology
+([BIMSB](https://www.mdc-berlin.de/13800178/en/bimsb))
+at the Max-Delbrueck-Center for Molecular Medicine
+([MDC](https://www.mdc-berlin.de)) in Berlin.
 
-RCAS is developed as a bioinformatics service as part of the [RNA Bioinformatics Center](http://www.denbi.de/index.php/rbc), which is one of the eight centers of the German Network for Bioinformatics Infrastructure ([de.NBI](http://www.denbi.de/)).  
+RCAS is developed as a bioinformatics service as part of
+the [RNA Bioinformatics Center](http://www.denbi.de/index.php/rbc),
+which is one of the eight centers of
+the German Network for Bioinformatics Infrastructure
+([de.NBI](http://www.denbi.de/)).  
 
 # References

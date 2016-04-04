@@ -7,7 +7,7 @@ library(motifRG)
 
 ## ----sample_data, warning=FALSE, message=FALSE---------------------------
 library(RCAS)
-data(queryRegions) #sample queryRegions in BED format
+data(queryRegions) #sample queryRegions in BED format()
 data(gff)          #sample GFF file
 
 ## ----RCAS_import_data, warning=FALSE, message=FALSE----------------------
@@ -69,14 +69,15 @@ p = plot_ly(data = mdf, x=bins, y=coverage, color = feature)
 layout(p)
 
 ## ----motif_analysis, warning=FALSE, message=FALSE------------------------
-motifResults <- runMotifRG(queryRegions = queryRegions, genomeVersion = 'hg19', motifN = 4)
+motifResults <- runMotifRG(queryRegions = queryRegions,
+    genomeVersion = 'hg19', motifN = 4)
 
 par(mfrow=c(2,2), mar=c(2,2,2,2))
 for (i in 1:length(motifResults$motifs)){
   motifPattern = motifResults$motifs[[i]]@pattern
-  motifRG::plotMotif(motifResults$motifs[[i]]@match$pattern, main=paste0('Motif-',i,': ',motifPattern), entropy = T)
+  motifRG::plotMotif(motifResults$motifs[[i]]@match$pattern,
+      main=paste0('Motif-',i,': ',motifPattern), entropy = T)
 }
-
 
 ## ----motif_analysis_table, warning=FALSE, message=FALSE------------------
 summary <- getMotifSummaryTable(motifResults)
@@ -95,7 +96,8 @@ backgroundGenes = unique(gff$gene_id)
 targetedGenes = unique(overlaps$gene_id)
 
 #run TopGO
-goResults = runTopGO(ontology = 'BP', species = 'human', backgroundGenes = backgroundGenes, targetedGenes = targetedGenes)
+goResults = runTopGO(ontology = 'BP', species = 'human',
+backgroundGenes = backgroundGenes, targetedGenes = targetedGenes)
 
 datatable(goResults[goResults$bh < 0.1,], extensions = 'FixedColumns',
   options = list(
@@ -108,9 +110,11 @@ datatable(goResults[goResults$bh < 0.1,], extensions = 'FixedColumns',
 ## ----msigdb_analysis, warning=FALSE, message=FALSE-----------------------
 #msigDB <- parseMsigdb(msigdbFile)
 data(msigDB)
-msigdbResults <- runMSIGDB(msigDB = msigDB, backgroundGenes = backgroundGenes, targetedGenes = targetedGenes)
+msigdbResults <- runMSIGDB(msigDB = msigDB,
+    backgroundGenes = backgroundGenes, targetedGenes = targetedGenes)
 
-datatable(msigdbResults[msigdbResults$BH < 0.1,], extensions = 'FixedColumns',
+datatable(msigdbResults[msigdbResults$BH < 0.1,],
+    extensions = 'FixedColumns',
   options = list(
     dom = 't',
     scrollX = TRUE,
