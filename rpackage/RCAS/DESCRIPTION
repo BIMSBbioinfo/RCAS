@@ -49,5 +49,6 @@ Suggests: knitr,
     org.Ce.eg.db,
     org.Dm.eg.db,
     plotly,
-    DT
+    DT,
+    testthat
 VignetteBuilder: knitr
