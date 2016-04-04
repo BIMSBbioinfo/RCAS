@@ -115,70 +115,6 @@ importBed <- function (filePath, sampleN = 0, keepStandardChr = TRUE) {
   }
 }
 
-processHits <- function(queryRegions, tx, type) {
-  overlaps <- GenomicRanges::findOverlaps(queryRegions, tx)
-  overlapsQuery <- queryRegions[GenomicRanges::queryHits(overlaps)]
-  overlapsTX <- tx[GenomicRanges::subjectHits(overlaps)]
-  overlapsTX$overlappingQuery <- paste(GenomicRanges::seqnames(overlapsQuery),
-                                GenomicRanges::start(overlapsQuery),
-                                GenomicRanges::end(overlapsQuery),
-                                GenomicRanges::strand(overlapsQuery),
-                                sep=':')
-  dt <- data.table::data.table('tx_name' = overlapsTX$tx_name,
-                               'query' = overlapsTX$overlappingQuery)
-  summary <- dt[,length(unique(query)), by=tx_name]
-  colnames(summary) <- c('tx_name', type)
-  return(summary)
-}
-
-#' getTargetedGenesTable
-#'
-#' This function provides a list of genes which are targeted by query regions
-#' and their corresponding numbers from an input BED file. Then, the hits are
-#' categorized by the gene features such as promoters, introns, exons,
-#' intron-exon boundaries, 5'/3' UTRs and whole transcripts.
-#'
-#' @param queryRegions GRanges object containing coordinates of input query
-#'   regions imported by the \code{\link{importBed}} function
-#' @param txdbFeatures A list of GRanges objects where each GRanges object
-#'   corresponds to the genomic coordinates of gene features such as promoters,
-#'   introns, exons, intron-exon boundaries, 5'/3' UTRs and whole transcripts.
-#'   This list of GRanges objects are obtained by the function
-#'   \code{\link{getTxdbFeaturesFromGff}} or \code{\link{getTxdbFeatures}}.
-#'
-#' @examples
-#' gff <- importGtf(filePath = 'annotation.gtf')
-#' bed <- importBed(filePath = 'input.bed')
-#' txdbFeatures <- getTxdbFeaturesFromGff(gff)
-#' featuresTable <- getTargetedGenesTable(queryRegions=bed,
-#'                                        txdbFeatures=txdbFeatures)
-#'
-#' or
-#'
-#' bed <- importBed(filePath = 'input.bed')
-#' txdb <- GenomicFeatures::makeTxDbFromGFF(file = 'annotation.gtf',
-#'                                        format = 'gtf')
-#' txdbFeatures <- getTxdbFeatures(txdb)
-#' featuresTable <- getTargetedGenesTable(queryRegions=bed,
-#'                                        txdbFeatures=txdbFeatures)
-#' @return A data.frame object where rows correspond to genes and columns
-#'   correspond to gene features
-#'
-#' @export
-getTargetedGenesTable <- function (queryRegions, txdbFeatures) {
-
-  tbls <- lapply(X=seq_along(txdbFeatures),
-               FUN=function(i) { processHits(queryRegions = queryRegions,
-                                 tx = txdbFeatures[[names(txdbFeatures)[i]]],
-                                 type = names(txdbFeatures)[i])})
-
-  tbls <- lapply(tbls, function(i) setkey(i, tx_name))
-  merged <- Reduce(function(...) merge(..., all = T), tbls)
-  merged$gene_name = gff[match(merged$tx_name, gff$transcript_id)]$gene_name
-  merged[is.na(merged)] <- 0
-  return(merged)
-}
-
 
 #' getTxdbFeatures
 #'
@@ -321,6 +257,70 @@ getTxdbFeaturesFromGff <- function (gff) {
   return(txdbFeatures)
 }
 
+processHits <- function(queryRegions, tx, type) {
+  overlaps <- GenomicRanges::findOverlaps(queryRegions, tx)
+  overlapsQuery <- queryRegions[GenomicRanges::queryHits(overlaps)]
+  overlapsTX <- tx[GenomicRanges::subjectHits(overlaps)]
+  overlapsTX$overlappingQuery <- paste(GenomicRanges::seqnames(overlapsQuery),
+                                       GenomicRanges::start(overlapsQuery),
+                                       GenomicRanges::end(overlapsQuery),
+                                       GenomicRanges::strand(overlapsQuery),
+                                       sep=':')
+  dt <- data.table::data.table('tx_name' = overlapsTX$tx_name,
+                               'query' = overlapsTX$overlappingQuery)
+  summary <- dt[,length(unique(query)), by=tx_name]
+  colnames(summary) <- c('tx_name', type)
+  return(summary)
+}
+
+
+#' getTargetedGenesTable
+#'
+#' This function provides a list of genes which are targeted by query regions
+#' and their corresponding numbers from an input BED file. Then, the hits are
+#' categorized by the gene features such as promoters, introns, exons,
+#' intron-exon boundaries, 5'/3' UTRs and whole transcripts.
+#'
+#' @param queryRegions GRanges object containing coordinates of input query
+#'   regions imported by the \code{\link{importBed}} function
+#' @param txdbFeatures A list of GRanges objects where each GRanges object
+#'   corresponds to the genomic coordinates of gene features such as promoters,
+#'   introns, exons, intron-exon boundaries, 5'/3' UTRs and whole transcripts.
+#'   This list of GRanges objects are obtained by the function
+#'   \code{\link{getTxdbFeaturesFromGff}} or \code{\link{getTxdbFeatures}}.
+#'
+#' @examples
+#' gff <- importGtf(filePath = 'annotation.gtf')
+#' bed <- importBed(filePath = 'input.bed')
+#' txdbFeatures <- getTxdbFeaturesFromGff(gff)
+#' featuresTable <- getTargetedGenesTable(queryRegions=bed,
+#'                                        txdbFeatures=txdbFeatures)
+#'
+#' or
+#'
+#' bed <- importBed(filePath = 'input.bed')
+#' txdb <- GenomicFeatures::makeTxDbFromGFF(file = 'annotation.gtf',
+#'                                        format = 'gtf')
+#' txdbFeatures <- getTxdbFeatures(txdb)
+#' featuresTable <- getTargetedGenesTable(queryRegions=bed,
+#'                                        txdbFeatures=txdbFeatures)
+#' @return A data.frame object where rows correspond to genes and columns
+#'   correspond to gene features
+#'
+#' @export
+getTargetedGenesTable <- function (queryRegions, txdbFeatures) {
+
+  tbls <- lapply(X=seq_along(txdbFeatures),
+                 FUN=function(i) { processHits(queryRegions = queryRegions,
+                                               tx = txdbFeatures[[names(txdbFeatures)[i]]],
+                                               type = names(txdbFeatures)[i])})
+
+  tbls <- lapply(tbls, function(i) setkey(i, tx_name))
+  merged <- Reduce(function(...) merge(..., all = T), tbls)
+  merged$gene_name = gff[match(merged$tx_name, gff$transcript_id)]$gene_name
+  merged[is.na(merged)] <- 0
+  return(merged)
+}
 
 #' summarizeQueryRegions
 #'
