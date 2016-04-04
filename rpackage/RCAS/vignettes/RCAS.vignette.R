@@ -5,17 +5,19 @@ library(plotly)
 library(DT)
 library(motifRG)
 
-## ----importGtf, warning=FALSE, message=FALSE-----------------------------
-#gff = importGtf(filePath = gtfFile)
-data(gff)
+## ----sample_data, warning=FALSE, message=FALSE---------------------------
+library(RCAS)
+data(queryRegions) #sample queryRegions in BED format
+data(gff)          #sample GFF file
 
-## ----importBed, warning=FALSE, message=FALSE-----------------------------
-#queryRegions = importBed(filePath = peaksFile, sampleN = 10000)
-data(queryRegions)
+## ----RCAS_import_data, warning=FALSE, message=FALSE----------------------
+#library(RCAS)
+#queryRegions = importBed(filePath = BED_file, sampleN = 10000)
+#gff = importGtf(filePath = GFF_file)
 
 ## ----queryGFF, warning=FALSE, message=FALSE------------------------------
 overlaps = queryGff(queryRegions = queryRegions, gff = gff)
-overlaps.dt = data.table(as.data.frame(overlaps)) #data.table is used to do quick summary operations 
+overlaps.dt = data.table(as.data.frame(overlaps)) #data.table is used to do quick summary operations
 
 ## ----query_gene_types, warning=FALSE, message=FALSE----------------------
 biotype_col = grep('biotype', colnames(overlaps.dt), value=T)
@@ -87,12 +89,12 @@ datatable(summary, extensions = 'FixedColumns',
 
 ## ----GO analysis, warning=FALSE, message=FALSE---------------------------
 
-#get all genes from the gff data
+#get all genes from the GTF data
 backgroundGenes = unique(gff$gene_id)
 #get genes that overlap query regions
 targetedGenes = unique(overlaps$gene_id)
 
-#run TopGO 
+#run TopGO
 goResults = runTopGO(ontology = 'BP', species = 'human', backgroundGenes = backgroundGenes, targetedGenes = targetedGenes)
 
 datatable(goResults[goResults$bh < 0.1,], extensions = 'FixedColumns',
@@ -104,8 +106,8 @@ datatable(goResults[goResults$bh < 0.1,], extensions = 'FixedColumns',
 
 
 ## ----msigdb_analysis, warning=FALSE, message=FALSE-----------------------
-#msigDB <- parseMsigdb(msigdbFile) 
-data(msigDB) 
+#msigDB <- parseMsigdb(msigdbFile)
+data(msigDB)
 msigdbResults <- runMSIGDB(msigDB = msigDB, backgroundGenes = backgroundGenes, targetedGenes = targetedGenes)
 
 datatable(msigdbResults[msigdbResults$BH < 0.1,], extensions = 'FixedColumns',
