@@ -32,19 +32,22 @@ Depends: data.table,
     AnnotationDbi,
     GenomicRanges,
     BSgenome.Hsapiens.UCSC.hg19,
-    BSgenome.Mmusculus.UCSC.mm9,
-    BSgenome.Celegans.UCSC.ce6,
-    BSgenome.Dmelanogaster.UCSC.dm3,
     GenomeInfoDb,
     Biostrings,
     motifRG,
     rtracklayer,
+    org.Hs.eg.db,
     GenomicFeatures,
-    genomation,
-    org.Hs.eg.db
+    genomation
 RoxygenNote: 5.0.1
 Suggests: knitr,
     rmarkdown,
+    BSgenome.Mmusculus.UCSC.mm9,
+    BSgenome.Celegans.UCSC.ce6,
+    BSgenome.Dmelanogaster.UCSC.dm3,
+    org.Mm.eg.db,
+    org.Ce.eg.db,
+    org.Dm.eg.db,
     plotly,
     DT
 VignetteBuilder: knitr

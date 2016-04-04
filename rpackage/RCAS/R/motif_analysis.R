@@ -1,11 +1,13 @@
 #' createControlRegions
 #'
-#' Given a GRanges object of query regions, create a background set of peaks that have
-#' the same length distribution based on the flanking regions of the peaks.
+#' Given a GRanges object of query regions, create a background set of peaks
+#' that have the same length distribution based on the flanking regions of the
+#' peaks.
 #'
 #' @param queryRegions GRanges object containing coordinates of input query
-#' regions imported by the \code{\link{importBed}} function.
-#' @return GRanges object that contains the same number of regions as query regions
+#'   regions imported by the \code{\link{importBed}} function.
+#' @return GRanges object that contains the same number of regions as query
+#'   regions
 #' @examples
 #' bed <- importBed('input.bed')
 #' controlRegions <- createControlRegions(queryRegions=bed)
@@ -16,7 +18,8 @@ createControlRegions <- function (queryRegions) {
   upFlank <- GenomicRanges::flank(queryRegions, start=TRUE, width=200)
   downFlank <- GenomicRanges::flank(queryRegions, start=FALSE, width=200)
 
-  s <- sample(c(0:1), length(queryRegions), replace = TRUE) #randomly select up or downstream flanking regions
+  #randomly select up or downstream flanking regions
+  s <- sample(c(0:1), length(queryRegions), replace = TRUE)
   flanks <- upFlank
   flanks[s==1] <- downFlank[s==1]
 
@@ -28,13 +31,17 @@ createControlRegions <- function (queryRegions) {
 
   df$flankStart <- GenomicRanges::start(flanks)
   df$flankEnd <- GenomicRanges::end(flanks)
-  df$randomFlankStart <- apply(df[,6:7], 1, FUN = function(x) sample(x[1]:x[2], 1))
+  df$randomFlankStart <- apply(X = df[,6:7], 1,
+                               FUN = function(x) sample(x[1]:x[2], 1))
   df$randomFlankEnd <- df$randomFlankStart + df$width - 1
 
   controlRegions <- df[1] #control intervals
   controlRegions$start <- df$randomFlankStart
   controlRegions$end <- df$randomFlankEnd
-  controlRegions$id <- paste(controlRegions$seqnames, controlRegions$start, controlRegions$end, df$strand, sep=':')
+  controlRegions$id <- paste(controlRegions$seqnames,
+                             controlRegions$start,
+                             controlRegions$end,
+                             df$strand, sep=':')
   controlRegions$score <- 1
   controlRegions$strand <- df$strand
 
@@ -46,13 +53,15 @@ createControlRegions <- function (queryRegions) {
 
 #' extractSequences
 #'
-#' Given a GRanges object and a genome version (hg19, mm9, ce6 or dm3), this function
-#' extracts the DNA sequences for all genomic regions found in an input object.
+#' Given a GRanges object and a genome version (hg19, mm9, ce6 or dm3), this
+#' function extracts the DNA sequences for all genomic regions found in an input
+#' object.
 #'
 #' @param queryRegions GRanges object containing coordinates of input query
-#' regions imported by the \code{\link{importBed}} function
-#' @param genomeVersion A character string to denote the BS genome library required to
-#' extract sequences. Available options are hg19, mm9, ce6 and dm3.
+#'   regions imported by the \code{\link{importBed}} function
+#' @param genomeVersion A character string to denote the BS genome library
+#'   required to extract sequences. Available options are hg19, mm9, ce6 and
+#'   dm3.
 #'
 #' @return DNAStringSet object will be returned
 #'
@@ -65,41 +74,42 @@ createControlRegions <- function (queryRegions) {
 extractSequences <- function (queryRegions, genomeVersion) {
 
   if (genomeVersion == 'hg19') {
-    seqDb = BSgenome.Hsapiens.UCSC.hg19::Hsapiens
+    seqDb <- BSgenome.Hsapiens.UCSC.hg19::Hsapiens
   } else if(genome_version == 'mm9') {
-    seqDb = BSgenome.Mmusculus.UCSC.mm9::Mmusculus
+    seqDb <- BSgenome.Mmusculus.UCSC.mm9::Mmusculus
   } else if(genome_version == 'ce6') {
-    seqDb = BSgenome.Celegans.UCSC.ce6::Celegans
+    seqDb <- BSgenome.Celegans.UCSC.ce6::Celegans
   } else if(genome_version == 'dm3') {
-    seqDb = BSgenome.Dmelanogaster.UCSC.dm3::Dmelanogaster
+    seqDb <- BSgenome.Dmelanogaster.UCSC.dm3::Dmelanogaster
   } else {
-    stop ("Cannot extract fasta sequences from genome versions except: hg19, mm9, ce6 and dm3\n")
+    stop ("Cannot extract fasta sequences from genome versions except:
+          hg19, mm9, ce6 and dm3\n")
   }
-  GenomeInfoDb::seqlevelsStyle(seqDb) =  GenomeInfoDb::seqlevelsStyle(queryRegions)
+  style <- GenomeInfoDb::seqlevelsStyle(queryRegions)
+  GenomeInfoDb::seqlevelsStyle(seqDb) <- style
   sequences <- Biostrings::getSeq(seqDb, queryRegions)
-  names(sequences) <- paste('seq',1:length(sequences), sep='_')
+  names(sequences) <- paste('seq', 1:length(sequences), sep='_')
 
   return (sequences)
 }
 
 #' runMotifRG
 #'
-#' This function makes use of \code{motifRG} library to carry out de novo motif discovery
-#' from input query regions
+#' This function makes use of \code{motifRG} library to carry out de novo motif
+#' discovery from input query regions
 #'
 #' @param queryRegions GRanges object containing coordinates of input query
-#' regions imported by the \code{\link{importBed}} function
-#' @param genomeVersion A character string to denote the BS genome library required to
-#' extract sequences. Available options are hg19, mm9, ce6 and dm3.
-#' @param motifN A positive integer (default:5) denoting the maximum number of motifs that
-#' should be sought by the \code{motifRG::findMotifFgBg} function
+#'   regions imported by the \code{\link{importBed}} function
+#' @param genomeVersion A character string to denote the BS genome library
+#'   required to extract sequences. Available options are hg19, mm9, ce6 and
+#'   dm3.
+#' @param motifN A positive integer (default:5) denoting the maximum number of
+#'   motifs that should be sought by the \code{motifRG::findMotifFgBg} function
 #'
 #' @return a list of objects returned by the \code{motifRG::findMotif} function
 #' @examples
-#'
 #' bed <- importBed('input.bed')
 #' motifResults <- runMotifRG(queryRegions=bed, genomeVersion='hg19')
-
 #' @export
 runMotifRG <- function (queryRegions, genomeVersion, motifN = 5) {
 
@@ -112,8 +122,11 @@ runMotifRG <- function (queryRegions, genomeVersion, motifN = 5) {
   controlSeqs <- extractSequences(controlRegions, genomeVersion)
 
   cat('running motifRG...')
-  motifResults <- motifRG::findMotifFgBg(querySeqs, controlSeqs, enriched.only=T, max.motif=motifN , both.strand=FALSE)
-
+  motifResults <- motifRG::findMotifFgBg(fg.seq = querySeqs,
+                                         bg.seq = controlSeqs,
+                                         enriched.only = T,
+                                         max.motif = motifN,
+                                         both.strand = FALSE)
   return(motifResults)
 }
 
@@ -122,7 +135,8 @@ runMotifRG <- function (queryRegions, genomeVersion, motifN = 5) {
 #' A repurposed/simplified version of the \code{motifRG::summaryMotif} function.
 #'
 #' @param motifResults Output object of \code{runMotifRG} function
-#' @return A data.frame object containing summary statistics about the discovered motifs
+#' @return A data.frame object containing summary statistics about the
+#'   discovered motifs
 #' @examples
 #'
 #' bed <- importBed('input.bed')
@@ -158,10 +172,14 @@ getMotifSummaryTable <- function(motifResults){
   ratio <- (hitsCounts1/hitsCounts2)/(fgSize/bgSize)
   frac1 <- seqCounts1/fgSize
   frac2 <- seqCounts2/bgSize
-  summary <- data.frame(patterns=motifPatterns,
-                        scores=round(scores,1),
-                        fgHits=hitsCounts1, bgHits= hitsCounts2,
-                        fgSeq=seqCounts1, bgSeq = seqCounts2,
-                        ratio=round(ratio,1), fgFrac=round(frac1,4), bgFrac=round(frac2,4))
+  summary <- data.frame(patterns = motifPatterns,
+                        scores = round(scores,1),
+                        fgHits = hitsCounts1,
+                        bgHits = hitsCounts2,
+                        fgSeq = seqCounts1,
+                        bgSeq = seqCounts2,
+                        ratio = round(ratio,1),
+                        fgFrac = round(frac1,4),
+                        bgFrac = round(frac2,4))
   return(summary)
 }

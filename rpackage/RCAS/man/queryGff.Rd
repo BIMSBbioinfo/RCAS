@@ -7,22 +7,26 @@
 queryGff(queryRegions, gff)
 }
 \arguments{
-\item{queryRegions}{GRanges object imported from a BED file using \code{importBed} function}
+\item{queryRegions}{GRanges object imported from a BED file using
+\code{importBed} function}
 
-\item{gff}{GRanges object imported from a GTF file using \code{importGtf} function}
+\item{gff}{GRanges object imported from a GTF file using \code{importGtf}
+function}
 }
 \value{
-a GRanges object (a subset of input gff) with an additional column 'overlappingQuery' that
-contains the coordinates of query regions that overlap the target annotation features
+a GRanges object (a subset of input gff) with an additional column
+  'overlappingQuery' that contains the coordinates of query regions that
+  overlap the target annotation features
 }
 \description{
-This function is used to overlap the input query regions (from a BED file) with a target
-GTF file imported as a GRanges object
+This function checks overlaps between the regions in input query and in
+reference. Input query should be in BED format and reference should be in GFF
+format. Both data are imported as GRanges object.
 }
 \examples{
 peaks <- importBed('input.BED')
 gff <- importGtf('annotation.gtf')
-overlaps <- queryGff(queryRegions=peaks, gff=gff)
+overlaps <- queryGff(queryRegions=queryRegions, gff=gff)
 
 }
 

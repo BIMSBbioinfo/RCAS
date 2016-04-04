@@ -10,7 +10,8 @@ getMotifSummaryTable(motifResults)
 \item{motifResults}{Output object of \code{runMotifRG} function}
 }
 \value{
-A data.frame object containing summary statistics about the discovered motifs
+A data.frame object containing summary statistics about the
+  discovered motifs
 }
 \description{
 A repurposed/simplified version of the \code{motifRG::summaryMotif} function.

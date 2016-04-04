@@ -8,32 +8,38 @@ getTargetedGenesTable(queryRegions, txdbFeatures)
 }
 \arguments{
 \item{queryRegions}{GRanges object containing coordinates of input query
-regions imported by the \code{\link{importBed}} function.}
+regions imported by the \code{\link{importBed}} function}
 
-\item{txdbFeatures}{A list of GRanges objects where each GRanges object corresponds to the
-genomic coordinates of gene features such as promoters, introns, exons, intron-exon boundaries, 5'/3' UTRs, and whole transcripts.
-This list of GRanges objects is obtained by the function \code{\link{getTxdbFeaturesFromGff}} or \code{\link{getTxdbFeatures}}}
+\item{txdbFeatures}{A list of GRanges objects where each GRanges object
+corresponds to the genomic coordinates of gene features such as promoters,
+introns, exons, intron-exon boundaries, 5'/3' UTRs and whole transcripts.
+This list of GRanges objects are obtained by the function
+\code{\link{getTxdbFeaturesFromGff}} or \code{\link{getTxdbFeatures}}.}
 }
 \value{
 A data.frame object where rows correspond to genes and columns
-correspond to gene features
+  correspond to gene features
 }
 \description{
-This function finds out which genes are targeted by how many query regions
-from the input BED file. Then, the hits are categorized by the gene features
-such as promoters, introns, exons, intron-exon boundaries, 5'/3' UTRs, and whole transcripts.
+This function provides a list of genes which are targeted by query regions
+and their corresponding numbers from an input BED file. Then, the hits are
+categorized by the gene features such as promoters, introns, exons,
+intron-exon boundaries, 5'/3' UTRs and whole transcripts.
 }
 \examples{
-gff <- importGtf('annotation.gtf')
-bed <- importBed('input.bed')
+gff <- importGtf(filePath = 'annotation.gtf')
+bed <- importBed(filePath = 'input.bed')
 txdbFeatures <- getTxdbFeaturesFromGff(gff)
-featuresTable <- getTargetedGenesTable(queryRegions=bed, txdbFeatures=txdbFeatures)
+featuresTable <- getTargetedGenesTable(queryRegions=bed,
+                                       txdbFeatures=txdbFeatures)
 
 or
 
-bed <- importBed('input.bed')
-txdb <- GenomicFeatures::makeTxDbFromGFF(file='annotation.gtf', format='gtf')
+bed <- importBed(filePath = 'input.bed')
+txdb <- GenomicFeatures::makeTxDbFromGFF(file = 'annotation.gtf',
+                                       format = 'gtf')
 txdbFeatures <- getTxdbFeatures(txdb)
-featuresTable <- getTargetedGenesTable(queryRegions=bed, txdbFeatures=txdbFeatures)
+featuresTable <- getTargetedGenesTable(queryRegions=bed,
+                                       txdbFeatures=txdbFeatures)
 }
 

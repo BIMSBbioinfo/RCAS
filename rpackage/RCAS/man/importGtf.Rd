@@ -2,40 +2,45 @@
 % Please edit documentation in R/report_functions.R
 \name{importGtf}
 \alias{importGtf}
-\title{Import GTF file}
+\title{importGtf}
 \usage{
-importGtf(filePath, readFromRds = TRUE, saveObjectAsRds = TRUE,
+importGtf(filePath, saveObjectAsRds = TRUE, readFromRds = TRUE,
   overwriteObjectAsRds = FALSE, keepStandardChr = TRUE)
 }
 \arguments{
-\item{filePath}{Path to the GTF file}
+\item{filePath}{Path to a GTF file}
 
-\item{readFromRds}{TRUE/FALSE (default:TRUE). If set to TRUE, will import the annotation data
-from previously generated .Rds file (<filePath>.granges.rds)}
+\item{saveObjectAsRds}{TRUE/FALSE (default:TRUE). If it is set to TRUE, a
+GRanges object will be created and saved in RDS format
+(<filePath>.granges.rds) so that importing can re-use this .rds file in
+next run.}
 
-\item{saveObjectAsRds}{TRUE/FALSE (default:TRUE). If set to TRUE, will create a GRanges object
-and save it in an .Rds file (<filePath>.granges.rds) so that in the next run, importing can re-use this .Rds file.}
+\item{readFromRds}{TRUE/FALSE (default:TRUE). If it is set to TRUE,
+annotation data will be imported from previously generated .rds file
+(<filePath>.granges.rds).}
 
-\item{overwriteObjectAsRds}{TRUE/FALSE (default:FALSE). If set to TRUE, will overwrite an existing
-.Rds file (<filePath>.granges.rds)}
+\item{overwriteObjectAsRds}{TRUE/FALSE (default:FALSE). If it is set to TRUE,
+existing .rds file (<filePath>.granges.rds) will overwritten.}
 
-\item{keepStandardChr}{TRUE/FALSE (default:TRUE). If set to TRUE, will convert the \code{seqlevelsStyle} to 'UCSC' and
-apply \code{keepStandardChromosomes} function to only keep data from the standard chromosomes}
+\item{keepStandardChr}{TRUE/FALSE (default:TRUE). If it is set to TRUE,
+\code{seqlevelsStyle} will be converted to 'UCSC' and
+\code{keepStandardChromosomes} function  will be applied to only keep data
+from the standard chromosomes.}
 }
 \value{
-A \code{GRanges} object containing the coordinates of the
-annotated genomic features in the input GTF file
+A \code{GRanges} object containing the coordinates of the annotated
+  genomic features in an input GTF file
 }
 \description{
-\code{importGtf} uses \code{rtracklayer::import.gff()} function to import genome annoatation data from Ensembl gtf files
+This function uses \code{rtracklayer::import.gff()} function to import genome
+annoatation data from an Ensembl gtf file
 }
 \examples{
-download.file(url = 'ftp://ftp.ensembl.org/pub/release-75/gtf/homo_sapiens/Homo_sapiens.GRCh37.75.gtf.gz', destfile = 'Ensembl75.hg19.gtf.gz')
-R.utils::gunzip('Ensembl75.hg19.gtf.gz')
-importGtf(filePath='./Ensembl75.hg19.gtf') #import the data an write it into an .Rds file
-importGtf(filePath='./Ensembl75.hg19.gtf', saveObjectAsRds = FALSE) #import the data but don't save it as RDS
-importGtf(filePath='./Ensembl75.hg19.gtf', overwriteObjectAsRds = TRUE) #import the data and overwrite the previously generated
-.Rds file
-
+#import the data and write it into a .rds file
+importGtf(filePath='./Ensembl75.hg19.gtf')
+#import the data but don't save it as RDS
+importGtf(filePath='./Ensembl75.hg19.gtf', saveObjectAsRds = FALSE)
+#import the data and overwrite the previously generated
+importGtf(filePath='./Ensembl75.hg19.gtf', overwriteObjectAsRds = TRUE)
 }
 
