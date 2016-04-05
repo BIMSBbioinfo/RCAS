@@ -145,7 +145,7 @@ layout(p = p,
 ### Distribution of query regions across chromosomes
 To find out the distribution of the query regions across chromosomes:
 ```{r chromosomes_gene_features, warning=FALSE, message=FALSE}
-df <- overlaps.dt[, length(unique(overlappingQuery)), by = c('seqnames', 'type')]
+df <- overlaps.dt[,length(unique(overlappingQuery)), by = c('seqnames', 'type')]
 colnames(df) <- c('seqnames', 'type', 'count')
 df <- df[order(seqnames)]
 p <- plot_ly(data = df, 
@@ -314,15 +314,18 @@ backgroundGenes <- unique(gff$gene_id)
 targetedGenes <- unique(overlaps$gene_id)
 
 #run TopGO
-goResults <- runTopGO(ontology = 'BP', species = 'human',
-backgroundGenes = backgroundGenes, targetedGenes = targetedGenes)
+goResults <- runTopGO(ontology = 'BP', 
+                      species = 'human', 
+                      backgroundGenes = backgroundGenes, 
+                      targetedGenes = targetedGenes)
 
-datatable(goResults[goResults$bh < 0.1,], extensions = 'FixedColumns',
-  options = list(
-    dom = 't',
-    scrollX = TRUE,
-    scrollCollapse = TRUE
-  ))
+datatable(data = goResults[goResults$bh < 0.1,], 
+          extensions = 'FixedColumns', 
+          options = list(dom = 't',
+                         scrollX = TRUE,
+                         scrollCollapse = TRUE
+                         )
+          )
 
 ```
 
@@ -354,16 +357,13 @@ datatable(msigdbResults[msigdbResults$BH < 0.1,],
 # Acknowledgements
 
 RCAS is developed by
-[Dr. Altuna Akalin]
-(http://bioinformatics.mdc-berlin.de/team.html#altuna-akalin-phd)
+[Dr. Altuna Akalin](http://bioinformatics.mdc-berlin.de/team.html#altuna-akalin-phd)
 (head of the Scientific Bioinformatics Platform),
 [Dr. Bora Uyar](http://bioinformatics.mdc-berlin.de/team.html#bora-uyar-phd)
 (Bioinformatics Scientist),
-[Dr. Dilmurat Yusuf]
-(http://bioinformatics.mdc-berlin.de/team.html#dilmurat-yusuf-phd)
-(Bioinformatics Scientist)
-and [Ricardo Wurmus]
-(http://bioinformatics.mdc-berlin.de/team.html#ricardo-wurmus)
+[Dr. Dilmurat Yusuf](http://bioinformatics.mdc-berlin.de/team.html#dilmurat-yusuf-phd)
+(Bioinformatics Scientist) and 
+[Ricardo Wurmus](http://bioinformatics.mdc-berlin.de/team.html#ricardo-wurmus)
 (System Administrator) at the Berlin Institute of Medical Systems Biology
 ([BIMSB](https://www.mdc-berlin.de/13800178/en/bimsb))
 at the Max-Delbrueck-Center for Molecular Medicine
