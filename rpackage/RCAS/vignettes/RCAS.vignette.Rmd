@@ -185,8 +185,26 @@ To have a global overview of the distribution of query regions across gene
 features, we can use the summarizeQueryRegions function.
 
 ```{R summarizeQueryRegions, warning=FALSE, message=FALSE}
+summary <- summarizeQueryRegions(queryRegions = queryRegions, 
+                                 txdbFeatures = txdbFeatures)
 
-
+df <- data.frame(summary)
+df$percent <- round((df$count / length(queryRegions)), 3) * 100
+p <- plot_ly( data = df, 
+              x = rownames(df), 
+              y = percent, 
+              type = 'bar',
+              text = paste("count:", count), 
+              color = rownames(df)
+              )
+layout(p = p, 
+       xaxis = list(title = 'features'),
+       yaxis = list(title = paste("percentage of query regions,", 
+                                  "n =", length(queryRegions)
+                                  )
+                    ), 
+       margin = list(b = 150, r = 50)
+       )
 ```
 
 ### Obtaining a table of overlap counts between query regions and genes 
