@@ -121,7 +121,7 @@ runMotifRG <- function (queryRegions, genomeVersion, motifN = 5) {
   cat('extracting background sequences from fasta..\n')
   controlSeqs <- extractSequences(controlRegions, genomeVersion)
 
-  cat('running motifRG...')
+  cat('running motifRG...\n')
   motifResults <- motifRG::findMotifFgBg(fg.seq = querySeqs,
                                          bg.seq = controlSeqs,
                                          enriched.only = T,
