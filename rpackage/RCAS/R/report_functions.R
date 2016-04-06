@@ -310,10 +310,11 @@ processHits <- function(queryRegions, tx, type) {
 #' @export
 getTargetedGenesTable <- function (queryRegions, txdbFeatures) {
 
-  tbls <- lapply(X=seq_along(txdbFeatures),
-                 FUN=function(i) { processHits(queryRegions = queryRegions,
-                                               tx = txdbFeatures[[names(txdbFeatures)[i]]],
-                                               type = names(txdbFeatures)[i])})
+  tbls <- lapply(X = seq_along(txdbFeatures),
+                 FUN = function(i) {
+                   processHits(queryRegions = queryRegions,
+                               tx = txdbFeatures[[names(txdbFeatures)[i]]],
+                               type = names(txdbFeatures)[i])})
 
   tbls <- lapply(tbls, function(i) setkey(i, tx_name))
   merged <- Reduce(function(...) merge(..., all = T), tbls)
@@ -589,4 +590,30 @@ findLongLines <- function (myfile, lineLimit = 80) {
   counts <- lapply(X = readLines(myfile), FUN = function (x) {l=nchar(x)})
   names(counts) <- c(1:length(counts))
   return(names(counts)[counts > lineLimit])
-  }
+}
+
+#' @export
+runReport <- function(queryFilePath = 'testdata',
+                      gffFilePath = 'testdata',
+                      goAnalysis = TRUE,
+                      msigdbAnalysis = TRUE,
+                      motifAnalysis = TRUE) {
+  reportFile <- system.file('report.Rmd', package='RCAS')
+  headerFile <- system.file('header.html', package='RCAS')
+  rmarkdown::render(
+    input = reportFile,
+    output_format = rmarkdown::html_document(
+      toc = TRUE,
+      toc_float = TRUE,
+      theme = 'simplex',
+      number_sections = TRUE,
+      includes = rmarkdown::includes(in_header = headerFile)
+      ),
+    params = list(query = queryFilePath,
+                  gff = gffFilePath,
+                  goAnalysis = goAnalysis,
+                  msigdbAnalysis = msigdbAnalysis,
+                  motifAnalysis = motifAnalysis)
+    )
+}
+
