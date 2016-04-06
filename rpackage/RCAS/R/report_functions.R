@@ -595,9 +595,12 @@ findLongLines <- function (myfile, lineLimit = 80) {
 #' @export
 runReport <- function(queryFilePath = 'testdata',
                       gffFilePath = 'testdata',
+                      msigdbFilePath = 'testdata',
+                      annotationSummary = TRUE,
                       goAnalysis = TRUE,
                       msigdbAnalysis = TRUE,
-                      motifAnalysis = TRUE) {
+                      motifAnalysis = TRUE,
+                      genomeVersion = 'hg19') {
   reportFile <- system.file('report.Rmd', package='RCAS')
   headerFile <- system.file('header.html', package='RCAS')
   rmarkdown::render(
@@ -611,9 +614,12 @@ runReport <- function(queryFilePath = 'testdata',
       ),
     params = list(query = queryFilePath,
                   gff = gffFilePath,
+                  msigdb = msigdbFilePath,
+                  annotationSummary = annotationSummary,
                   goAnalysis = goAnalysis,
                   msigdbAnalysis = msigdbAnalysis,
-                  motifAnalysis = motifAnalysis)
+                  motifAnalysis = motifAnalysis,
+                  genomeVersion = genomeVersion)
     )
 }
 
