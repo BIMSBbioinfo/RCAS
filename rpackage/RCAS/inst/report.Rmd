@@ -5,13 +5,22 @@ date: "`r Sys.Date()`"
 params: 
   query: 'testdata'
   gff: 'testdata'
+  msigdb: 'testdata'
+  annotationSummary: TRUE
   goAnalysis: TRUE
   msigdbAnalysis: TRUE
   motifAnalysis: TRUE
+  genomeVersion: 'hg19'
 ---
 
-```{r load_libraries, results='hide', message=FALSE, warning=FALSE, echo=FALSE}
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+```
+
+```{r load_libraries, results='hide', message=FALSE, warning=FALSE}
 library(RCAS)
+library(plotly)
+library(DT)
 ```
 
 # Introduction
@@ -59,8 +68,12 @@ to shed light on the functional aspects of target regions.
 The final report of RCAS consists of high-quality dynamic figures and tables,
 which are readily applicable for publications or other academic usage.
 
-## Importing sample data
-```{r sample_data, warning = FALSE, message = FALSE}
+```{r initiate_figure_table_counts}
+figureCount <- 1
+tableCount <- 1
+```
+
+```{r getInput}
 if(params$query == 'testdata') {
   data(queryRegions) 
 } else {
@@ -74,83 +87,31 @@ if(params$gff == 'testdata') {
   cat('importing GTF from filepath',params$gff,'\n')
   gff <- importGtf(filePath = params$gff)
 }
-head(queryRegions)
-head(gff)
+
 ```
 
-# Summarizing Overlaps of Query Regions with Genomic Annotation Features
-
-## Querying the annotation file 
-```{r queryGFF, warning=FALSE, message=FALSE}
+```{r queryGFF, eval=params$annotationSummary}
 overlaps <- queryGff(queryRegions = queryRegions, gff = gff)
 #data.table is used to do quick summary operations
 overlaps.dt <- data.table(GenomicRanges::as.data.frame(overlaps)) 
 ```
 
-
-### Finding targeted gene types
-To find out the distribution of the query regions across gene types:
-```{r query_gene_types, warning=FALSE, message=FALSE}
-biotype_col <- grep('biotype', colnames(overlaps.dt), value = T)
-df <- overlaps.dt[,length(unique(overlappingQuery)), by = biotype_col]
-colnames(df) <- c("feature", "count")
-df$percent <- round(df$count / length(queryRegions) * 100, 1)
-df <- df[order(count, decreasing = TRUE)]
-p <- plot_ly(data = df, 
-             type = "bar",
-             x = feature,
-             y = percent,
-             text = paste("count:", count), color=feature)
-layout(p = p, 
-       margin = list(l=100, r=100, b=150), 
-       xaxis = list(showticklabels = TRUE,  tickangle = 90), 
-       yaxis = list(title = paste("percentage of query regions,", 
-                                  "n =", length(queryRegions))))
-```
-
-### Distribution of query regions across chromosomes
-To find out the distribution of the query regions across chromosomes:
-```{r chromosomes_gene_features, warning=FALSE, message=FALSE}
-df <- overlaps.dt[,length(unique(overlappingQuery)), by = c('seqnames', 'type')]
-colnames(df) <- c('seqnames', 'type', 'count')
-df <- df[order(seqnames)]
-p <- plot_ly(data = df, 
-             type = "bar", 
-             x = seqnames,
-             y = count, 
-             text = paste("count:", count), 
-             color = type)
-layout(p = p, 
-       margin = list(b=150), 
-       xaxis = list(showticklabels = TRUE,  tickangle = 90), 
-       yaxis = list(title = paste("Number of query regions,", 
-                                  "n =", length(queryRegions)
-                                  )
-                    )
-       )
-```
-
-## Extending the annotation feature space 
-
-GTF files contain some annotation features (e.g. exons, transcripts) that are 
-usually explicitly defined, however, some gene features such as introns,
-exon-intron boundaries, promoter regions are only implicitly defined. Such 
-implicity features can be extracted from a GTF file using makeTxDb family of 
-functions from the GenomicFeatures library.
-
-First we create a list of GRanges objects, where each list element contains all
-the available coordinates of gene features such as transcripts, exons, introns,
-5'/3' UTRs, exon-intron boundaries, and promoter regions. 
-
-```{r getTxdbFeatures, warning=FALSE, message=FALSE}
+```{r getTxdbFeatures, eval=params$annotationSummary}
 txdbFeatures <- getTxdbFeaturesFromGff(gff)
 ```
 
-### Plotting overlap counts between query regions and gene features
-To have a global overview of the distribution of query regions across gene
-features, we can use the summarizeQueryRegions function.
+```{r summaryOverlapsHeader, results='asis', eval=params$annotationSummary}
+cat('# Annotation Summary for Query Regions \n')
+```
 
-```{R summarizeQueryRegions, warning=FALSE, message=FALSE}
+```{r summarizeQueryRegionsFigureCaption, results='asis', eval=params$annotationSummary}
+cat('## Distribution of query regions across gene features\n')
+
+cat("**Figure",figureCount,":** The number of query regions that overlap different kinds of gene features are counted. The 'y' axis denotes the types of gene features included in the analysis and the 'x' axis denotes the percentage of query regions (out of total number of query regions denoted with 'n') that overlap at least one genomic interval that host the corresponding feature. Notice that the sum of the percentage values for different features don't add up to 100%, because some query regions may overlap multiple kinds of features \n")
+```
+
+
+```{r summarizeQueryRegions, eval=params$annotationSummary}
 summary <- summarizeQueryRegions(queryRegions = queryRegions, 
                                  txdbFeatures = txdbFeatures)
 
@@ -171,14 +132,15 @@ layout(p = p,
                     ), 
        margin = list(b = 150, r = 50)
        )
+figureCount <- figureCount + 1
 ```
 
-### Obtaining a table of overlap counts between query regions and genes 
-To find out which genes overlap with how many queries and categorise overlaps by
-gene features; we use getTargetedGenesTable function, which returns a data.frame
-object. Then we use datatable function from 'DT' library to print an interactive
-table of genes that overlap query Regions.
-```{r getTargetedGenesTable, warning=FALSE, message=FALSE}
+```{r get_table_of_genes_tabcap, echo=FALSE, results='asis', eval=params$annotationSummary}
+cat("## Interactive table of genes that overlap query regions\n")
+cat("**Table",tableCount,":** Interactive table of genes that overlap query regions, grouped by gene features such as introns, exons, UTRs, etc.\n")
+```
+
+```{r getTargetedGenesTable, eval=params$annotationSummary}
 dt = getTargetedGenesTable(queryRegions = queryRegions, 
                            txdbFeatures = txdbFeatures)
 datatable(data = dt[order(transcripts, decreasing = T)][1:500], 
@@ -189,37 +151,39 @@ datatable(data = dt[order(transcripts, decreasing = T)][1:500],
             scrollCollapse = TRUE
             )
           )
+tableCount <- tableCount + 1
 ```
 
-### Profiling the coverage of query regions across gene features 
-
-#### Coverage profile of query regions for 3' UTRs
-Coverage profiles can be obtained for a single type of gene feature or a list of
-gene features. Here we demonstrate how to get coverage profile of query regions
-across 3'UTRs. It might be a good idea to use sampleN parameter to randomly
-downsample the target regions to speed up the calculations.
-
-```{r coverageprofile, warning=FALSE, message=FALSE}
-cov <- calculateCoverageProfile(queryRegions = queryRegions, 
-                               targetRegions = txdbFeatures$threeUTRs, 
-                               sampleN = 10000)
-
-p <- plot_ly(cov, x = bins, y = coverage)
-p %>%   add_trace(y = fitted(loess(coverage ~ as.numeric(bins)))) %>%
-layout(title = paste("Coverage along 3'UTRs (5' -> 3' direction)", sep = " "), 
-       showlegend = FALSE, 
-       margin = list(l = 50, r = 50, b = 50, t = 50))
-
+```{r query_gene_types_figcap, results='asis', eval=params$annotationSummary}
+cat("## Distribution of query regions in the genome grouped by gene types\n")
+cat("**Figure",figureCount,":** The number of query regions that overlap different kinds of gene types are counted. The 'x' axis denotes the types of genes included in the analysis and the 'y' axis denotes the percentage of query regions (out of total number of query regions denoted with 'n') that overlap at least one genomic interval that host the corresponding gene type. If the query regions don't overlap any known genes, they are classified as 'Unknown'.\n")
 ```
 
-#### Coverage profile of query regions for all gene features
-Coverage profiles can be obtained for a single type of gene feature or a list of
-gene features. Here we demonstrate how to get coverage profile of query regions 
-across all available gene features. It might be a good idea to use sampleN
-parameter to randomly downsample the target regions to speed up the 
-calculations.
+```{r query_gene_types, eval=params$annotationSummary}
+biotype_col <- grep('biotype', colnames(overlaps.dt), value = T)
+df <- overlaps.dt[,length(unique(overlappingQuery)), by = biotype_col]
+colnames(df) <- c("feature", "count")
+df$percent <- round(df$count / length(queryRegions) * 100, 1)
+df <- df[order(count, decreasing = TRUE)]
+p <- plot_ly(data = df, 
+             type = "bar",
+             x = feature,
+             y = percent,
+             text = paste("count:", count), color=feature)
+layout(p = p, 
+       margin = list(l=100, r=100, b=150), 
+       xaxis = list(showticklabels = TRUE,  tickangle = 90), 
+       yaxis = list(title = paste("percentage of query regions,", 
+                                  "n =", length(queryRegions))))
+figureCount <- figureCount + 1
+```
 
-```{r coverageprofilelist, warning=FALSE, message=FALSE}
+```{r coverageprofilelist_figcap, results='asis', eval=params$annotationSummary}
+cat("## Coverage profile of query regions across the length of different gene features\n")
+cat("**Figure",figureCount,":** The query regions are overlaid with the genomic coordinates of features. Each entry corresponding to a feature is divided into 100 bins of equal length and for each bin the number of query regions that cover the corresponding bin is counted. Features shorter than 100bp are excluded. Thus, a coverage profile is obtained based on the distribution of the query regions. The strandedness of the features are taken into account. The coverage profile is plotted in the 5' to 3' direction.\n")
+```
+
+```{r coverageprofilelist, eval=params$annotationSummary}
 covList <- calculateCoverageProfileList(queryRegions = queryRegions, 
                                        targetRegionsList = txdbFeatures, 
                                        sampleN = 10000)
@@ -232,17 +196,19 @@ mdf <- reshape2::melt(df, id.vars = c('bins'))
 colnames(mdf) <- c('bins', 'feature', 'coverage')
 p = plot_ly(data = mdf, x = bins, y = coverage, color = feature)
 layout(p)
+
+figureCount <- figureCount + 1
 ```
 
-# Motif Analysis using motifRG
+```{r plot_motif_results_figcap, results='asis', eval=params$motifAnalysis}
+cat('# motifRG analysis results \n')
+cat('## Top motifs discovered using motifRG \n')
+```
 
-## Calculating enriched motifs
-With the RCAS package, a motif analysis is also possible.
-RCAS uses motifRG library to find enriched motifs among the query regions.
-```{r motif_analysis, warning=FALSE, message=FALSE, eval=params$motifAnalysis}
+```{r motif_analysis, eval=params$motifAnalysis}
 motifResults <- runMotifRG(queryRegions = queryRegions, 
-                           genomeVersion = 'hg19', 
-                           motifN = 4)
+                           genomeVersion = params$genomeVersion, 
+                           motifN = 2)
 
 par(mfrow = c(2,2), mar = c(2,2,2,2))
 for (i in 1:length(motifResults$motifs)) {
@@ -253,9 +219,12 @@ for (i in 1:length(motifResults$motifs)) {
 }
 ```
 
-## motif analysis: getting motif summary statistics
-A summary table from the motif analysis results can be obtained
-```{r motif_analysis_table, warning=FALSE, message=FALSE, eval=params$motifAnalysis}
+```{r summarize_stats_tablecap, results='asis', eval=params$motifAnalysis}
+cat('## motifRG motif discovery statistics \n')
+cat("**Table",tableCount,":** motifRG motif discovery statistics. fg: foreground; bg: background; hits: number of motif hits; seq: number of sequences with motifs; frac: fraction of sequences that contain the motif compared to the all sequences; ratio: ratio of foreground motif fraction versus background motif fraction\n")
+```
+
+```{r motif_analysis_table, eval=params$motifAnalysis}
 summary <- getMotifSummaryTable(motifResults)
 datatable(summary, extensions = 'FixedColumns', 
           options = list( 
@@ -264,15 +233,19 @@ datatable(summary, extensions = 'FixedColumns',
             scrollCollapse = TRUE
             )
           )
+tableCount <- tableCount + 1
 ```
 
+```{r GO_section_header, results='asis', eval=params$goAnalysis}
+cat("# GO term Analysis Results\n")
+```
 
-# GO term analysis
+```{r GO_BP_tabcap, results='asis', eval=params$goAnalysis}
+cat("## GO Term Enrichment Results for Biological Processes\n")
+cat("**Table",tableCount,":** Significant Biological Process GO terms (BH < 0.1) enriched for genes that overlap query regions\n")  
+```
 
-## Biological processes enriched among targeted genes
-RCAS can perform GO term enrichment analysis to find out
-enriched functions in genes that overlap the query regions
-```{r GO analysis, warning=FALSE, message=FALSE, eval=params$goAnalysis}
+```{r GO analysis, eval=params$goAnalysis}
 
 #get all genes from the GTF data
 backgroundGenes <- unique(gff$gene_id)
@@ -292,31 +265,32 @@ datatable(data = goResults[goResults$bh < 0.1,],
                          scrollCollapse = TRUE
                          )
           )
-
+tableCount <- tableCount + 1
 ```
 
+```{r GSEA_msigdb_tabcap, results='asis', eval=params$msigdbAnalysis}
+cat("## Gene Set Enrichment Results based on MSigDB\n")
+cat("**Table",tableCount,":** Significant MSigDB Gene Sets (BH < 0.1) enriched for genes that overlap query regions\n")
+```
 
-# Gene Set Enrichment Analysis
+```{r msigdb_analysis, eval=params$msigdbAnalysis}
+if (params$msigdb == 'testdata') {
+  data(msigDB)
+} else {
+  msigDB <- parseMsigdb(filePath = params$msigdb)
+}
 
-## MSIGDB gene sets enriched among targeted genes
-RCAS can use gene sets from Molecular Signatures Database
-and calculate gene set enrichment analysis
-to find out which gene sets are enriched
-among the genes targeted by the query regions
-```{r msigdb_analysis, warning=FALSE, message=FALSE, eval=params$msigdbAnalysis}
-#msigDB <- parseMsigdb(msigdbFile)
-data(msigDB)
 msigdbResults <- runMSIGDB(msigDB = msigDB,
-    backgroundGenes = backgroundGenes, targetedGenes = targetedGenes)
+                           backgroundGenes = backgroundGenes, 
+                           targetedGenes = targetedGenes)
 
-datatable(msigdbResults[msigdbResults$BH < 0.1,],
-    extensions = 'FixedColumns',
-  options = list(
-    dom = 't',
-    scrollX = TRUE,
-    scrollCollapse = TRUE
-  ))
-
+datatable(msigdbResults[msigdbResults$BH < 0.1,], 
+          extensions = 'FixedColumns', 
+          options = list( dom = 't', 
+                          scrollX = TRUE, 
+                          scrollCollapse = TRUE 
+                          )
+          )
 ```
 
 
@@ -341,4 +315,3 @@ which is one of the eight centers of
 the German Network for Bioinformatics Infrastructure
 ([de.NBI](http://www.denbi.de/)).  
 
-# References
