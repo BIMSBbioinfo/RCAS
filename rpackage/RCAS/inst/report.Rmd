@@ -6,18 +6,19 @@ params:
   query: 'testdata'
   gff: 'testdata'
   msigdb: 'testdata'
-  annotationSummary: TRUE
+  annotationSummary: FALSE
   goAnalysis: TRUE
-  msigdbAnalysis: TRUE
+  msigdbAnalysis: FALSE
   motifAnalysis: TRUE
   genomeVersion: 'hg19'
+  species: 'human'
 ---
 
 ```{r global_options, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 ```
 
-```{r load_libraries, results='hide', message=FALSE, warning=FALSE}
+```{r load_libraries, results='hide'}
 library(RCAS)
 library(plotly)
 library(DT)
@@ -73,7 +74,7 @@ figureCount <- 1
 tableCount <- 1
 ```
 
-```{r getInput}
+```{r getInput, results='hide'}
 if(params$query == 'testdata') {
   data(queryRegions) 
 } else {
@@ -143,7 +144,7 @@ cat("**Table",tableCount,":** Interactive table of genes that overlap query regi
 ```{r getTargetedGenesTable, eval=params$annotationSummary}
 dt = getTargetedGenesTable(queryRegions = queryRegions, 
                            txdbFeatures = txdbFeatures)
-datatable(data = dt[order(transcripts, decreasing = T)][1:500], 
+DT::datatable(data = dt[order(transcripts, decreasing = T)][1:500], 
           extensions = 'FixedColumns', 
           options = list(
             dom = 't',
@@ -202,20 +203,33 @@ figureCount <- figureCount + 1
 
 ```{r plot_motif_results_figcap, results='asis', eval=params$motifAnalysis}
 cat('# motifRG analysis results \n')
-cat('## Top motifs discovered using motifRG \n')
 ```
 
-```{r motif_analysis, eval=params$motifAnalysis}
+```{r motif_analysis, results='hide', eval=params$motifAnalysis}
+
 motifResults <- runMotifRG(queryRegions = queryRegions, 
                            genomeVersion = params$genomeVersion, 
                            motifN = 2)
 
-par(mfrow = c(2,2), mar = c(2,2,2,2))
-for (i in 1:length(motifResults$motifs)) {
-  motifPattern <- motifResults$motifs[[i]]@pattern
-  motifRG::plotMotif(match = motifResults$motifs[[i]]@match$pattern, 
-                     main = paste0('Motif-',i,': ',motifPattern),
-                     entropy = T)
+```
+
+```{r motif_analysis_plot_figcap, results='asis', eval=params$motifAnalysis}
+cat('## Top motifs discovered using motifRG \n')
+```
+
+```{r motif_analysis_plot, results='asis', eval=params$motifAnalysis}
+if (length(motifResults$motifs) > 0) {
+  cat("**Figure-",figureCount,":** Top motifs discovered in the sequences of the query regions\n")
+  par(mfrow = c(2,2), mar = c(2,2,2,2))
+  for (i in 1:length(motifResults$motifs)) {
+    motifPattern <- motifResults$motifs[[i]]@pattern
+    motifRG::plotMotif(match = motifResults$motifs[[i]]@match$pattern, 
+                       main = paste0('Motif-',i,': ',motifPattern),
+                       entropy = T)
+  }
+  figureCount <- figureCount + 1
+} else {
+  cat('**Could not detect any motif enrichment in the given query regions**\n')
 }
 ```
 
@@ -225,25 +239,23 @@ cat("**Table",tableCount,":** motifRG motif discovery statistics. fg: foreground
 ```
 
 ```{r motif_analysis_table, eval=params$motifAnalysis}
-summary <- getMotifSummaryTable(motifResults)
-datatable(summary, extensions = 'FixedColumns', 
-          options = list( 
-            dom = 't', 
-            scrollX = TRUE, 
-            scrollCollapse = TRUE
+if (length(motifResults$motifs) > 0) {
+  summary <- getMotifSummaryTable(motifResults)
+  DT::datatable(summary, extensions = 'FixedColumns', 
+            options = list( 
+              dom = 't', 
+              scrollX = TRUE, 
+              scrollCollapse = TRUE
+              )
             )
-          )
-tableCount <- tableCount + 1
+  tableCount <- tableCount + 1
+}
 ```
 
 ```{r GO_section_header, results='asis', eval=params$goAnalysis}
 cat("# GO term Analysis Results\n")
 ```
 
-```{r GO_BP_tabcap, results='asis', eval=params$goAnalysis}
-cat("## GO Term Enrichment Results for Biological Processes\n")
-cat("**Table",tableCount,":** Significant Biological Process GO terms (BH < 0.1) enriched for genes that overlap query regions\n")  
-```
 
 ```{r GO analysis, eval=params$goAnalysis}
 
@@ -253,20 +265,30 @@ backgroundGenes <- unique(gff$gene_id)
 targetedGenes <- unique(overlaps$gene_id)
 
 #run TopGO
-goResults <- runTopGO(ontology = 'BP', 
-                      species = 'human', 
+goBP <- runTopGO(ontology = 'BP', 
+                      species = params$species, 
                       backgroundGenes = backgroundGenes, 
                       targetedGenes = targetedGenes)
 
-datatable(data = goResults[goResults$bh < 0.1,], 
-          extensions = 'FixedColumns', 
-          options = list(dom = 't',
-                         scrollX = TRUE,
-                         scrollCollapse = TRUE
-                         )
-          )
-tableCount <- tableCount + 1
+goMF <- runTopGO(ontology = 'MF', 
+                      species = params$species, 
+                      backgroundGenes = backgroundGenes, 
+                      targetedGenes = targetedGenes)
+
+goCC <- runTopGO(ontology = 'CC', 
+                      species = params$species, 
+                      backgroundGenes = backgroundGenes, 
+                      targetedGenes = targetedGenes)
 ```
+
+```{r GO_BP_tabcap, results='asis', eval=params$goAnalysis}
+cat("## GO Term Enrichment Results for Biological Processes\n")
+if (nrow(goBP) > 0) {
+  cat("**Table",tableCount,":** Significant Biological Process GO terms (BH < 0.1) enriched for genes that overlap query regions\n")  
+  DT::datatable(goBP)
+} 
+```
+
 
 ```{r GSEA_msigdb_tabcap, results='asis', eval=params$msigdbAnalysis}
 cat("## Gene Set Enrichment Results based on MSigDB\n")
@@ -284,7 +306,7 @@ msigdbResults <- runMSIGDB(msigDB = msigDB,
                            backgroundGenes = backgroundGenes, 
                            targetedGenes = targetedGenes)
 
-datatable(msigdbResults[msigdbResults$BH < 0.1,], 
+DT::datatable(msigdbResults[msigdbResults$BH < 0.1,], 
           extensions = 'FixedColumns', 
           options = list( dom = 't', 
                           scrollX = TRUE, 
