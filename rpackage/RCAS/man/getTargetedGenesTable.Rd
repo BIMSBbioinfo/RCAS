@@ -30,8 +30,8 @@ intron-exon boundaries, 5'/3' UTRs and whole transcripts.
 gff <- importGtf(filePath = 'annotation.gtf')
 bed <- importBed(filePath = 'input.bed')
 txdbFeatures <- getTxdbFeaturesFromGff(gff)
-featuresTable <- getTargetedGenesTable(queryRegions=bed,
-                                       txdbFeatures=txdbFeatures)
+featuresTable <- getTargetedGenesTable(queryRegions = bed,
+                                       txdbFeatures = txdbFeatures)
 
 or
 

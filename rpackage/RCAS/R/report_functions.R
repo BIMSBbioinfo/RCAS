@@ -293,8 +293,8 @@ processHits <- function(queryRegions, tx, type) {
 #' gff <- importGtf(filePath = 'annotation.gtf')
 #' bed <- importBed(filePath = 'input.bed')
 #' txdbFeatures <- getTxdbFeaturesFromGff(gff)
-#' featuresTable <- getTargetedGenesTable(queryRegions=bed,
-#'                                        txdbFeatures=txdbFeatures)
+#' featuresTable <- getTargetedGenesTable(queryRegions = bed,
+#'                                        txdbFeatures = txdbFeatures)
 #'
 #' or
 #'
@@ -318,7 +318,6 @@ getTargetedGenesTable <- function (queryRegions, txdbFeatures) {
 
   tbls <- lapply(tbls, function(i) setkey(i, tx_name))
   merged <- Reduce(function(...) merge(..., all = T), tbls)
-  merged$gene_name = gff[match(merged$tx_name, gff$transcript_id)]$gene_name
   merged[is.na(merged)] <- 0
   return(merged)
 }
@@ -600,11 +599,16 @@ runReport <- function(queryFilePath = 'testdata',
                       goAnalysis = TRUE,
                       msigdbAnalysis = TRUE,
                       motifAnalysis = TRUE,
-                      genomeVersion = 'hg19') {
-  reportFile <- system.file('report.Rmd', package='RCAS')
+                      genomeVersion = 'hg19',
+                      species = 'human',
+                      outDir = getwd()) {
+
+  reportFile <- '~/Desktop/RCAS/rpackage/RCAS/inst/report.Rmd'
+  #reportFile <- system.file('report.Rmd', package='RCAS')
   headerFile <- system.file('header.html', package='RCAS')
   rmarkdown::render(
     input = reportFile,
+    output_dir = outDir,
     output_format = rmarkdown::html_document(
       toc = TRUE,
       toc_float = TRUE,
