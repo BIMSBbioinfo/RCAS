@@ -591,6 +591,63 @@ findLongLines <- function (myfile, lineLimit = 80) {
   return(names(counts)[counts > lineLimit])
 }
 
+#' Generate a RCAS Report for a CLIP-Seq-based experiment
+#'
+#' This is the main report generation function for RCAS. This function can take
+#' a BED file, a GTF file and optionally an MSIGDB annotation; and use these
+#' input to run multiple RCAS functions to create a summary report regarding the
+#' annotation data that overlap the input BED file, enrichment analysis for GO
+#' terms, gene sets from MSIGDB, and motif analysis.
+#'
+#' @param queryFilePath a BED format file which contains genomic coordinates of
+#'   protein-RNA binding sites
+#' @param gffFilePath A GTF format file which contains genome annotations
+#'   (preferably from ENSEMBL)
+#' @param msigdbFilePath Gene set annotations for Homo sapiens from Molecular
+#'   Signatures Database
+#' @param annotationSummary TRUE/FALSE (default: TRUE) A switch to decide if
+#'   RCAS should provide annotation summaries from overlap operations
+#' @param goAnalysis TRUE/FALSE (default: TRUE) A switch to decide if RCAS
+#'   should run GO term enrichment analysis
+#' @param msigdbAnalysis TRUE/FALSE (default: TRUE) A switch to decide if RCAS
+#'   should run gene set enrichment analysis
+#' @param motifAnalysis TRUE/FALSE (default: TRUE) A switch to decide if RCAS
+#'   should run motif analysis
+#' @param genomeVersion  A character string to denote for which genome version
+#'   the analysis is being done. Available options are hg19 (human), mm9
+#'   (mouse), ce6 (worm) and dm3 (fly).
+#' @return An html generated using rmarkdown/knitr/pandoc that contains
+#'   interactive figures, tables, and text that provide an overview of the
+#'   experiment
+#' @examples
+#' #Default run will generate a report using built-in test data for hg19 genome.
+#' runReport()
+#'
+#' #A custom run for human
+#' runReport( queryFilePath = 'input.BED',
+#'            gffFilePath = 'annotation.gtf',
+#'            msigdbFilePath = 'human_msigdb.gmt',
+#' # To turn off certain modules of the report
+#' runReport( queryFilePath = 'input.BED',
+#'            gffFilePath = 'annotation.gtf',
+#'            msigdbFilePath = 'human_msigdb.gmt',
+#'            motifAnalysis = FALSE,
+#'            goAnalysis = FALSE
+#'            )
+#' # To run the pipeline for species other than human
+#' # First an MSIGDB dataset needs to be generated using the human dataset.
+#' mouseMSIGDB <- createOrthologousMsigdbDataset(refMsigdbFilePath = 'human_msigdb.gmt',
+#'                                refGenomeVersion = 'hg19',
+#'                                targetGenomeVersion = 'mm9')
+#' # print mouseMSIGDB to a file
+#' printMsigdbDataset(mouseMSIGDB, outputFilename = 'msigdb.mm9.gmt')
+#' # run the report
+#' runReport( queryFilePath = 'input.mm9.BED',
+#'            gffFilePath = 'annotation.mm9.gtf',
+#'            msigdbFilePath = 'msigdb.mm9.gmt',
+#'            genomeVersion = 'mm9',
+#'            species = 'mouse' )
+#'
 #' @export
 runReport <- function(queryFilePath = 'testdata',
                       gffFilePath = 'testdata',
