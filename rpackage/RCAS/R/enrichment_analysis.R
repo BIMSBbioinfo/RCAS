@@ -115,6 +115,25 @@ parseMsigdb <- function(filePath){
   return(geneLists)
 }
 
+#' Print MSIGDB Dataset to a file
+#' This function is used to print a MSIGDB dataset into a file. Mostly
+#' useful when human data is mapped to another species, and that mapping
+#' is required to run the report.
+#' @export
+printMsigdbDataset = function(dataset, outputFilename){
+  if (file.exists(outputFilename)){
+    stop('A filename with the same name exists.
+        Delete the file first or choose a different file')
+  }
+  sink(file = outputFilename, append = TRUE)
+  for (i in 1:length(dataset)){
+    geneSetName = names(dataset)[i]
+    geneSet = paste(unique(paste(unlist(dataset[i]))), collapse = '\t')
+    cat(geneSetName, 'no_http', geneSet, sep='\t', "\n")
+  }
+  sink()
+}
+
 #' retrieveOrthologs
 #'
 #' Given two biomart connections and a set of entrez gene identifiers; retrieve
