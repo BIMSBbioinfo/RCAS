@@ -660,6 +660,31 @@ runReport <- function(queryFilePath = 'testdata',
                       species = 'human',
                       outDir = getwd()) {
 
+  if (species != 'human') {
+    if (queryFilePath == 'testdata') {
+      stop('Test-data only works for human.
+           Please provide a queryFilePath to input in BED format \n')
+    }
+
+    if (gffFilePath == 'testdata') {
+      stop('Test-data only works for human.
+           Please provide a gffFilePath to input in GTF format \n')
+    }
+
+    if (msigdbFilePath == 'testdata' && msigdbAnalysis == TRUE) {
+      stop('Test-data only works for human.
+           Please provide a gene set dataset with ENTREZ gene ids
+            downloaded from MSIGDB database or
+            set msigdbAnalysis option to FALSE \n')
+    }
+
+    if (genomeVersion == 'ce6') {
+      warning('Turning off GO term and gene set enrichment analyses for genomeVersion ce6\n')
+      goAnalysis = FALSE
+      msigdbAnalysis = FALSE
+    }
+  }
+
   reportFile <- system.file('report.Rmd', package='RCAS')
   headerFile <- system.file('header.html', package='RCAS')
   outFile <- paste0(basename(queryFilePath), '.RCAS.report.html')
