@@ -319,7 +319,16 @@ cat("**Table",tableCount,":** Significant MSigDB Gene Sets (BH < 0.1) enriched f
 ```
 
 ```{r msigdb_analysis, eval=params$msigdbAnalysis}
-if (params$msigdb == 'testdata') {
+if (params$species != 'human') {
+  targetMSIGDB <- createOrthologousMsigdbDataset(refMsigdbFilePath = params$msigdb, 
+                                                refGenomeVersion = 'hg19', 
+                                                targetGenomeVersion = params$genomeVersion)
+  msigdbOutFile <- paste(params$genomeVersion, 'msigdb.gmt', sep='.')
+  
+  printMsigdbDataset(dataset = targetMSIGDB, 
+                     outputFilename = msigdbOutFile)
+  msigDB <- parseMsigdb(filePath = msigdbOutFile)
+} else if (params$msigdb == 'testdata') {
   data(msigDB)
 } else {
   msigDB <- parseMsigdb(filePath = params$msigdb)
