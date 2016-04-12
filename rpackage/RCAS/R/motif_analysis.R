@@ -75,11 +75,11 @@ extractSequences <- function (queryRegions, genomeVersion) {
 
   if (genomeVersion == 'hg19') {
     seqDb <- BSgenome.Hsapiens.UCSC.hg19::Hsapiens
-  } else if(genome_version == 'mm9') {
+  } else if(genomeVersion == 'mm9') {
     seqDb <- BSgenome.Mmusculus.UCSC.mm9::Mmusculus
-  } else if(genome_version == 'ce6') {
+  } else if(genomeVersion == 'ce6') {
     seqDb <- BSgenome.Celegans.UCSC.ce6::Celegans
-  } else if(genome_version == 'dm3') {
+  } else if(genomeVersion == 'dm3') {
     seqDb <- BSgenome.Dmelanogaster.UCSC.dm3::Dmelanogaster
   } else {
     stop ("Cannot extract fasta sequences from genome versions except:
