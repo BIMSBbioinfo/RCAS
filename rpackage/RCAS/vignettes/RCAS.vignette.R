@@ -38,7 +38,7 @@ layout(p = p,
                                   "n =", length(queryRegions))))
 
 ## ----chromosomes_gene_features, warning=FALSE, message=FALSE-------------
-df <- overlaps.dt[, length(unique(overlappingQuery)), by = c('seqnames', 'type')]
+df <- overlaps.dt[,length(unique(overlappingQuery)), by = c('seqnames', 'type')]
 colnames(df) <- c('seqnames', 'type', 'count')
 df <- df[order(seqnames)]
 p <- plot_ly(data = df, 
@@ -150,15 +150,18 @@ backgroundGenes <- unique(gff$gene_id)
 targetedGenes <- unique(overlaps$gene_id)
 
 #run TopGO
-goResults <- runTopGO(ontology = 'BP', species = 'human',
-backgroundGenes = backgroundGenes, targetedGenes = targetedGenes)
+goResults <- runTopGO(ontology = 'BP', 
+                      species = 'human', 
+                      backgroundGenes = backgroundGenes, 
+                      targetedGenes = targetedGenes)
 
-datatable(goResults[goResults$bh < 0.1,], extensions = 'FixedColumns',
-  options = list(
-    dom = 't',
-    scrollX = TRUE,
-    scrollCollapse = TRUE
-  ))
+datatable(data = goResults[goResults$bh < 0.1,], 
+          extensions = 'FixedColumns', 
+          options = list(dom = 't',
+                         scrollX = TRUE,
+                         scrollCollapse = TRUE
+                         )
+          )
 
 
 ## ----msigdb_analysis, warning=FALSE, message=FALSE-----------------------
