@@ -2,7 +2,6 @@
 title: "The RNA Centric Analysis System Report"
 author: "Bora Uyar, Dilmurat Yusuf, Ricardo Wurmus, Altuna Akalin"
 date: "`r Sys.Date()`"
-bibliography: bibliography.bib
 output:
   html_document:
     toc: true
@@ -36,7 +35,7 @@ various HTS methods have been applied to study different aspects of
 the complete set of transcripts that are produced by the genome.
 On such method is
 cross-linking immunoprecipitation-high-throughput
-sequencing (CLIP-Seq) [@Konig2011]
+sequencing (CLIP-Seq)
 that is used to
 study RNA binding sites for a protein of interest on a genome-wide scale,
 thereby increasing the understanding of
@@ -52,7 +51,7 @@ that contain transcriptomic target regions.
 Provided with target regions in
 [BED](http://www.ensembl.org/info/website/upload/bed.html) format(
 and annotation references in
-[GFF/GTF](http://www.ensembl.org/info/website/upload/gff.html) format,
+[GTF](http://www.ensembl.org/info/website/upload/gff.html) format,
 RCAS automatically summarizes annotated features that overlap with targets,
 and perform enrichment analysis of
 motifs, Gene Ontology (GO) terms and gene set.
@@ -72,21 +71,19 @@ which are readily applicable for publications or other academic usage.
 
 #  Data input
 
-RCAS requires inputs of a BED file and a GFF/GTF file.
+RCAS requires inputs of a BED file and a GTF file.
 The BED file should contain coordinates/intervals
 of target transcriptomic regions
 which are located via transcriptomics methods such as Clip-Seq.
-The GFF/GTF file should provide reference annotation.
-The usual source of GFF/GTF file are
-[ENSEMBLE](http://www.ensembl.org/info/data/ftp/index.html) and
-[GENCODE](http://www.gencodegenes.org/releases/).
-Meanwhile user can also provide custom GFF/GTF file.
+The GTF file should provide reference annotation.
+The usual source of GTF files are
+[ENSEMBLE](http://www.ensembl.org/info/data/ftp/index.html). 
 
 For this vignette.
 to demonstrate RCAS functionality,
-we  provide sample BED and GFF file via RCAS library,
+we  provide sample BED and GTF data via RCAS library,
 which can be imported using a common R function, data().
-To import custom BED and GFF/GTF files,
+To import custom BED and GTF files,
 user should execute two RCAS functions called importBed() and importGtf().
 
 ## Importing sample data
@@ -99,7 +96,7 @@ data(gff)          #sample GFF file
 ## Importing custom data
 To use importBed() and importGtf(),
 the user should provide file paths to the respective
-BED file and GFF/GTF file.
+BED file and GTF file.
 To reduce memory usage and time consumption,
 we advise user to set `sampleN=10000` to avoid
 huge input of intervals.
@@ -353,6 +350,51 @@ datatable(msigdbResults[msigdbResults$BH < 0.1,],
 
 ```
 
+# Generating a full report 
+
+The users can use the runReport() function to generate full custom reports including all the analysis modules
+described above. There are four main parts of the analysis report.
+  
+  - Annotation summaries via overlap operations
+  - GO term analysis
+  - MSIGDB analysis 
+  - Motif analysis 
+
+By default, runReport() function aims to run all four modules, while the user can turn off these individual modules.
+
+Below are example commands to generate reports using these functionalities. 
+
+## A test run for human
+
+```
+runReport()
+```
+## A custom run for human
+```
+runReport( queryFilePath = 'input.BED',
+            gffFilePath = 'annotation.gtf',
+            msigdbFilePath = 'human_msigdb.gmt')
+```
+## To turn off certain modules of the report
+``` 
+runReport( queryFilePath = 'input.BED',
+            gffFilePath = 'annotation.gtf',
+            msigdbFilePath = 'human_msigdb.gmt',
+            motifAnalysis = FALSE,
+            goAnalysis = FALSE )
+```
+## To run the pipeline for species other than human
+If the msigdb module is needed, the msigdbFilePath
+must be set to the MSIGDB annotations for 'human'.
+MSIGDB datasets for other species will be calculated
+in the background using the createOrthologousMsigdbDataset
+function
+```
+runReport( queryFilePath = 'input.mm9.BED',
+            gffFilePath = 'annotation.mm9.gtf',
+            msigdbFilePath = 'human_msigdb.gmt',
+            genomeVersion = 'mm9' )
+```
 
 # Acknowledgements
 
@@ -375,4 +417,3 @@ which is one of the eight centers of
 the German Network for Bioinformatics Infrastructure
 ([de.NBI](http://www.denbi.de/)).  
 
-# References
