@@ -11,7 +11,7 @@ runMotifRG(queryRegions, genomeVersion, motifN = 5)
 regions imported by the \code{\link{importBed}} function}
 
 \item{genomeVersion}{A character string to denote the BS genome library
-required to extract sequences. Available options are hg19, mm9, ce6 and
+required to extract sequences. Available options are hg19, mm9, ce10 and
 dm3.}
 
 \item{motifN}{A positive integer (default:5) denoting the maximum number of

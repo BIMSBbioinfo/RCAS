@@ -183,17 +183,13 @@ getBioMartConnection <- function (genomeVersion) {
     mart <- biomaRt::useMart( biomart = 'ENSEMBL_MART_ENSEMBL',
                               host = 'dec2014.archive.ensembl.org',
                               dataset = "dmelanogaster_gene_ensembl")
-  } else if (genomeVersion == 'ce6') {
-    mart <- biomaRt::useMart( biomart = 'ENSEMBL_MART_ENSEMBL',
-                              host = 'may2009.archive.ensembl.org',
-                              dataset = "celegans_gene_ensembl")
   } else if (genomeVersion == 'ce10') {
     mart <- biomaRt::useMart( biomart = 'ENSEMBL_MART_ENSEMBL',
                               host = 'jan2013.archive.ensembl.org',
                               dataset = "celegans_gene_ensembl")
   } else {
     stop ("Cannot create a BioMart connection for genome versions except:
-          hg19, ce6, ce10, dm3, and mm9\n")
+          hg19, ce10, dm3, and mm9\n")
   }
   return (mart)
 }
@@ -208,7 +204,7 @@ getBioMartConnection <- function (genomeVersion) {
 #'   gene ids must be in Entrez format.
 #' @param refGenomeVersion Genome version of a reference species. (default:hg19)
 #' @param targetGenomeVersion Genome version of a target species. Available
-#'   options are mm9, dm3, and ce6
+#'   options are mm9, dm3, and ce10
 #'
 #' @return A list of vectors where each vector consists of a set of Entrez gene
 #'   ids
@@ -217,7 +213,7 @@ getBioMartConnection <- function (genomeVersion) {
 #' #First Download gene sets (with Entrez Ids) from MSIGDB database
 #' #from \url{http://software.broadinstitute.org/gsea/msigdb/collections.jsp#C2}
 #'
-#' #Map the gene sets to a target genome (supported genomes: mm9, dm3, or ce6)
+#' #Map the gene sets to a target genome (supported genomes: mm9, dm3, or ce10)
 #' createOrthologousMsigdbDataset(refMsigdbFilePath = 'msigdb.entrez.txt',
 #'                                refGenomeVersion = 'hg19',
 #'                                targetGenomeVersion = 'mm9')

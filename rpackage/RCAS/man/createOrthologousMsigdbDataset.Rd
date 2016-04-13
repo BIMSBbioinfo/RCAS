@@ -14,7 +14,7 @@ gene ids must be in Entrez format.}
 \item{refGenomeVersion}{Genome version of a reference species. (default:hg19)}
 
 \item{targetGenomeVersion}{Genome version of a target species. Available
-options are mm9, dm3, and ce6}
+options are mm9, dm3, and ce10}
 }
 \value{
 A list of vectors where each vector consists of a set of Entrez gene
@@ -29,7 +29,7 @@ worm via orthologous relationships to human genes.
 #First Download gene sets (with Entrez Ids) from MSIGDB database
 #from \\url{http://software.broadinstitute.org/gsea/msigdb/collections.jsp#C2}
 
-#Map the gene sets to a target genome (supported genomes: mm9, dm3, or ce6)
+#Map the gene sets to a target genome (supported genomes: mm9, dm3, or ce10)
 createOrthologousMsigdbDataset(refMsigdbFilePath = 'msigdb.entrez.txt',
                                refGenomeVersion = 'hg19',
                                targetGenomeVersion = 'mm9')

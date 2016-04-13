@@ -615,7 +615,7 @@ findLongLines <- function (myfile, lineLimit = 80) {
 #'   should run motif analysis
 #' @param genomeVersion  A character string to denote for which genome version
 #'   the analysis is being done. Available options are hg19 (human), mm9
-#'   (mouse), ce6 (worm) and dm3 (fly).
+#'   (mouse), ce10 (worm) and dm3 (fly).
 #' @return An html generated using rmarkdown/knitr/pandoc that contains
 #'   interactive figures, tables, and text that provide an overview of the
 #'   experiment
@@ -635,18 +635,15 @@ findLongLines <- function (myfile, lineLimit = 80) {
 #'            goAnalysis = FALSE
 #'            )
 #' # To run the pipeline for species other than human
-#' # First an MSIGDB dataset needs to be generated using the human dataset.
-#' mouseMSIGDB <- createOrthologousMsigdbDataset(refMsigdbFilePath = 'human_msigdb.gmt',
-#'                                refGenomeVersion = 'hg19',
-#'                                targetGenomeVersion = 'mm9')
-#' # print mouseMSIGDB to a file
-#' printMsigdbDataset(mouseMSIGDB, outputFilename = 'msigdb.mm9.gmt')
-#' # run the report
+#' # If the msigdb module is needed, the msigdbFilePath
+#' # must be set to the MSIGDB annotations for 'human'.
+#' # MSIGDB datasets for other species will be calculated
+#' # in the background using the createOrthologousMsigdbDataset
+#' # function
 #' runReport( queryFilePath = 'input.mm9.BED',
 #'            gffFilePath = 'annotation.mm9.gtf',
-#'            msigdbFilePath = 'msigdb.mm9.gmt',
-#'            genomeVersion = 'mm9',
-#'            species = 'mouse' )
+#'            msigdbFilePath = 'msigdb.human.gmt',
+#'            genomeVersion = 'mm9' )
 #'
 #' @export
 runReport <- function(queryFilePath = 'testdata',
@@ -657,8 +654,30 @@ runReport <- function(queryFilePath = 'testdata',
                       msigdbAnalysis = TRUE,
                       motifAnalysis = TRUE,
                       genomeVersion = 'hg19',
-                      species = 'human',
                       outDir = getwd()) {
+
+  if (genomeVersion == 'hg19') {
+    species <- 'human'
+  } else if (genomeVersion == 'mm9') {
+    species <- 'mouse'
+  } else if (genomeVersion == 'ce10') {
+    species <- 'worm'
+    #TODO#
+    #msigdb and GO term analysis is not supported for ce10 genome
+    #because of gene id issues. However, this will be fixed
+    if (msigdbAnalysis == TRUE) {
+      warning('Turning off msigdbAnalysis for genomeVersion ce10\n')
+      msigdbAnalysis <- FALSE
+    }
+    if (goAnalysis == TRUE) {
+      warning('Turning off msigdbAnalysis for genomeVersion ce10\n')
+      goAnalysis <- FALSE
+    }
+  } else if (genomeVersion == 'dm3') {
+    species <- 'fly'
+  } else {
+    stop (genomeVersion,' is not a supported genome version.')
+  }
 
   if (species != 'human') {
     if (queryFilePath == 'testdata') {
@@ -676,12 +695,6 @@ runReport <- function(queryFilePath = 'testdata',
            Please provide a gene set dataset with ENTREZ gene ids
             downloaded from MSIGDB database or
             set msigdbAnalysis option to FALSE \n')
-    }
-
-    if (genomeVersion == 'ce6') {
-      warning('Turning off GO term and gene set enrichment analyses for genomeVersion ce6\n')
-      goAnalysis = FALSE
-      msigdbAnalysis = FALSE
     }
   }
 
@@ -707,7 +720,8 @@ runReport <- function(queryFilePath = 'testdata',
                   goAnalysis = goAnalysis,
                   msigdbAnalysis = msigdbAnalysis,
                   motifAnalysis = motifAnalysis,
-                  genomeVersion = genomeVersion)
+                  genomeVersion = genomeVersion,
+                  species = species)
     )
 }
 

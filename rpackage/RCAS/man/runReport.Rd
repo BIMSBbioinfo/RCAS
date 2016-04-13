@@ -7,7 +7,7 @@
 runReport(queryFilePath = "testdata", gffFilePath = "testdata",
   msigdbFilePath = "testdata", annotationSummary = TRUE,
   goAnalysis = TRUE, msigdbAnalysis = TRUE, motifAnalysis = TRUE,
-  genomeVersion = "hg19", species = "human", outDir = getwd())
+  genomeVersion = "hg19", outDir = getwd())
 }
 \arguments{
 \item{queryFilePath}{a BED format file which contains genomic coordinates of
@@ -33,7 +33,7 @@ should run motif analysis}
 
 \item{genomeVersion}{A character string to denote for which genome version
 the analysis is being done. Available options are hg19 (human), mm9
-(mouse), ce6 (worm) and dm3 (fly).}
+(mouse), ce10 (worm) and dm3 (fly).}
 }
 \value{
 An html generated using rmarkdown/knitr/pandoc that contains
@@ -63,18 +63,15 @@ runReport( queryFilePath = 'input.BED',
            goAnalysis = FALSE
            )
 # To run the pipeline for species other than human
-# First an MSIGDB dataset needs to be generated using the human dataset.
-mouseMSIGDB <- createOrthologousMsigdbDataset(refMsigdbFilePath = 'human_msigdb.gmt',
-                               refGenomeVersion = 'hg19',
-                               targetGenomeVersion = 'mm9')
-# print mouseMSIGDB to a file
-printMsigdbDataset(mouseMSIGDB, outputFilename = 'msigdb.mm9.gmt')
-# run the report
+# If the msigdb module is needed, the msigdbFilePath
+# must be set to the MSIGDB annotations for 'human'.
+# MSIGDB datasets for other species will be calculated
+# in the background using the createOrthologousMsigdbDataset
+# function
 runReport( queryFilePath = 'input.mm9.BED',
            gffFilePath = 'annotation.mm9.gtf',
-           msigdbFilePath = 'msigdb.mm9.gmt',
-           genomeVersion = 'mm9',
-           species = 'mouse' )
+           msigdbFilePath = 'msigdb.human.gmt',
+           genomeVersion = 'mm9' )
 
 }
 

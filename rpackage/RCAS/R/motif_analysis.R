@@ -53,14 +53,14 @@ createControlRegions <- function (queryRegions) {
 
 #' extractSequences
 #'
-#' Given a GRanges object and a genome version (hg19, mm9, ce6 or dm3), this
+#' Given a GRanges object and a genome version (hg19, mm9, ce10 or dm3), this
 #' function extracts the DNA sequences for all genomic regions found in an input
 #' object.
 #'
 #' @param queryRegions GRanges object containing coordinates of input query
 #'   regions imported by the \code{\link{importBed}} function
 #' @param genomeVersion A character string to denote the BS genome library
-#'   required to extract sequences. Available options are hg19, mm9, ce6 and
+#'   required to extract sequences. Available options are hg19, mm9, ce10 and
 #'   dm3.
 #'
 #' @return DNAStringSet object will be returned
@@ -77,13 +77,13 @@ extractSequences <- function (queryRegions, genomeVersion) {
     seqDb <- BSgenome.Hsapiens.UCSC.hg19::Hsapiens
   } else if(genomeVersion == 'mm9') {
     seqDb <- BSgenome.Mmusculus.UCSC.mm9::Mmusculus
-  } else if(genomeVersion == 'ce6') {
-    seqDb <- BSgenome.Celegans.UCSC.ce6::Celegans
+  } else if(genomeVersion == 'ce10') {
+    seqDb <- BSgenome.Celegans.UCSC.ce10::Celegans
   } else if(genomeVersion == 'dm3') {
     seqDb <- BSgenome.Dmelanogaster.UCSC.dm3::Dmelanogaster
   } else {
     stop ("Cannot extract fasta sequences from genome versions except:
-          hg19, mm9, ce6 and dm3\n")
+          hg19, mm9, ce10 and dm3\n")
   }
   style <- GenomeInfoDb::seqlevelsStyle(queryRegions)
   GenomeInfoDb::seqlevelsStyle(seqDb) <- style
@@ -101,7 +101,7 @@ extractSequences <- function (queryRegions, genomeVersion) {
 #' @param queryRegions GRanges object containing coordinates of input query
 #'   regions imported by the \code{\link{importBed}} function
 #' @param genomeVersion A character string to denote the BS genome library
-#'   required to extract sequences. Available options are hg19, mm9, ce6 and
+#'   required to extract sequences. Available options are hg19, mm9, ce10 and
 #'   dm3.
 #' @param motifN A positive integer (default:5) denoting the maximum number of
 #'   motifs that should be sought by the \code{motifRG::findMotifFgBg} function
