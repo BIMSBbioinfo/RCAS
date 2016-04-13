@@ -24,7 +24,7 @@ Description: RNA Centric Annotation System is an automated system that provides
     the Molecular Signatures Database that are enriched or depleted in the queried
     target regions. Results are corrected for multiple-testing according to both the
     False Discovery Rate and the Family-Wise Error Rate.
-License: What license is it under?
+License: Artistic-2.0
 LazyData: TRUE
 Depends: data.table,
     topGO,
