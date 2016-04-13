@@ -26,7 +26,8 @@ Description: RNA Centric Annotation System is an automated system that provides
     False Discovery Rate and the Family-Wise Error Rate.
 License: Artistic-2.0
 LazyData: TRUE
-Depends: data.table,
+Depends: R (>= 3.2.2), 
+    data.table,
     topGO,
     biomaRt,
     AnnotationDbi,
