@@ -212,7 +212,7 @@ table of genes that overlap query Regions.
 ```{r getTargetedGenesTable, warning=FALSE, message=FALSE}
 dt = getTargetedGenesTable(queryRegions = queryRegions, 
                            txdbFeatures = txdbFeatures)
-datatable(data = dt[order(transcripts, decreasing = T)][1:500], 
+datatable(data = dt[order(transcripts, decreasing = T)][1:50], 
           extensions = 'FixedColumns', 
           options = list(
             dom = 't',
@@ -273,9 +273,9 @@ RCAS uses motifRG library to find enriched motifs among the query regions.
 ```{r motif_analysis, warning=FALSE, message=FALSE}
 motifResults <- runMotifRG(queryRegions = queryRegions, 
                            genomeVersion = 'hg19', 
-                           motifN = 4)
+                           motifN = 2)
 
-par(mfrow = c(2,2), mar = c(2,2,2,2))
+par(mfrow = c(1,2), mar = c(2,2,2,2))
 for (i in 1:length(motifResults$motifs)) {
   motifPattern <- motifResults$motifs[[i]]@pattern
   motifRG::plotMotif(match = motifResults$motifs[[i]]@match$pattern, 
