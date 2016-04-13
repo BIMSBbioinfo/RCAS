@@ -20,7 +20,7 @@ test_that("Gene set enrichment analysis using MSIGDB gene sets", {
 test_that("Creating biomart connections for different genome versions",{
   expect_is(getBioMartConnection(genomeVersion = 'hg19'), 'Mart')
   expect_is(getBioMartConnection(genomeVersion = 'dm3'), 'Mart')
-  expect_is(getBioMartConnection(genomeVersion = 'ce6'), 'Mart')
+  expect_is(getBioMartConnection(genomeVersion = 'ce10'), 'Mart')
   expect_is(getBioMartConnection(genomeVersion = 'mm9'), 'Mart')
   expect_error(getBioMartConnection(genomeVersion = 'mm10'))
   expect_error(getBioMartConnection(genomeVersion = 'bar'))

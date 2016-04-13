@@ -29,9 +29,9 @@ mytable <- getTargetedGenesTable(queryRegions = queryRegions,
 test_that("Getting table of targeted genes", {
   expect_is(mytable, 'data.table')
   expect_equal(nrow(mytable), 2097)
-  expect_equal(ncol(mytable), 10)
+  expect_equal(ncol(mytable), 9)
   expect_match(colnames(mytable)[1], "tx_name")
-  expect_match(colnames(mytable)[10], "gene_name")
+  expect_match(colnames(mytable)[9], "threeUTRs")
 })
 
 summary <- summarizeQueryRegions(queryRegions = queryRegions,
