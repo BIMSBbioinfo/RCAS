@@ -12,7 +12,7 @@ overlaps <- queryGff(queryRegions = queryRegions, gff = gff)
 test_that("Testing queryGff function", {
   expect_is(overlaps, 'GRanges')
   expect_equal(length(overlaps), 12200)
-  expect_equal(length(colnames(mcols(overlaps))), 17)
+  expect_equal(length(colnames(GenomicRanges::mcols(overlaps))), 17)
 })
 
 
