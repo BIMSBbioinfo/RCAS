@@ -39,18 +39,18 @@ Imports: data.table,
     rtracklayer,
     org.Hs.eg.db,
     GenomicFeatures,
-    genomation
+    genomation,
+    rmarkdown,
+    plotly,
+    DT
 RoxygenNote: 5.0.1
 Suggests: knitr,
-    rmarkdown,
     BSgenome.Mmusculus.UCSC.mm9,
     BSgenome.Celegans.UCSC.ce6,
     BSgenome.Dmelanogaster.UCSC.dm3,
     org.Mm.eg.db,
     org.Ce.eg.db,
     org.Dm.eg.db,
-    plotly,
-    DT,
     testthat
 SystemRequirements: pandoc (>= 1.12.3)
 VignetteBuilder: knitr
