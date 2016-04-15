@@ -1,9 +1,0 @@
-#Temporary README file
-
-#To run a single job for a given input BED file:
-
-Rscript <RCAS_dir/src>/run.rcas.R --gff_file=/data/akalin/Base/Annotation/hg19/EnsemblGenes/142812_EnsemblFTP_hg19_EnsemblGenes.gtf --peak_file=<RCAS_dir>/test/TIA1.bed --genome_version=hg19
-
-#To run a parallel job on a given directory containing multiple BED files:
-
-Rscript <RCAS_dir/src>/run_rcas.parallel.R --gff_file=/data/akalin/Base/Annotation/hg19/EnsemblGenes/142812_EnsemblFTP_hg19_EnsemblGenes.gtf --genome_version=hg19 --bed_dir=<RCAS_dir>/test/
