@@ -46,7 +46,7 @@ createControlRegions <- function (queryRegions) {
   controlRegions$strand <- df$strand
 
   #convert to Granges object
-  controlRegions <- makeGRangesFromDataFrame(controlRegions)
+  controlRegions <- GenomicRanges::makeGRangesFromDataFrame(controlRegions)
 
   return(controlRegions)
 }
