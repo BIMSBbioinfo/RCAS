@@ -64,7 +64,7 @@ runTopGO <- function (ontology = 'BP',
                 geneSel = function (x){ return(x == 1) },
                 nodeSize = 20,
                 description = "Test",
-                annot = annFUN.org,
+                annot = topGO::annFUN.org(),
                 mapping = speciesOrgdb,
                 ID = "Ensembl")
 
