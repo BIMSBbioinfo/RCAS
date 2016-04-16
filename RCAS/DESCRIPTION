@@ -46,7 +46,7 @@ Imports: data.table,
 RoxygenNote: 5.0.1
 Suggests: knitr,
     BSgenome.Mmusculus.UCSC.mm9,
-    BSgenome.Celegans.UCSC.ce6,
+    BSgenome.Celegans.UCSC.ce10,
     BSgenome.Dmelanogaster.UCSC.dm3,
     org.Mm.eg.db,
     org.Ce.eg.db,
