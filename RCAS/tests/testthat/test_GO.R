@@ -1,5 +1,5 @@
 library(RCAS)
-library(topGO)
+suppressMessages(library(topGO))
 context("Functions to do GO term enrichment analysis")
 
 data(gff)
