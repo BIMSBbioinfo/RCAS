@@ -316,7 +316,7 @@ getTargetedGenesTable <- function (queryRegions, txdbFeatures) {
                                tx = txdbFeatures[[names(txdbFeatures)[i]]],
                                type = names(txdbFeatures)[i])})
 
-  tbls <- lapply(tbls, function(i) setkey(i, tx_name))
+  tbls <- lapply(tbls, function(i) data.table::setkey(i, tx_name))
   merged <- Reduce(function(...) merge(..., all = T), tbls)
   merged[is.na(merged)] <- 0
   return(merged)
