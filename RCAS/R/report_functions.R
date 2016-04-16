@@ -137,11 +137,11 @@ getTxdbFeatures <- function (txdb) {
   transcripts <- GenomicFeatures::transcripts(txdb)
 
   tmp <- GenomicFeatures::exonsBy(x = txdb, by = "tx", use.names = TRUE)
-  exons <- GenomicRanges::unlist(tmp)
+  exons <- BiocGenerics::unlist(tmp)
   exons$tx_name <- names(exons)
 
   tmp <- GenomicFeatures::intronsByTranscript(x = txdb, use.names = TRUE)
-  introns <- GenomicRanges::unlist(tmp)
+  introns <- BiocGenerics::unlist(tmp)
   introns$tx_name <- names(introns)
 
   tmp1 <- GenomicRanges::flank(x = introns[GenomicRanges::width(introns) > 99],
@@ -159,15 +159,15 @@ getTxdbFeatures <- function (txdb) {
   promoters$tx_name <- names(promoters)
 
   tmp <- GenomicFeatures::fiveUTRsByTranscript(x = txdb, use.names = TRUE)
-  fiveUTRs <- GenomicRanges::unlist(tmp)
+  fiveUTRs <- BiocGenerics::unlist(tmp)
   fiveUTRs$tx_name <- names(fiveUTRs)
 
   tmp <- GenomicFeatures::threeUTRsByTranscript(x = txdb, use.names = TRUE)
-  threeUTRs <- GenomicRanges::unlist(tmp)
+  threeUTRs <- BiocGenerics::unlist(tmp)
   threeUTRs$tx_name <- names(threeUTRs)
 
   tmp <- GenomicFeatures::cdsBy(x = txdb, by = "tx", use.names = TRUE)
-  cds <- GenomicRanges::unlist(tmp)
+  cds <- BiocGenerics::unlist(tmp)
   cds$tx_name <- names(cds)
 
   txdbFeatures <- list(
@@ -207,12 +207,12 @@ getTxdbFeaturesFromGff <- function (gff) {
   transcripts$gene_name <- gff[m]$gene_name
 
   tmp <- GenomicFeatures::exonsBy(x = txdb, by = "tx", use.names = TRUE)
-  exons <- GenomicRanges::unlist(tmp)
+  exons <- BiocGenerics::unlist(tmp)
   exons$tx_name <- names(exons)
   exons$gene_name <- gff[match(names(exons), gff$transcript_id)]$gene_name
 
   tmp <- GenomicFeatures::intronsByTranscript(x = txdb, use.names = TRUE)
-  introns <- GenomicRanges::unlist(tmp)
+  introns <- BiocGenerics::unlist(tmp)
   introns$tx_name <- names(introns)
   m <- match(names(introns), gff$transcript_id)
   introns$gene_name <- gff[m]$gene_name
@@ -228,19 +228,19 @@ getTxdbFeaturesFromGff <- function (gff) {
   promoters$gene_name <- gff[m]$gene_name
 
   tmp <- GenomicFeatures::fiveUTRsByTranscript(x = txdb, use.names = TRUE)
-  fiveUTRs <- GenomicRanges::unlist(tmp)
+  fiveUTRs <- BiocGenerics::unlist(tmp)
   fiveUTRs$tx_name <- names(fiveUTRs)
   m <- match(names(fiveUTRs), gff$transcript_id)
   fiveUTRs$gene_name <- gff[m]$gene_name
 
   tmp <- GenomicFeatures::threeUTRsByTranscript(x = txdb, use.names = TRUE)
-  threeUTRs <- GenomicRanges::unlist(tmp)
+  threeUTRs <- BiocGenerics::unlist(tmp)
   threeUTRs$tx_name <- names(threeUTRs)
   m <- match(names(threeUTRs), gff$transcript_id)
   threeUTRs$gene_name <- gff[m]$gene_name
 
   tmp <- GenomicFeatures::cdsBy(x = txdb, by = "tx", use.names = TRUE)
-  cds <- GenomicRanges::unlist(tmp)
+  cds <- BiocGenerics::unlist(tmp)
   cds$tx_name <- names(cds)
   cds$gene_name <- gff[match(names(cds), gff$transcript_id)]$gene_name
 
@@ -547,13 +547,13 @@ calculateCoverageProfileFromTxdb <- function (queryRegions,
     targetRegions <- GenomicFeatures::transcripts(txdb)
   } else if (type == 'exons') {
     tmp <- GenomicFeatures::exonsBy(x = txdb, by = "tx", use.names = TRUE)
-    targetRegions <- GenomicRanges::unlist(tmp)
+    targetRegions <- BiocGenerics::unlist(tmp)
   } else if (type == 'introns') {
     tmp <- GenomicFeatures::intronsByTranscript(x = txdb, use.names = TRUE)
-    targetRegions <- GenomicRanges::unlist(tmp)
+    targetRegions <- BiocGenerics::unlist(tmp)
   } else if (type == 'exonIntronBoundaries') {
     tmp <- GenomicFeatures::intronsByTranscript(x = txdb, use.names = TRUE)
-    introns <- GenomicRanges::unlist(tmp)
+    introns <- BiocGenerics::unlist(tmp)
     tmp1 <- GenomicRanges::flank(introns[GenomicRanges::width(introns) >= 100],
                                  width = 50,
                                  start = TRUE,
@@ -567,13 +567,13 @@ calculateCoverageProfileFromTxdb <- function (queryRegions,
     targetRegions <- GenomicFeatures::promoters(txdb)
   } else if (type == 'fiveUTRs') {
     tmp <- GenomicFeatures::fiveUTRsByTranscript(x = txdb, use.names = TRUE)
-    targetRegions <- GenomicRanges::unlist(tmp)
+    targetRegions <- BiocGenerics::unlist(tmp)
   } else if (type == 'threeUTRs') {
     tmp <- GenomicFeatures::threeUTRsByTranscript(x = txdb, use.names = TRUE)
-    targetRegions <- GenomicRanges::unlist()
+    targetRegions <- BiocGenerics::unlist()
   } else if (type == 'cds') {
     tmp <- GenomicFeatures::cdsBy(x = txdb, by = "tx", use.names = TRUE)
-    targetRegions <- GenomicRanges::unlist(tmp)
+    targetRegions <- BiocGenerics::unlist(tmp)
   } else {
     stop ("Can calculate coverage profiles for only:
           transcripts, exons, introns, exonIntronBoundaries,
