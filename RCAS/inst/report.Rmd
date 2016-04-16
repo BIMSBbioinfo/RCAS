@@ -30,6 +30,8 @@ goSummaryCC <- FALSE
 library(RCAS)
 library(plotly)
 library(DT)
+library(data.table)
+library(topGO)
 ```
 
 # Introduction
