@@ -110,13 +110,11 @@ extractSequences <- function (queryRegions, genomeVersion) {
 #'   parallel execution.
 #' @return a list of objects returned by the \code{motifRG::findMotif} function
 #' @examples
-#' \dontrun{
 #' data(queryRegions)
 #' motifResults <- runMotifRG(queryRegions = queryRegions,
 #'                            genomeVersion = 'hg19',
 #'                            motifN = 1,
 #'                            nCores = 2)
-#'                            }
 #' @export
 runMotifRG <- function (queryRegions, genomeVersion, motifN = 5, nCores = 4) {
 
