@@ -42,7 +42,9 @@ Imports: data.table,
     genomation,
     rmarkdown,
     plotly,
-    DT
+    DT,
+    BiocGenerics,
+    S4Vectors
 RoxygenNote: 5.0.1
 Suggests: knitr,
     BSgenome.Mmusculus.UCSC.mm9,
