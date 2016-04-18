@@ -56,4 +56,4 @@ Suggests: knitr,
     testthat
 SystemRequirements: pandoc (>= 1.12.3)
 VignetteBuilder: knitr
-biocViews: Software, Transcriptomics, GenomeAnnotation, GeneSetEnrichment, Coverage, MotifDiscovery
+biocViews: Software, GeneTarget, MotifAnnotation, GO, Transcriptomics, GenomeAnnotation, GeneSetEnrichment, Coverage
