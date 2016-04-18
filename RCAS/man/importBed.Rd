@@ -31,6 +31,5 @@ files
 \dontrun{
 importBed(filePath='./myfile.BED', keepStandardChr = TRUE)
 }
-
 }
 

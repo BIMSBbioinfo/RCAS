@@ -11,11 +11,14 @@
 \usage{
 gff
 }
+\value{
+A GRanges object
+}
 \description{
-This dataset contains genomic annotation data from Ensembl version 75 for Homo sapiens
-downloaded from Ensembl.
-The GFF file is imported via the \code{importGtf} function and a subset of the data
-is selected by choosing features found on 'chr1'.
+This dataset contains genomic annotation data from Ensembl version 75 for
+Homo sapiens downloaded from Ensembl. The GFF file is imported via the
+\code{importGtf} function and a subset of the data is selected by choosing
+features found on 'chr1'.
 }
 \keyword{datasets}
 

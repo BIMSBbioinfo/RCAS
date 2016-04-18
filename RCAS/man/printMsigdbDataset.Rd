@@ -14,10 +14,17 @@ printMsigdbDataset(dataset, outputFilename)
 
 \item{outputFilename}{A character string that denotes the output file name}
 }
+\value{
+A text file printed to the current directory
+}
 \description{
 Print MSIGDB Dataset to a file
 This function is used to print a MSIGDB dataset into a file. Mostly
 useful when human data is mapped to another species, and that mapping
 is required to run the report.
+}
+\examples{
+data(msigDB)
+printMsigdbDataset(msigDB, 'output.gmt')
 }
 

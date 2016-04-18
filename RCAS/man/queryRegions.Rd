@@ -11,11 +11,15 @@
 \usage{
 queryRegions
 }
+\value{
+A GRanges object
+}
 \description{
-This dataset contains a randomly selected sample of human LIN28A protein binding
-sites detected by HITS-CLIP analysis downloaded from DoRina database (LIN28A HITS-CLIP hESCs (Wilbert 2012)).
-The BED file is imported via the \code{importBed} function and a subset of the data
-is selected by randomly choosing 10000 regions.
+This dataset contains a randomly selected sample of human LIN28A protein
+binding sites detected by HITS-CLIP analysis downloaded from DoRina database
+(LIN28A HITS-CLIP hESCs (Wilbert 2012)). The BED file is imported via the
+\code{importBed} function and a subset of the data is selected by randomly
+choosing 10000 regions.
 }
 \keyword{datasets}
 

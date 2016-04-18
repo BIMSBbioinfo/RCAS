@@ -4,17 +4,21 @@
 \name{msigDB}
 \alias{msigDB}
 \title{MSIGDB gene sets}
-\format{A list of vectors, where each list element corresponds to a
-curated pathways gene set, where genes are represented by Entrez ids.}
+\format{A list of vectors, where each list element corresponds to a curated
+  pathways gene set, where genes are represented by Entrez ids.}
 \source{
 \url{http://software.broadinstitute.org/gsea/msigdb}
 }
 \usage{
 msigDB
 }
+\value{
+A list object
+}
 \description{
-This dataset contains curated sets of genes with Entrez ids from Molecular Signatures Database.
-The data is imported using the \code{parseMsigdb} function.
+This dataset contains curated sets of genes with Entrez ids from Molecular
+Signatures Database. The data is imported using the \code{parseMsigdb}
+function.
 }
 \keyword{datasets}
 
