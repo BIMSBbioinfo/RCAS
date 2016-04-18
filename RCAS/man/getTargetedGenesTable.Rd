@@ -34,10 +34,11 @@ featuresTable <- getTargetedGenesTable(queryRegions = queryRegions,
                                        txdbFeatures = txdbFeatures)
 
 #or
-
+\dontrun{
 txdb <- GenomicFeatures::makeTxDbFromGRanges(gff)
 txdbFeatures <- getTxdbFeatures(txdb)
 featuresTable <- getTargetedGenesTable(queryRegions = queryRegions,
                                        txdbFeatures = txdbFeatures)
+                                       }
 }
 

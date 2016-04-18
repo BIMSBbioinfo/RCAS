@@ -32,6 +32,6 @@ data(queryRegions)
 txdbFeatures <- getTxdbFeaturesFromGff(gff)
 df <- calculateCoverageProfile(queryRegions = queryRegions,
                               targetRegions = txdbFeatures$exons,
-                                    sampleN = 10000)
+                                    sampleN = 1000)
 }
 

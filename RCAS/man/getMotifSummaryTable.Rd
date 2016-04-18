@@ -22,7 +22,7 @@ data(queryRegions)
 motifResults <- runMotifRG(queryRegions = queryRegions,
                           genomeVersion = 'hg19',
                           motifN = 1,
-                          nCores = 1)
+                          nCores = 2)
 motifSummary <- getMotifSummaryTable(motifResults)
 
 }

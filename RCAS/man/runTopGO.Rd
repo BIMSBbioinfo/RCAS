@@ -32,6 +32,7 @@ A wrapper function to facilitate GO term enrichment analysis using
 \code{topGO} package
 }
 \examples{
+\dontrun{
 #get all genes from the gff data
 backgroundGenes <- unique(gff$gene_id)
 #get genes that overlap query regions
@@ -42,5 +43,6 @@ goResults = runTopGO( ontology = 'BP',
                       species = 'human',
                       backgroundGenes = backgroundGenes,
                       targetedGenes = targetedGenes)
+                      }
 }
 

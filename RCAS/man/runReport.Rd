@@ -52,7 +52,9 @@ terms, gene sets from MSIGDB, and motif analysis.
 }
 \examples{
 #Default run will generate a report using built-in test data for hg19 genome.
+\dontrun{
 runReport()
+}
 
 #A custom run for human
 \dontrun{
