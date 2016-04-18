@@ -129,7 +129,7 @@ overlaps.dt <- data.table(as.data.frame(overlaps))
 ### Finding targeted gene types
 To find out the distribution of the query regions across gene types:
 ```{r query_gene_types}
-biotype_col <- grep('biotype', colnames(overlaps.dt), value = T)
+biotype_col <- grep('biotype', colnames(overlaps.dt), value = TRUE)
 df <- overlaps.dt[,length(unique(overlappingQuery)), by = biotype_col]
 colnames(df) <- c("feature", "count")
 df$percent <- round(df$count / length(queryRegions) * 100, 1)
@@ -219,7 +219,7 @@ table of genes that overlap query Regions.
 ```{r getTargetedGenesTable}
 dt = getTargetedGenesTable(queryRegions = queryRegions, 
                            txdbFeatures = txdbFeatures)
-datatable(data = dt[order(transcripts, decreasing = T)][1:10], 
+datatable(data = dt[order(transcripts, decreasing = TRUE)][1:10], 
           extensions = 'FixedColumns', 
           options = list(
             dom = 't',
@@ -287,7 +287,7 @@ for (i in 1:length(motifResults$motifs)) {
   motifPattern <- motifResults$motifs[[i]]@pattern
   motifRG::plotMotif(match = motifResults$motifs[[i]]@match$pattern, 
                      main = paste0('Motif-',i,': ',motifPattern),
-                     entropy = T)
+                     entropy = TRUE)
 }
 ```
 
@@ -359,17 +359,17 @@ datatable(msigdbResults[1:10,],
 
 # Generating a full report 
 
-The users can use the runReport() function to generate full custom reports including all the analysis modules
-described above. There are four main parts of the analysis report.
-  
-  - Annotation summaries via overlap operations
-  - GO term analysis
-  - MSIGDB analysis 
-  - Motif analysis 
+The users can use the runReport() function to generate full custom reports
+including all the analysis modules described above. There are four main parts of
+the analysis report.
 
-By default, runReport() function aims to run all four modules, while the user can turn off these individual modules.
+- Annotation summaries via overlap operations - GO term analysis - MSIGDB
+analysis - Motif analysis
 
-Below are example commands to generate reports using these functionalities. 
+By default, runReport() function aims to run all four modules, while the user
+can turn off these individual modules.
+
+Below are example commands to generate reports using these functionalities.
 
 ## A test run for human
 

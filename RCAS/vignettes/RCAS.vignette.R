@@ -25,7 +25,7 @@ knitr::opts_chunk$set(warning = FALSE, message = FALSE, eval = FALSE)
 #  overlaps.dt <- data.table(as.data.frame(overlaps))
 
 ## ----query_gene_types----------------------------------------------------
-#  biotype_col <- grep('biotype', colnames(overlaps.dt), value = T)
+#  biotype_col <- grep('biotype', colnames(overlaps.dt), value = TRUE)
 #  df <- overlaps.dt[,length(unique(overlappingQuery)), by = biotype_col]
 #  colnames(df) <- c("feature", "count")
 #  df$percent <- round(df$count / length(queryRegions) * 100, 1)
@@ -88,7 +88,7 @@ knitr::opts_chunk$set(warning = FALSE, message = FALSE, eval = FALSE)
 ## ----getTargetedGenesTable-----------------------------------------------
 #  dt = getTargetedGenesTable(queryRegions = queryRegions,
 #                             txdbFeatures = txdbFeatures)
-#  datatable(data = dt[order(transcripts, decreasing = T)][1:10],
+#  datatable(data = dt[order(transcripts, decreasing = TRUE)][1:10],
 #            extensions = 'FixedColumns',
 #            options = list(
 #              dom = 't',
@@ -133,7 +133,7 @@ knitr::opts_chunk$set(warning = FALSE, message = FALSE, eval = FALSE)
 #    motifPattern <- motifResults$motifs[[i]]@pattern
 #    motifRG::plotMotif(match = motifResults$motifs[[i]]@match$pattern,
 #                       main = paste0('Motif-',i,': ',motifPattern),
-#                       entropy = T)
+#                       entropy = TRUE)
 #  }
 
 ## ----motif_analysis_table------------------------------------------------
