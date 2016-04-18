@@ -275,7 +275,7 @@ processHits <- function(queryRegions, tx, type) {
                                        sep=':')
   dt <- data.table::data.table('tx_name' = overlapsTX$tx_name,
                                'query' = overlapsTX$overlappingQuery)
-  summary <- dt[,length(unique(query)), by=tx_name]
+  summary <- dt[,length(unique(query)), by='tx_name']
   colnames(summary) <- c('tx_name', type)
   return(summary)
 }
@@ -304,11 +304,12 @@ processHits <- function(queryRegions, tx, type) {
 #'                                        txdbFeatures = txdbFeatures)
 #'
 #' #or
-#'
+#' \dontrun{
 #' txdb <- GenomicFeatures::makeTxDbFromGRanges(gff)
 #' txdbFeatures <- getTxdbFeatures(txdb)
 #' featuresTable <- getTargetedGenesTable(queryRegions = queryRegions,
 #'                                        txdbFeatures = txdbFeatures)
+#'                                        }
 #' @return A data.frame object where rows correspond to genes and columns
 #'   correspond to gene features
 #'
@@ -321,7 +322,7 @@ getTargetedGenesTable <- function (queryRegions, txdbFeatures) {
                                tx = txdbFeatures[[names(txdbFeatures)[i]]],
                                type = names(txdbFeatures)[i])})
 
-  tbls <- lapply(tbls, function(i) data.table::setkey(i, tx_name))
+  tbls <- lapply(tbls, function(i) data.table::setkey(i, 'tx_name'))
   merged <- Reduce(function(...) merge(..., all = T), tbls)
   merged[is.na(merged)] <- 0
   return(merged)
@@ -413,7 +414,7 @@ queryGff <- function(queryRegions, gff) {
 #' txdbFeatures <- getTxdbFeaturesFromGff(gff)
 #' df <- calculateCoverageProfile(queryRegions = queryRegions,
 #'                               targetRegions = txdbFeatures$exons,
-#'                                     sampleN = 10000)
+#'                                     sampleN = 1000)
 #' @export
 calculateCoverageProfile = function (queryRegions, targetRegions, sampleN = 0){
   #remove windows shorter than 100 bp
@@ -613,7 +614,9 @@ findLongLines <- function (myfile, lineLimit = 80) {
 #'   experiment
 #' @examples
 #' #Default run will generate a report using built-in test data for hg19 genome.
+#' \dontrun{
 #' runReport()
+#' }
 #'
 #' #A custom run for human
 #' \dontrun{
