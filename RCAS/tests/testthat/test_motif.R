@@ -22,7 +22,7 @@ test_that("Extracting sequences of a GRanges object from a BSGenome object", {
   expect_error(extractSequences(peaks[1:5], 'foo'))
 })
 
-motifs <- runMotifRG(queryRegions = queryRegions[1:1500], genomeVersion = 'hg19', motifN = 1, nCores = 2)
+motifs <- runMotifRG(queryRegions = queryRegions, genomeVersion = 'hg19', motifN = 1, nCores = 2)
 test_that("Motif analysis using motifRG package",{
   expect_is(motifs, 'list')
   expect_equal(length(motifs$motifs[[1]]@pattern), 1)
