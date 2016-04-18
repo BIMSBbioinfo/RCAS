@@ -58,7 +58,7 @@ runTopGO <- function (ontology = 'BP',
           human, worm, fly, and mouse\n")
   }
 
-  GOdata <- new("topGOdata",
+  GOdata <- methods::new("topGOdata",
                 ontology = ontology,
                 allGenes = allGenes,
                 geneSelectionFun = function (x){ return(x == 1) },
@@ -79,8 +79,8 @@ runTopGO <- function (ontology = 'BP',
   #some p-values have the "less than" sign ("<"),
   #which causes the numeric column to be interpreted as character.
   goResults$classicFisher <- gsub("<", "", goResults$classicFisher)
-  goResults$bonferroni <- p.adjust(goResults$classicFisher, method="bonferroni")
-  goResults$bh <- p.adjust(goResults$classicFisher, method="BH")
+  goResults$bonferroni <- stats::p.adjust(goResults$classicFisher, method="bonferroni")
+  goResults$bh <- stats::p.adjust(goResults$classicFisher, method="BH")
   return(goResults)
 }
 
@@ -277,7 +277,7 @@ calculateEnrichment <- function (targetedGenes, backgroundGenes, geneSet) {
   contingencyTable <- matrix(c(t, b, tSize - t, bSize - b), nrow = 2,
                              dimnames = list(c("treatment", "background"),
                                              c("found", "not_found")))
-  pval  <- fisher.test(contingencyTable, alternative = "greater")$p.value
+  pval  <- stats::fisher.test(contingencyTable, alternative = "greater")$p.value
 
   result <- data.frame('treatment' = t,
                        'treatmentSize' = tSize,
@@ -348,8 +348,8 @@ runMSIGDB <- function (msigDB,
                                          backgroundGenes=backgroundGenes,
                                          geneSet = x )})
   results <- do.call("rbind", results)
-  results$BH <- p.adjust(results$fisherPVal, method = "BH")
-  results$bonferroni <- p.adjust(results$fisherPVal, method = "bonferroni")
+  results$BH <- stats::p.adjust(results$fisherPVal, method = "BH")
+  results$bonferroni <- stats::p.adjust(results$fisherPVal, method = "bonferroni")
   return(results[order(results$fisherPVal),])
 }
 
