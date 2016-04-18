@@ -35,6 +35,5 @@ createOrthologousMsigdbDataset(refMsigdbFilePath = 'msigdb.entrez.txt',
                                refGenomeVersion = 'hg19',
                                targetGenomeVersion = 'mm9')
                                }
-
 }
 

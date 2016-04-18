@@ -48,5 +48,6 @@ importGtf(filePath='./Ensembl75.hg19.gtf', saveObjectAsRds = FALSE)
 \dontrun{
 importGtf(filePath='./Ensembl75.hg19.gtf', overwriteObjectAsRds = TRUE)
 }
+
 }
 

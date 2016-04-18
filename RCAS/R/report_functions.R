@@ -36,6 +36,10 @@
 #' \dontrun{
 #' importGtf(filePath='./Ensembl75.hg19.gtf', overwriteObjectAsRds = TRUE)
 #' }
+#'
+#' @importFrom rtracklayer import.gff
+#' @importFrom GenomeInfoDb seqlevelsStyle
+#' @importFrom GenomeInfoDb keepStandardChromosomes
 #' @export
 importGtf <- function (filePath,  saveObjectAsRds = TRUE, readFromRds = TRUE,
                        overwriteObjectAsRds = FALSE, keepStandardChr = TRUE) {
@@ -99,6 +103,10 @@ importGtf <- function (filePath,  saveObjectAsRds = TRUE, readFromRds = TRUE,
 #' @examples
 #' input <- system.file('testfile.bed', package='RCAS')
 #' importBed(filePath = input, keepStandardChr = TRUE)
+#'
+#' @importFrom rtracklayer import.bed
+#' @importFrom GenomeInfoDb seqlevelsStyle
+#' @importFrom GenomeInfoDb keepStandardChromosomes
 #' @export
 importBed <- function (filePath, sampleN = 0, keepStandardChr = TRUE) {
 
@@ -137,6 +145,10 @@ importBed <- function (filePath, sampleN = 0, keepStandardChr = TRUE) {
 #' txdbFeatures <- getTxdbFeatures(txdb)
 #'
 #' @return A list of GRanges objects
+#'
+#' @import GenomicFeatures
+#' @import GenomicRanges
+#' @importFrom BiocGenerics unlist
 #' @export
 getTxdbFeatures <- function (txdb) {
 
@@ -202,6 +214,10 @@ getTxdbFeatures <- function (txdb) {
 #' txdbFeatures <- getTxdbFeaturesFromGff(gff)
 #'
 #' @return A list of GRanges objects
+#'
+#' @import GenomicFeatures
+#' @import GenomicRanges
+#' @importFrom BiocGenerics unlist
 #' @export
 getTxdbFeaturesFromGff <- function (gff) {
 
@@ -263,6 +279,9 @@ getTxdbFeaturesFromGff <- function (gff) {
 }
 
 #' @importFrom data.table data.table
+#' @importFrom S4Vectors queryHits
+#' @importFrom S4Vectors subjectHits
+#' @import GenomicRanges
 processHits <- function(queryRegions, tx, type) {
   overlaps <- GenomicRanges::findOverlaps(queryRegions, tx)
   overlapsQuery <- queryRegions[S4Vectors::queryHits(overlaps)]
@@ -311,6 +330,9 @@ processHits <- function(queryRegions, tx, type) {
 #'                                        }
 #' @return A data.frame object where rows correspond to genes and columns
 #'   correspond to gene features
+#'
+#' @importFrom data.table setkey
+#' @importFrom S4Vectors Reduce
 #' @export
 getTargetedGenesTable <- function (queryRegions, txdbFeatures) {
 
@@ -321,7 +343,7 @@ getTargetedGenesTable <- function (queryRegions, txdbFeatures) {
                                type = names(txdbFeatures)[i])})
 
   tbls <- lapply(tbls, function(i) data.table::setkey(i, 'tx_name'))
-  merged <- Reduce(function(...) merge(..., all = TRUE), tbls)
+  merged <- S4Vectors::Reduce(function(...) merge(..., all = TRUE), tbls)
   merged[is.na(merged)] <- 0
   return(merged)
 }
@@ -344,6 +366,8 @@ getTargetedGenesTable <- function (queryRegions, txdbFeatures) {
 #' summary <- summarizeQueryRegions(queryRegions = queryRegions,
 #'                                  txdbFeatures = txdbFeatures)
 #'
+#' @import GenomicRanges
+#' @importFrom S4Vectors queryHits
 #' @export
 summarizeQueryRegions <- function(queryRegions, txdbFeatures) {
   summarize <- function (x) {
@@ -376,6 +400,9 @@ summarizeQueryRegions <- function(queryRegions, txdbFeatures) {
 #' data(gff)
 #' overlaps <- queryGff(queryRegions = queryRegions, gff = gff)
 #'
+#' @import GenomicRanges
+#' @importFrom S4Vectors queryHits
+#' @importFrom S4Vectors subjectHits
 #' @export
 queryGff <- function(queryRegions, gff) {
   #find all overlapping pairs of intervals between gff features and BED file
@@ -413,6 +440,9 @@ queryGff <- function(queryRegions, gff) {
 #' df <- calculateCoverageProfile(queryRegions = queryRegions,
 #'                               targetRegions = txdbFeatures$exons,
 #'                                     sampleN = 1000)
+#'
+#' @importFrom genomation ScoreMatrixBin
+#' @import GenomicRanges
 #' @export
 calculateCoverageProfile = function (queryRegions, targetRegions, sampleN = 0){
   #remove windows shorter than 100 bp
@@ -495,6 +525,7 @@ calculateCoverageProfileList <- function (queryRegions,
 #' df <- calculateCoverageProfileListFromTxdb(queryRegions = queryRegions,
 #'                                                    txdb = txdb,
 #'                                                 sampleN = 1000)
+#'
 #' @export
 calculateCoverageProfileListFromTxdb <- function (queryRegions,
                                                   txdb,
@@ -534,6 +565,9 @@ calculateCoverageProfileListFromTxdb <- function (queryRegions,
 #'                                                type = 'exons',
 #'                                                txdb = txdb,
 #'                                             sampleN = 1000)
+#' @import GenomicFeatures
+#' @import GenomicRanges
+#' @importFrom BiocGenerics unlist
 #' @export
 calculateCoverageProfileFromTxdb <- function (queryRegions,
                                               txdb,
@@ -651,23 +685,6 @@ findLongLines <- function (myfile, lineLimit = 80) {
 #'            genomeVersion = 'mm9' )
 #'            }
 #' @import rmarkdown
-#' @import data.table
-#' @import topGO
-#' @import biomaRt
-#' @import AnnotationDbi
-#' @import GenomicRanges
-#' @import BSgenome.Hsapiens.UCSC.hg19
-#' @import GenomeInfoDb
-#' @import Biostrings
-#' @import motifRG
-#' @import rtracklayer
-#' @import org.Hs.eg.db
-#' @import GenomicFeatures
-#' @import genomation
-#' @import plotly
-#' @import DT
-#' @import BiocGenerics
-#' @import S4Vectors
 #' @export
 runReport <- function(queryFilePath = 'testdata',
                       gffFilePath = 'testdata',

@@ -35,6 +35,5 @@ genes <- c('2645','5232', '5230','5162','5160')
 orthologs <- retrieveOrthologs( mart1 = mart1_hg19,
                                 mart2 = mart2_mm9,
                                 geneSet = genes)
-
 }
 

@@ -12,6 +12,7 @@
 #' data(queryRegions)
 #' controlRegions <- createControlRegions(queryRegions = queryRegions)
 #'
+#' @import GenomicRanges
 #' @export
 createControlRegions <- function (queryRegions) {
 
@@ -70,7 +71,9 @@ createControlRegions <- function (queryRegions) {
 #' data(queryRegions)
 #' sequences <- extractSequences(queryRegions = queryRegions,
 #'                              genomeVersion = 'hg19')
-#'
+#' @importFrom BSgenome.Hsapiens.UCSC.hg19 Hsapiens
+#' @importFrom GenomeInfoDb seqlevelsStyle
+#' @importFrom Biostrings getSeq
 #' @export
 extractSequences <- function (queryRegions, genomeVersion) {
 
@@ -115,6 +118,7 @@ extractSequences <- function (queryRegions, genomeVersion) {
 #'                            genomeVersion = 'hg19',
 #'                            motifN = 1,
 #'                            nCores = 2)
+#' @import motifRG
 #' @export
 runMotifRG <- function (queryRegions, genomeVersion, motifN = 5, nCores = 4) {
 

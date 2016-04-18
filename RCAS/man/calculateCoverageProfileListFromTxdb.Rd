@@ -34,5 +34,6 @@ txdb <- GenomicFeatures::makeTxDbFromGRanges(gff)
 df <- calculateCoverageProfileListFromTxdb(queryRegions = queryRegions,
                                                    txdb = txdb,
                                                 sampleN = 1000)
+
 }
 

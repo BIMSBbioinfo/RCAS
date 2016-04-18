@@ -26,5 +26,6 @@ is required to run the report.
 \examples{
 data(msigDB)
 printMsigdbDataset(msigDB, 'output.gmt')
+
 }
 

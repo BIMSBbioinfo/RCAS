@@ -34,6 +34,13 @@
 #'                       backgroundGenes = backgroundGenes,
 #'                       targetedGenes = targetedGenes)
 #'                       }
+#' @import org.Hs.eg.db
+#' @importFrom topGO runTest
+#' @importFrom topGO GenTable
+#' @importFrom topGO usedGO
+#' @importFrom topGO annFUN.org
+#' @importFrom stats p.adjust
+#' @importFrom stats fisher.test
 #' @export
 runTopGO <- function (ontology = 'BP',
                       species = 'human',
@@ -129,6 +136,7 @@ parseMsigdb <- function(filePath){
 #' @examples
 #' data(msigDB)
 #' printMsigdbDataset(msigDB, 'output.gmt')
+#'
 #' @export
 printMsigdbDataset = function(dataset, outputFilename){
   if (file.exists(outputFilename)){
@@ -169,7 +177,7 @@ printMsigdbDataset = function(dataset, outputFilename){
 #' orthologs <- retrieveOrthologs( mart1 = mart1_hg19,
 #'                                 mart2 = mart2_mm9,
 #'                                 geneSet = genes)
-#'
+#' @importFrom biomaRt getLDS
 #' @export
 retrieveOrthologs <- function(mart1, mart2, geneSet){
   biomaRt::getLDS( attributes = c("entrezgene"),
@@ -180,6 +188,7 @@ retrieveOrthologs <- function(mart1, mart2, geneSet){
                    martL = mart2)
 }
 
+#' @importFrom biomaRt useMart
 getBioMartConnection <- function (genomeVersion) {
   if (genomeVersion == 'hg19') {
     mart <- biomaRt::useMart( biomart = 'ENSEMBL_MART_ENSEMBL',
@@ -229,7 +238,6 @@ getBioMartConnection <- function (genomeVersion) {
 #'                                refGenomeVersion = 'hg19',
 #'                                targetGenomeVersion = 'mm9')
 #'                                }
-#'
 #' @export
 createOrthologousMsigdbDataset <- function(refMsigdbFilePath,
                                            refGenomeVersion = 'hg19',
@@ -271,6 +279,7 @@ createOrthologousMsigdbDataset <- function(refMsigdbFilePath,
   return(orthMsigdbDataset)
 }
 
+#' @importFrom stats fisher.test
 calculateEnrichment <- function (targetedGenes, backgroundGenes, geneSet) {
 
   #we need to know the number of all genes in the compared sets
@@ -333,6 +342,9 @@ calculateEnrichment <- function (targetedGenes, backgroundGenes, geneSet) {
 #'           species = 'human',
 #'           backgroundGenes = backgroundGenes,
 #'           targetedGenes = targetedGenes)
+#' @importFrom org.Hs.eg.db org.Hs.egENSEMBL2EG
+#' @importFrom AnnotationDbi as.list
+#' @importFrom stats p.adjust
 #' @export
 runMSIGDB <- function (msigDB,
                        species = 'human',

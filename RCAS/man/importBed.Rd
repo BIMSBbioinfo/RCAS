@@ -30,5 +30,6 @@ files
 \examples{
 input <- system.file('testfile.bed', package='RCAS')
 importBed(filePath = input, keepStandardChr = TRUE)
+
 }
 
