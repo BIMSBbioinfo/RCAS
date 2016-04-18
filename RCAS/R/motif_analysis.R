@@ -9,8 +9,8 @@
 #' @return GRanges object that contains the same number of regions as query
 #'   regions
 #' @examples
-#' bed <- importBed('input.bed')
-#' controlRegions <- createControlRegions(queryRegions=bed)
+#' data(queryRegions)
+#' controlRegions <- createControlRegions(queryRegions = queryRegions)
 #'
 #' @export
 createControlRegions <- function (queryRegions) {
@@ -67,8 +67,9 @@ createControlRegions <- function (queryRegions) {
 #'
 #' @examples
 #'
-#' bed <- importBed('input.bed')
-#' sequences <- extractSequences(queryRegions=bed, genomeVersion='hg19')
+#' data(queryRegions)
+#' sequences <- extractSequences(queryRegions = queryRegions,
+#'                              genomeVersion = 'hg19')
 #'
 #' @export
 extractSequences <- function (queryRegions, genomeVersion) {
@@ -108,8 +109,9 @@ extractSequences <- function (queryRegions, genomeVersion) {
 #'
 #' @return a list of objects returned by the \code{motifRG::findMotif} function
 #' @examples
-#' bed <- importBed('input.bed')
-#' motifResults <- runMotifRG(queryRegions=bed, genomeVersion='hg19')
+#' data(queryRegions)
+#' motifResults <- runMotifRG(queryRegions = queryRegions,
+#'                            genomeVersion = 'hg19', motifN = 1)
 #' @export
 runMotifRG <- function (queryRegions, genomeVersion, motifN = 5) {
 
@@ -139,8 +141,9 @@ runMotifRG <- function (queryRegions, genomeVersion, motifN = 5) {
 #'   discovered motifs
 #' @examples
 #'
-#' bed <- importBed('input.bed')
-#' motifResults <- runMotifRG(queryRegions=bed, genomeVersion='hg19')
+#' data(queryRegions)
+#' motifResults <- runMotifRG(queryRegions = queryRegions,
+#'                           genomeVersion = 'hg19', motifN = 1)
 #' motifSummary <- getMotifSummaryTable(motifResults)
 #'
 #' @export
