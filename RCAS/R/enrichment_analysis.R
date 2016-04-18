@@ -81,7 +81,8 @@ runTopGO <- function (ontology = 'BP',
   #some p-values have the "less than" sign ("<"),
   #which causes the numeric column to be interpreted as character.
   goResults$classicFisher <- gsub("<", "", goResults$classicFisher)
-  goResults$bonferroni <- stats::p.adjust(goResults$classicFisher, method="bonferroni")
+  goResults$bonferroni <- stats::p.adjust(p = goResults$classicFisher,
+                                          method = "bonferroni")
   goResults$bh <- stats::p.adjust(goResults$classicFisher, method="BH")
   return(goResults)
 }
@@ -125,6 +126,10 @@ parseMsigdb <- function(filePath){
 #' is required to run the report.
 #' @param dataset A list of vectors containing gene sets from MSIGDB
 #' @param outputFilename A character string that denotes the output file name
+#' @return A text file printed to the current directory
+#' @examples
+#' data(msigDB)
+#' printMsigdbDataset(msigDB, 'output.gmt')
 #' @export
 printMsigdbDataset = function(dataset, outputFilename){
   if (file.exists(outputFilename)){
@@ -358,7 +363,8 @@ runMSIGDB <- function (msigDB,
                                          geneSet = x )})
   results <- do.call("rbind", results)
   results$BH <- stats::p.adjust(results$fisherPVal, method = "BH")
-  results$bonferroni <- stats::p.adjust(results$fisherPVal, method = "bonferroni")
+  results$bonferroni <- stats::p.adjust(p = results$fisherPVal,
+                                        method = "bonferroni")
   return(results[order(results$fisherPVal),])
 }
 
