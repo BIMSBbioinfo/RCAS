@@ -97,9 +97,8 @@ importGtf <- function (filePath,  saveObjectAsRds = TRUE, readFromRds = TRUE,
 #'   from an input BED file
 #'
 #' @examples
-#' \dontrun{
-#' importBed(filePath='./myfile.BED', keepStandardChr = TRUE)
-#' }
+#' input <- system.file('testfile.bed', package='RCAS')
+#' importBed(filePath = input, keepStandardChr = TRUE)
 #' @export
 importBed <- function (filePath, sampleN = 0, keepStandardChr = TRUE) {
 
@@ -263,6 +262,7 @@ getTxdbFeaturesFromGff <- function (gff) {
   return(txdbFeatures)
 }
 
+#' @importFrom data.table data.table
 processHits <- function(queryRegions, tx, type) {
   overlaps <- GenomicRanges::findOverlaps(queryRegions, tx)
   overlapsQuery <- queryRegions[S4Vectors::queryHits(overlaps)]
