@@ -100,7 +100,6 @@ importGtf <- function (filePath,  saveObjectAsRds = TRUE, readFromRds = TRUE,
 #' \dontrun{
 #' importBed(filePath='./myfile.BED', keepStandardChr = TRUE)
 #' }
-#'
 #' @export
 importBed <- function (filePath, sampleN = 0, keepStandardChr = TRUE) {
 
@@ -312,7 +311,6 @@ processHits <- function(queryRegions, tx, type) {
 #'                                        }
 #' @return A data.frame object where rows correspond to genes and columns
 #'   correspond to gene features
-#'
 #' @export
 getTargetedGenesTable <- function (queryRegions, txdbFeatures) {
 
@@ -323,7 +321,7 @@ getTargetedGenesTable <- function (queryRegions, txdbFeatures) {
                                type = names(txdbFeatures)[i])})
 
   tbls <- lapply(tbls, function(i) data.table::setkey(i, 'tx_name'))
-  merged <- Reduce(function(...) merge(..., all = T), tbls)
+  merged <- Reduce(function(...) merge(..., all = TRUE), tbls)
   merged[is.na(merged)] <- 0
   return(merged)
 }
@@ -528,6 +526,14 @@ calculateCoverageProfileListFromTxdb <- function (queryRegions,
 #'   bins. The target regions are divided into 100 equal sized bins and coverage
 #'   level is summarized in a strand-specific manner using the
 #'   \code{genomation::ScoreMatrixBin} function.
+#' @examples
+#' data(gff)
+#' data(queryRegions)
+#' txdb <- GenomicFeatures::makeTxDbFromGRanges(gff)
+#' df <- calculateCoverageProfileFromTxdb(queryRegions = queryRegions,
+#'                                                type = 'exons',
+#'                                                txdb = txdb,
+#'                                             sampleN = 1000)
 #' @export
 calculateCoverageProfileFromTxdb <- function (queryRegions,
                                               txdb,
@@ -644,6 +650,24 @@ findLongLines <- function (myfile, lineLimit = 80) {
 #'            msigdbFilePath = 'msigdb.human.gmt',
 #'            genomeVersion = 'mm9' )
 #'            }
+#' @import rmarkdown
+#' @import data.table
+#' @import topGO
+#' @import biomaRt
+#' @import AnnotationDbi
+#' @import GenomicRanges
+#' @import BSgenome.Hsapiens.UCSC.hg19
+#' @import GenomeInfoDb
+#' @import Biostrings
+#' @import motifRG
+#' @import rtracklayer
+#' @import org.Hs.eg.db
+#' @import GenomicFeatures
+#' @import genomation
+#' @import plotly
+#' @import DT
+#' @import BiocGenerics
+#' @import S4Vectors
 #' @export
 runReport <- function(queryFilePath = 'testdata',
                       gffFilePath = 'testdata',
