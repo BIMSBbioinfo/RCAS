@@ -22,6 +22,7 @@
 #'   statistics
 #'
 #' @examples
+#' \dontrun{
 #' #get all genes from the gff data
 #' backgroundGenes <- unique(gff$gene_id)
 #' #get genes that overlap query regions
@@ -32,6 +33,7 @@
 #'                       species = 'human',
 #'                       backgroundGenes = backgroundGenes,
 #'                       targetedGenes = targetedGenes)
+#'                       }
 #' @export
 runTopGO <- function (ontology = 'BP',
                       species = 'human',
@@ -58,7 +60,7 @@ runTopGO <- function (ontology = 'BP',
           human, worm, fly, and mouse\n")
   }
 
-  GOdata <- methods::new("topGOdata",
+  GOdata <- new("topGOdata",
                 ontology = ontology,
                 allGenes = allGenes,
                 geneSelectionFun = function (x){ return(x == 1) },
@@ -334,13 +336,13 @@ runMSIGDB <- function (msigDB,
                        targetedGenes) {
   #map ENSEMBL gene ids to Entrez Gene Ids
   if (species == 'human'){
-    mappingDict <- org.Hs.egENSEMBL2EG
+    mappingDict <- org.Hs.eg.db::org.Hs.egENSEMBL2EG
   }else if (species == 'mouse'){
-    mappingDict <- org.Mm.egENSEMBL2EG
+    mappingDict <- org.Mm.eg.db::org.Mm.egENSEMBL2EG
   }else if (species == 'fly'){
-    mappingDict <- org.Dm.egENSEMBL2EG
+    mappingDict <- org.Dm.eg.db::org.Dm.egENSEMBL2EG
   }else if (species == 'worm'){
-    mappingDict <- org.Ce.egENSEMBL2EG
+    mappingDict <- org.Ce.eg.db::org.Ce.egENSEMBL2EG
   }
   #mapping dictionary from ENSEMBL to ENTREZ
   ens2eg <- AnnotationDbi::as.list(mappingDict)
