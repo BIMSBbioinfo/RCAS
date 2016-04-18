@@ -106,14 +106,17 @@ extractSequences <- function (queryRegions, genomeVersion) {
 #'   dm3.
 #' @param motifN A positive integer (default:5) denoting the maximum number of
 #'   motifs that should be sought by the \code{motifRG::findMotifFgBg} function
-#'
+#' @param nCores A positive integer (default:4) number of cores used for
+#'   parallel execution.
 #' @return a list of objects returned by the \code{motifRG::findMotif} function
 #' @examples
 #' data(queryRegions)
 #' motifResults <- runMotifRG(queryRegions = queryRegions,
-#'                            genomeVersion = 'hg19', motifN = 1)
+#'                            genomeVersion = 'hg19',
+#'                            motifN = 1,
+#'                            nCores = 1)
 #' @export
-runMotifRG <- function (queryRegions, genomeVersion, motifN = 5) {
+runMotifRG <- function (queryRegions, genomeVersion, motifN = 5, nCores = 4) {
 
   controlRegions <- createControlRegions(queryRegions)
 
@@ -128,7 +131,8 @@ runMotifRG <- function (queryRegions, genomeVersion, motifN = 5) {
                                          bg.seq = controlSeqs,
                                          enriched.only = T,
                                          max.motif = motifN,
-                                         both.strand = FALSE)
+                                         both.strand = FALSE,
+                                         mc.cores = nCores)
   return(motifResults)
 }
 
@@ -143,7 +147,9 @@ runMotifRG <- function (queryRegions, genomeVersion, motifN = 5) {
 #'
 #' data(queryRegions)
 #' motifResults <- runMotifRG(queryRegions = queryRegions,
-#'                           genomeVersion = 'hg19', motifN = 1)
+#'                           genomeVersion = 'hg19',
+#'                           motifN = 1,
+#'                           nCores = 1)
 #' motifSummary <- getMotifSummaryTable(motifResults)
 #'
 #' @export

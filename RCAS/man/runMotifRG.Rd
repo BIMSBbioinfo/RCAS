@@ -4,7 +4,7 @@
 \alias{runMotifRG}
 \title{runMotifRG}
 \usage{
-runMotifRG(queryRegions, genomeVersion, motifN = 5)
+runMotifRG(queryRegions, genomeVersion, motifN = 5, nCores = 4)
 }
 \arguments{
 \item{queryRegions}{GRanges object containing coordinates of input query
@@ -16,6 +16,9 @@ dm3.}
 
 \item{motifN}{A positive integer (default:5) denoting the maximum number of
 motifs that should be sought by the \code{motifRG::findMotifFgBg} function}
+
+\item{nCores}{A positive integer (default:4) number of cores used for
+parallel execution.}
 }
 \value{
 a list of objects returned by the \code{motifRG::findMotif} function
@@ -27,6 +30,8 @@ discovery from input query regions
 \examples{
 data(queryRegions)
 motifResults <- runMotifRG(queryRegions = queryRegions,
-                           genomeVersion = 'hg19', motifN = 1)
+                           genomeVersion = 'hg19',
+                           motifN = 1,
+                           nCores = 1)
 }
 
