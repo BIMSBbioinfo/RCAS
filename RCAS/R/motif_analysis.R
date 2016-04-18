@@ -15,8 +15,8 @@
 #' @export
 createControlRegions <- function (queryRegions) {
 
-  upFlank <- GenomicRanges::flank(queryRegions, start=TRUE, width=200)
-  downFlank <- GenomicRanges::flank(queryRegions, start=FALSE, width=200)
+  upFlank <- GenomicRanges::flank(queryRegions, start = TRUE, width=200)
+  downFlank <- GenomicRanges::flank(queryRegions, start = FALSE, width=200)
 
   #randomly select up or downstream flanking regions
   s <- sample(c(0:1), length(queryRegions), replace = TRUE)
@@ -131,7 +131,7 @@ runMotifRG <- function (queryRegions, genomeVersion, motifN = 5, nCores = 4) {
   cat('running motifRG...\n')
   motifResults <- motifRG::findMotifFgBg(fg.seq = querySeqs,
                                          bg.seq = controlSeqs,
-                                         enriched.only = T,
+                                         enriched.only = TRUE,
                                          max.motif = motifN,
                                          both.strand = FALSE,
                                          mc.cores = nCores)
