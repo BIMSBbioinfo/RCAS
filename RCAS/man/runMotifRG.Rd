@@ -28,12 +28,10 @@ This function makes use of \code{motifRG} library to carry out de novo motif
 discovery from input query regions
 }
 \examples{
-\dontrun{
 data(queryRegions)
 motifResults <- runMotifRG(queryRegions = queryRegions,
                            genomeVersion = 'hg19',
                            motifN = 1,
                            nCores = 2)
-                           }
 }
 

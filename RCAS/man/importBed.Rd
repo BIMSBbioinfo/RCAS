@@ -28,8 +28,7 @@ This function uses \code{rtracklayer::import.bed()} function to import BED
 files
 }
 \examples{
-\dontrun{
-importBed(filePath='./myfile.BED', keepStandardChr = TRUE)
-}
+input <- system.file('testfile.bed', package='RCAS')
+importBed(filePath = input, keepStandardChr = TRUE)
 }
 
