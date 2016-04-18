@@ -73,7 +73,7 @@ runTopGO <- function (ontology = 'BP',
                                  statistic = "fisher")
   goResults <- topGO::GenTable(object = GOdata,
                                classicFisher = resultFisher,
-                               topNodes = length(usedGO(GOdata)))
+                               topNodes = length(topGO::usedGO(GOdata)))
 
   #Do multiple-testing correction
   #some p-values have the "less than" sign ("<"),
@@ -99,7 +99,9 @@ runTopGO <- function (ontology = 'BP',
 #' #First Download gene sets (with Entrez Ids) from MSIGDB database
 #' #from \url{http://software.broadinstitute.org/gsea/msigdb/collections.jsp#C2}
 #'
-#' msigDB <- parseMsigdb (<path to downloaded file>)
+#' \dontrun{
+#' msigDB <- parseMsigdb (filePath = 'c2.cp.v5.0.entrez.gmt')
+#' }
 #'
 #' @export
 parseMsigdb <- function(filePath){
@@ -119,6 +121,8 @@ parseMsigdb <- function(filePath){
 #' This function is used to print a MSIGDB dataset into a file. Mostly
 #' useful when human data is mapped to another species, and that mapping
 #' is required to run the report.
+#' @param dataset A list of vectors containing gene sets from MSIGDB
+#' @param outputFilename A character string that denotes the output file name
 #' @export
 printMsigdbDataset = function(dataset, outputFilename){
   if (file.exists(outputFilename)){
@@ -214,9 +218,11 @@ getBioMartConnection <- function (genomeVersion) {
 #' #from \url{http://software.broadinstitute.org/gsea/msigdb/collections.jsp#C2}
 #'
 #' #Map the gene sets to a target genome (supported genomes: mm9, dm3, or ce10)
+#' \dontrun{
 #' createOrthologousMsigdbDataset(refMsigdbFilePath = 'msigdb.entrez.txt',
 #'                                refGenomeVersion = 'hg19',
 #'                                targetGenomeVersion = 'mm9')
+#'                                }
 #'
 #' @export
 createOrthologousMsigdbDataset <- function(refMsigdbFilePath,
@@ -311,6 +317,7 @@ calculateEnrichment <- function (targetedGenes, backgroundGenes, geneSet) {
 #' #load test data
 #' data(msigDB)
 #' data(gff)
+#' data(queryRegions)
 #' #get all genes from the gff data
 #' backgroundGenes <- unique(gff$gene_id)
 #' #get genes that overlap query regions
@@ -318,7 +325,7 @@ calculateEnrichment <- function (targetedGenes, backgroundGenes, geneSet) {
 #' targetedGenes <- unique(overlaps$gene_id)
 #' runMSIGDB(msigDB = msigDB,
 #'           species = 'human',
-#'           backgroundGenes = backgroundGenes
+#'           backgroundGenes = backgroundGenes,
 #'           targetedGenes = targetedGenes)
 #' @export
 runMSIGDB <- function (msigDB,
