@@ -22,7 +22,7 @@ Database (MSIGDB)
 #First Download gene sets (with Entrez Ids) from MSIGDB database
 #from \\url{http://software.broadinstitute.org/gsea/msigdb/collections.jsp#C2}
 
-msigDB <- parseMsigdb (<path to downloaded file>)
+msigDB <- parseMsigdb (filePath = 'c2.cp.v5.0.entrez.gmt')
 
 }
 

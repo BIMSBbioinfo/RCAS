@@ -9,6 +9,11 @@ is required to run the report.}
 \usage{
 printMsigdbDataset(dataset, outputFilename)
 }
+\arguments{
+\item{dataset}{A list of vectors containing gene sets from MSIGDB}
+
+\item{outputFilename}{A character string that denotes the output file name}
+}
 \description{
 Print MSIGDB Dataset to a file
 This function is used to print a MSIGDB dataset into a file. Mostly

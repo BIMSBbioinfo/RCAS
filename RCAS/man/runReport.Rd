@@ -34,6 +34,9 @@ should run motif analysis}
 \item{genomeVersion}{A character string to denote for which genome version
 the analysis is being done. Available options are hg19 (human), mm9
 (mouse), ce10 (worm) and dm3 (fly).}
+
+\item{outDir}{Path to the output directory. (default: current working
+directory)}
 }
 \value{
 An html generated using rmarkdown/knitr/pandoc that contains

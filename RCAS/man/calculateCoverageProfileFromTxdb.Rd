@@ -31,7 +31,4 @@ This function overlaps the input query regions with a target list of
 annotation features and calculates the coverage profile along the target
 regions.
 }
-\examples{
-
-}
 

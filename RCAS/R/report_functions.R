@@ -25,11 +25,17 @@
 #'
 #' @examples
 #' #import the data and write it into a .rds file
+#' \dontrun{
 #' importGtf(filePath='./Ensembl75.hg19.gtf')
+#' }
 #' #import the data but don't save it as RDS
+#' \dontrun{
 #' importGtf(filePath='./Ensembl75.hg19.gtf', saveObjectAsRds = FALSE)
+#' }
 #' #import the data and overwrite the previously generated
+#' \dontrun{
 #' importGtf(filePath='./Ensembl75.hg19.gtf', overwriteObjectAsRds = TRUE)
+#' }
 #' @export
 importGtf <- function (filePath,  saveObjectAsRds = TRUE, readFromRds = TRUE,
                        overwriteObjectAsRds = FALSE, keepStandardChr = TRUE) {
@@ -91,7 +97,9 @@ importGtf <- function (filePath,  saveObjectAsRds = TRUE, readFromRds = TRUE,
 #'   from an input BED file
 #'
 #' @examples
+#' \dontrun{
 #' importBed(filePath='./myfile.BED', keepStandardChr = TRUE)
+#' }
 #'
 #' @export
 importBed <- function (filePath, sampleN = 0, keepStandardChr = TRUE) {
@@ -126,8 +134,8 @@ importBed <- function (filePath, sampleN = 0, keepStandardChr = TRUE) {
 #'   functions
 #'
 #' @examples
-#'
-#' txdb <- GenomicFeatures::makeTxDbFromGFF(file='annotation.gtf', format='gtf')
+#' data(gff)
+#' txdb <- GenomicFeatures::makeTxDbFromGRanges(gff)
 #' txdbFeatures <- getTxdbFeatures(txdb)
 #'
 #' @return A list of GRanges objects
@@ -156,7 +164,6 @@ getTxdbFeatures <- function (txdb) {
   exonIntronBoundaries$tx_name <- names(exonIntronBoundaries)
 
   promoters <- GenomicFeatures::promoters(txdb)
-  promoters$tx_name <- names(promoters)
 
   tmp <- GenomicFeatures::fiveUTRsByTranscript(x = txdb, use.names = TRUE)
   fiveUTRs <- BiocGenerics::unlist(tmp)
@@ -193,7 +200,7 @@ getTxdbFeatures <- function (txdb) {
 #' @param gff A GRanges object imported by \code{importGtf} function
 #'
 #' @examples
-#' gff <- importGtf(file='annotation.gtf')
+#' data(gff)
 #' txdbFeatures <- getTxdbFeaturesFromGff(gff)
 #'
 #' @return A list of GRanges objects
@@ -290,20 +297,18 @@ processHits <- function(queryRegions, tx, type) {
 #'   \code{\link{getTxdbFeaturesFromGff}} or \code{\link{getTxdbFeatures}}.
 #'
 #' @examples
-#' gff <- importGtf(filePath = 'annotation.gtf')
-#' bed <- importBed(filePath = 'input.bed')
+#' data(gff)
+#' data(queryRegions)
 #' txdbFeatures <- getTxdbFeaturesFromGff(gff)
-#' featuresTable <- getTargetedGenesTable(queryRegions = bed,
+#' featuresTable <- getTargetedGenesTable(queryRegions = queryRegions,
 #'                                        txdbFeatures = txdbFeatures)
 #'
-#' or
+#' #or
 #'
-#' bed <- importBed(filePath = 'input.bed')
-#' txdb <- GenomicFeatures::makeTxDbFromGFF(file = 'annotation.gtf',
-#'                                        format = 'gtf')
+#' txdb <- GenomicFeatures::makeTxDbFromGRanges(gff)
 #' txdbFeatures <- getTxdbFeatures(txdb)
-#' featuresTable <- getTargetedGenesTable(queryRegions=bed,
-#'                                        txdbFeatures=txdbFeatures)
+#' featuresTable <- getTargetedGenesTable(queryRegions = queryRegions,
+#'                                        txdbFeatures = txdbFeatures)
 #' @return A data.frame object where rows correspond to genes and columns
 #'   correspond to gene features
 #'
@@ -334,12 +339,11 @@ getTargetedGenesTable <- function (queryRegions, txdbFeatures) {
 #' @return A data frame with two columns where first column holds features and
 #'   second column holds corresponding counts
 #' @examples
-#'
-#' peaks <- importBed('input.BED')
-#' gff <- importGtf('annotation.gtf')
+#' data(gff)
+#' data(queryRegions)
 #' txdbFeatures <- getTxdbFeaturesFromGff(gff)
-#' summary <- summarizeQueryRegions(queryRegions=peaks,
-#'                                  txdbFeatures=txdbFeatures)
+#' summary <- summarizeQueryRegions(queryRegions = queryRegions,
+#'                                  txdbFeatures = txdbFeatures)
 #'
 #' @export
 summarizeQueryRegions <- function(queryRegions, txdbFeatures) {
@@ -369,9 +373,9 @@ summarizeQueryRegions <- function(queryRegions, txdbFeatures) {
 #'   overlap the target annotation features
 #'
 #' @examples
-#' peaks <- importBed('input.BED')
-#' gff <- importGtf('annotation.gtf')
-#' overlaps <- queryGff(queryRegions=queryRegions, gff=gff)
+#' data(queryRegions)
+#' data(gff)
+#' overlaps <- queryGff(queryRegions = queryRegions, gff = gff)
 #'
 #' @export
 queryGff <- function(queryRegions, gff) {
@@ -404,13 +408,9 @@ queryGff <- function(queryRegions, gff) {
 #'   level is summarized in a strand-specific manner using the
 #'   \code{genomation::ScoreMatrixBin} function.
 #' @examples
-#' #load the test gff data
 #' data(gff)
-#' #' #load test query regions
 #' data(queryRegions)
-#' #get gene features' coordinates as a list of GRanges objects
 #' txdbFeatures <- getTxdbFeaturesFromGff(gff)
-#' #calculate coverage profile of query regions on exons
 #' df <- calculateCoverageProfile(queryRegions = queryRegions,
 #'                               targetRegions = txdbFeatures$exons,
 #'                                     sampleN = 10000)
@@ -456,16 +456,12 @@ calculateCoverageProfile = function (queryRegions, targetRegions, sampleN = 0){
 #'   coverage level is summarized in a strand-specific manner using the
 #'   \code{genomation::ScoreMatrixBin} function.
 #' @examples
-#' #load the test gff data
 #' data(gff)
-#' #load test query regions
 #' data(queryRegions)
-#' #get gene features' coordinates as a list of GRanges objects
 #' txdbFeatures <- getTxdbFeaturesFromGff(gff)
-#' #calculate coverage profile of query regions on exons
 #' list.df <- calculateCoverageProfileList(queryRegions = queryRegions,
 #'                               targetRegionsList = txdbFeatures,
-#'                                     sampleN = 10000)
+#'                                     sampleN = 1000)
 #' @export
 calculateCoverageProfileList <- function (queryRegions,
                                           targetRegionsList,
@@ -494,16 +490,12 @@ calculateCoverageProfileList <- function (queryRegions,
 #'   coverage level is summarized in a strand-specific manner using the
 #'   \code{genomation::ScoreMatrixBin} function.
 #' @examples
-#' #load the test gff data
 #' data(gff)
-#' #' #load test query regions
 #' data(queryRegions)
-#' #get a txdb object from gff
 #' txdb <- GenomicFeatures::makeTxDbFromGRanges(gff)
-#' #calculate coverage profile of query regions on exons
 #' df <- calculateCoverageProfileListFromTxdb(queryRegions = queryRegions,
 #'                                                    txdb = txdb,
-#'                                                 sampleN = 10000)
+#'                                                 sampleN = 1000)
 #' @export
 calculateCoverageProfileListFromTxdb <- function (queryRegions,
                                                   txdb,
@@ -535,8 +527,6 @@ calculateCoverageProfileListFromTxdb <- function (queryRegions,
 #'   bins. The target regions are divided into 100 equal sized bins and coverage
 #'   level is summarized in a strand-specific manner using the
 #'   \code{genomation::ScoreMatrixBin} function.
-#' @examples
-#'
 #' @export
 calculateCoverageProfileFromTxdb <- function (queryRegions,
                                               txdb,
@@ -616,6 +606,8 @@ findLongLines <- function (myfile, lineLimit = 80) {
 #' @param genomeVersion  A character string to denote for which genome version
 #'   the analysis is being done. Available options are hg19 (human), mm9
 #'   (mouse), ce10 (worm) and dm3 (fly).
+#' @param outDir Path to the output directory. (default: current working
+#'   directory)
 #' @return An html generated using rmarkdown/knitr/pandoc that contains
 #'   interactive figures, tables, and text that provide an overview of the
 #'   experiment
@@ -624,27 +616,31 @@ findLongLines <- function (myfile, lineLimit = 80) {
 #' runReport()
 #'
 #' #A custom run for human
+#' \dontrun{
 #' runReport( queryFilePath = 'input.BED',
 #'            gffFilePath = 'annotation.gtf',
-#'            msigdbFilePath = 'human_msigdb.gmt',
+#'            msigdbFilePath = 'human_msigdb.gmt')
+#'            }
 #' # To turn off certain modules of the report
+#' \dontrun{
 #' runReport( queryFilePath = 'input.BED',
 #'            gffFilePath = 'annotation.gtf',
 #'            msigdbFilePath = 'human_msigdb.gmt',
 #'            motifAnalysis = FALSE,
-#'            goAnalysis = FALSE
-#'            )
+#'            goAnalysis = FALSE )
+#'            }
 #' # To run the pipeline for species other than human
 #' # If the msigdb module is needed, the msigdbFilePath
 #' # must be set to the MSIGDB annotations for 'human'.
 #' # MSIGDB datasets for other species will be calculated
 #' # in the background using the createOrthologousMsigdbDataset
 #' # function
+#' \dontrun{
 #' runReport( queryFilePath = 'input.mm9.BED',
 #'            gffFilePath = 'annotation.mm9.gtf',
 #'            msigdbFilePath = 'msigdb.human.gmt',
 #'            genomeVersion = 'mm9' )
-#'
+#'            }
 #' @export
 runReport <- function(queryFilePath = 'testdata',
                       gffFilePath = 'testdata',

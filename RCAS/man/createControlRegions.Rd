@@ -20,8 +20,8 @@ that have the same length distribution based on the flanking regions of the
 peaks.
 }
 \examples{
-bed <- importBed('input.bed')
-controlRegions <- createControlRegions(queryRegions=bed)
+data(queryRegions)
+controlRegions <- createControlRegions(queryRegions = queryRegions)
 
 }
 
