@@ -30,9 +30,11 @@ worm via orthologous relationships to human genes.
 #from \\url{http://software.broadinstitute.org/gsea/msigdb/collections.jsp#C2}
 
 #Map the gene sets to a target genome (supported genomes: mm9, dm3, or ce10)
+\dontrun{
 createOrthologousMsigdbDataset(refMsigdbFilePath = 'msigdb.entrez.txt',
                                refGenomeVersion = 'hg19',
                                targetGenomeVersion = 'mm9')
+                               }
 
 }
 

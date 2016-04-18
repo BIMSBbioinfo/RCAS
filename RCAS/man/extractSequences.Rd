@@ -24,8 +24,9 @@ object.
 }
 \examples{
 
-bed <- importBed('input.bed')
-sequences <- extractSequences(queryRegions=bed, genomeVersion='hg19')
+data(queryRegions)
+sequences <- extractSequences(queryRegions = queryRegions,
+                             genomeVersion = 'hg19')
 
 }
 

@@ -28,15 +28,11 @@ annotation features and calculates the coverage profile along the target
 regions.
 }
 \examples{
-#load the test gff data
 data(gff)
-#' #load test query regions
 data(queryRegions)
-#get a txdb object from gff
 txdb <- GenomicFeatures::makeTxDbFromGRanges(gff)
-#calculate coverage profile of query regions on exons
 df <- calculateCoverageProfileListFromTxdb(queryRegions = queryRegions,
                                                    txdb = txdb,
-                                                sampleN = 10000)
+                                                sampleN = 1000)
 }
 

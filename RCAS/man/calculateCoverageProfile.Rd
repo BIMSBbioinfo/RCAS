@@ -27,13 +27,9 @@ This function checks overlaps betwenn input query regions and annotation
 features, and then calculates coverage profile along target regions.
 }
 \examples{
-#load the test gff data
 data(gff)
-#' #load test query regions
 data(queryRegions)
-#get gene features' coordinates as a list of GRanges objects
 txdbFeatures <- getTxdbFeaturesFromGff(gff)
-#calculate coverage profile of query regions on exons
 df <- calculateCoverageProfile(queryRegions = queryRegions,
                               targetRegions = txdbFeatures$exons,
                                     sampleN = 10000)

@@ -22,12 +22,11 @@ This function counts number of query regions that overlap with different
 types of gene features.
 }
 \examples{
-
-peaks <- importBed('input.BED')
-gff <- importGtf('annotation.gtf')
+data(gff)
+data(queryRegions)
 txdbFeatures <- getTxdbFeaturesFromGff(gff)
-summary <- summarizeQueryRegions(queryRegions=peaks,
-                                 txdbFeatures=txdbFeatures)
+summary <- summarizeQueryRegions(queryRegions = queryRegions,
+                                 txdbFeatures = txdbFeatures)
 
 }
 

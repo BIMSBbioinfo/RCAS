@@ -18,8 +18,9 @@ A repurposed/simplified version of the \code{motifRG::summaryMotif} function.
 }
 \examples{
 
-bed <- importBed('input.bed')
-motifResults <- runMotifRG(queryRegions=bed, genomeVersion='hg19')
+data(queryRegions)
+motifResults <- runMotifRG(queryRegions = queryRegions,
+                          genomeVersion = 'hg19', motifN = 1)
 motifSummary <- getMotifSummaryTable(motifResults)
 
 }

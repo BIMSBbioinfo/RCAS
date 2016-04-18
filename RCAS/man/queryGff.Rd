@@ -24,9 +24,9 @@ reference. Input query should be in BED format and reference should be in GFF
 format. Both data are imported as GRanges object.
 }
 \examples{
-peaks <- importBed('input.BED')
-gff <- importGtf('annotation.gtf')
-overlaps <- queryGff(queryRegions=queryRegions, gff=gff)
+data(queryRegions)
+data(gff)
+overlaps <- queryGff(queryRegions = queryRegions, gff = gff)
 
 }
 

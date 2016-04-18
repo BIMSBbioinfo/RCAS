@@ -37,10 +37,16 @@ annoatation data from an Ensembl gtf file
 }
 \examples{
 #import the data and write it into a .rds file
+\dontrun{
 importGtf(filePath='./Ensembl75.hg19.gtf')
+}
 #import the data but don't save it as RDS
+\dontrun{
 importGtf(filePath='./Ensembl75.hg19.gtf', saveObjectAsRds = FALSE)
+}
 #import the data and overwrite the previously generated
+\dontrun{
 importGtf(filePath='./Ensembl75.hg19.gtf', overwriteObjectAsRds = TRUE)
+}
 }
 

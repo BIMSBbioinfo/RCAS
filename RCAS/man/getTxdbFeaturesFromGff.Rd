@@ -19,7 +19,7 @@ such as promoters, introns, exons, intron-exon boundaries, 5'/3' UTRs and
 whole transcripts.
 }
 \examples{
-gff <- importGtf(file='annotation.gtf')
+data(gff)
 txdbFeatures <- getTxdbFeaturesFromGff(gff)
 
 }

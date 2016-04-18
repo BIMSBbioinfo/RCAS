@@ -27,19 +27,17 @@ categorized by the gene features such as promoters, introns, exons,
 intron-exon boundaries, 5'/3' UTRs and whole transcripts.
 }
 \examples{
-gff <- importGtf(filePath = 'annotation.gtf')
-bed <- importBed(filePath = 'input.bed')
+data(gff)
+data(queryRegions)
 txdbFeatures <- getTxdbFeaturesFromGff(gff)
-featuresTable <- getTargetedGenesTable(queryRegions = bed,
+featuresTable <- getTargetedGenesTable(queryRegions = queryRegions,
                                        txdbFeatures = txdbFeatures)
 
-or
+#or
 
-bed <- importBed(filePath = 'input.bed')
-txdb <- GenomicFeatures::makeTxDbFromGFF(file = 'annotation.gtf',
-                                       format = 'gtf')
+txdb <- GenomicFeatures::makeTxDbFromGRanges(gff)
 txdbFeatures <- getTxdbFeatures(txdb)
-featuresTable <- getTargetedGenesTable(queryRegions=bed,
-                                       txdbFeatures=txdbFeatures)
+featuresTable <- getTargetedGenesTable(queryRegions = queryRegions,
+                                       txdbFeatures = txdbFeatures)
 }
 

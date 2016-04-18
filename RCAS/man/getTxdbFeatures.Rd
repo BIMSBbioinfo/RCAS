@@ -19,8 +19,8 @@ extracts the coordinates of gene features such as promoters, introns, exons,
 intron-exon boundaries, 5'/3' UTRs, and whole transcripts.
 }
 \examples{
-
-txdb <- GenomicFeatures::makeTxDbFromGFF(file='annotation.gtf', format='gtf')
+data(gff)
+txdb <- GenomicFeatures::makeTxDbFromGRanges(gff)
 txdbFeatures <- getTxdbFeatures(txdb)
 
 }

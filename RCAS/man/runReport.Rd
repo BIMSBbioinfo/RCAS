@@ -55,26 +55,30 @@ terms, gene sets from MSIGDB, and motif analysis.
 runReport()
 
 #A custom run for human
+\dontrun{
 runReport( queryFilePath = 'input.BED',
            gffFilePath = 'annotation.gtf',
-           msigdbFilePath = 'human_msigdb.gmt',
+           msigdbFilePath = 'human_msigdb.gmt')
+           }
 # To turn off certain modules of the report
+\dontrun{
 runReport( queryFilePath = 'input.BED',
            gffFilePath = 'annotation.gtf',
            msigdbFilePath = 'human_msigdb.gmt',
            motifAnalysis = FALSE,
-           goAnalysis = FALSE
-           )
+           goAnalysis = FALSE )
+           }
 # To run the pipeline for species other than human
 # If the msigdb module is needed, the msigdbFilePath
 # must be set to the MSIGDB annotations for 'human'.
 # MSIGDB datasets for other species will be calculated
 # in the background using the createOrthologousMsigdbDataset
 # function
+\dontrun{
 runReport( queryFilePath = 'input.mm9.BED',
            gffFilePath = 'annotation.mm9.gtf',
            msigdbFilePath = 'msigdb.human.gmt',
            genomeVersion = 'mm9' )
-
+           }
 }
 
