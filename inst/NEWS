@@ -1,3 +1,9 @@
+# RCAS 0.99.1
+RCAS has been built on Linux, Mac, and Windows.
+The package built without errors or warnings on all platforms.
+
+http://bioconductor.org/spb_reports/RCAS_0.99.1_buildreport_20160419074009.html
+
 # RCAS 0.99.0
 Pre-release version of RCAS (RNA Centric Annotation System)
 
