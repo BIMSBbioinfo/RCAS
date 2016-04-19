@@ -1,5 +1,7 @@
 # RCAS project
 
+https://travis-ci.org/BIMSBbioinfo/RCAS.svg?branch=master
+
 Make a standalone RNA Centric Annotation System that
 provides intuitive reports and publication ready graphics.
 
