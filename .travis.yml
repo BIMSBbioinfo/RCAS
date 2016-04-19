@@ -5,8 +5,18 @@ sudo: false
 cache: packages
 r: bioc-devel
 
+bioc_required: true
+bioc_packages:
+  - BiocCheck
+
 r_github_packages:
   - jimhester/covr
-after_success:
-  - Rscript -e 'covr::codecov()'
 
+after_script:
+  - ls -lah
+  - FILE=$(ls -1t *.tar.gz | head -n 1)
+  - Rscript -e "library(BiocCheck); BiocCheck(\"${FILE}\")"
+
+after_success:
+  - Rscript -e 'library(covr);package_coverage()'
+  - Rscript -e 'library(covr);codecov()'
