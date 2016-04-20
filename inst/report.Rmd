@@ -175,7 +175,7 @@ cat("**Figure",figureCount,":** The number of query regions that overlap differe
 ```
 
 ```{r query_gene_types, eval=params$annotationSummary}
-biotype_col <- grep('biotype', colnames(overlaps.dt), value = T)
+biotype_col <- grep('gene_biotype', colnames(overlaps.dt), value = T)
 df <- overlaps.dt[,length(unique(overlappingQuery)), by = biotype_col]
 colnames(df) <- c("feature", "count")
 df$percent <- round(df$count / length(queryRegions) * 100, 1)
