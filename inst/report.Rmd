@@ -151,13 +151,13 @@ figureCount <- figureCount + 1
 
 ```{r get_table_of_genes_tabcap, echo=FALSE, results='asis', eval=params$annotationSummary}
 cat("## Interactive table of genes that overlap query regions\n")
-cat("**Table",tableCount,":** Interactive table of genes that overlap query regions, grouped by gene features such as introns, exons, UTRs, etc.\n")
+cat("**Table",tableCount,":** Interactive table of top 100 genes that overlap query regions, grouped by gene features such as introns, exons, UTRs, etc.\n")
 ```
 
 ```{r getTargetedGenesTable, eval=params$annotationSummary} 
 dt <- getTargetedGenesTable(queryRegions = queryRegions, 
                            txdbFeatures = txdbFeatures)
-dt <- dt[order(transcripts, decreasing = T)]
+dt <- dt[order(transcripts, decreasing = TRUE)][1:100]
 DT::datatable(data = dt,
           extensions = 'FixedColumns', 
           options = list(
