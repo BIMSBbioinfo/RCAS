@@ -725,18 +725,26 @@ runReport <- function(queryFilePath = 'testdata',
     if (queryFilePath == 'testdata') {
       stop('Test-data only works for human.
            Please provide a queryFilePath to input in BED format \n')
+    } else {
+      queryFilePath <- normalizePath(queryFilePath)
     }
 
     if (gffFilePath == 'testdata') {
       stop('Test-data only works for human.
            Please provide a gffFilePath to input in GTF format \n')
+    } else {
+      gffFilePath <- normalizePath(gffFilePath)
     }
 
-    if (msigdbFilePath == 'testdata' && msigdbAnalysis == TRUE) {
-      stop('Test-data only works for human.
+    if (msigdbFilePath == 'testdata') {
+      if (msigdbAnalysis == TRUE) {
+        stop('Test-data only works for human.
            Please provide a gene set dataset with ENTREZ gene ids
-            downloaded from MSIGDB database or
-            set msigdbAnalysis option to FALSE \n')
+             downloaded from MSIGDB database or
+             set msigdbAnalysis option to FALSE \n')
+      }
+    } else {
+      msigdbFilePath <- normalizePath(msigdbFilePath)
     }
   }
 
