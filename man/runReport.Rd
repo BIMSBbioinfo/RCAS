@@ -7,7 +7,7 @@
 runReport(queryFilePath = "testdata", gffFilePath = "testdata",
   msigdbFilePath = "testdata", annotationSummary = TRUE,
   goAnalysis = TRUE, msigdbAnalysis = TRUE, motifAnalysis = TRUE,
-  genomeVersion = "hg19", outDir = getwd())
+  genomeVersion = "hg19", outDir = getwd(), printProcessedTables = FALSE)
 }
 \arguments{
 \item{queryFilePath}{a BED format file which contains genomic coordinates of
@@ -37,6 +37,9 @@ the analysis is being done. Available options are hg19 (human), mm9
 
 \item{outDir}{Path to the output directory. (default: current working
 directory)}
+
+\item{printProcessedTables}{boolean value (default: FALSE). If set to TRUE,
+raw data tables that are used for plots/tables will be printed to files.}
 }
 \value{
 An html generated using rmarkdown/knitr/pandoc that contains

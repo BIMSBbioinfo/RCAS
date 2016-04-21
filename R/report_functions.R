@@ -649,6 +649,8 @@ findLongLines <- function (myfile, lineLimit = 80) {
 #'   (mouse), ce10 (worm) and dm3 (fly).
 #' @param outDir Path to the output directory. (default: current working
 #'   directory)
+#' @param printProcessedTables boolean value (default: FALSE). If set to TRUE,
+#'   raw data tables that are used for plots/tables will be printed to files.
 #' @return An html generated using rmarkdown/knitr/pandoc that contains
 #'   interactive figures, tables, and text that provide an overview of the
 #'   experiment
@@ -696,7 +698,8 @@ runReport <- function(queryFilePath = 'testdata',
                       msigdbAnalysis = TRUE,
                       motifAnalysis = TRUE,
                       genomeVersion = 'hg19',
-                      outDir = getwd()) {
+                      outDir = getwd(),
+                      printProcessedTables = FALSE) {
 
   if (genomeVersion == 'hg19') {
     species <- 'human'
@@ -774,7 +777,9 @@ runReport <- function(queryFilePath = 'testdata',
                   msigdbAnalysis = msigdbAnalysis,
                   motifAnalysis = motifAnalysis,
                   genomeVersion = genomeVersion,
-                  species = species)
+                  species = species,
+                  printProcessedTables = printProcessedTables,
+                  workdir = outDir)
     )
 }
 
