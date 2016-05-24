@@ -687,6 +687,7 @@ findLongLines <- function (myfile, lineLimit = 80) {
 #'            genomeVersion = 'mm9' )
 #'            }
 #' @import rmarkdown
+#' @import knitr
 #' @import plotly
 #' @import DT
 #' @export
