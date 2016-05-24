@@ -31,10 +31,6 @@ goSummaryCC <- FALSE
 
 ```{r load_libraries, results='hide'}
 library(RCAS)
-library(plotly)
-library(DT)
-library(data.table)
-library(topGO)
 ```
 
 # Introduction
