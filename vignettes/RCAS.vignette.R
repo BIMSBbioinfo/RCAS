@@ -3,11 +3,6 @@ knitr::opts_chunk$set(warning = FALSE, message = FALSE, eval = FALSE)
 
 ## ----load_libraries, results='hide'--------------------------------------
 #  library(RCAS)
-#  library(data.table)
-#  library(plotly)
-#  library(DT)
-#  library(motifRG)
-#  library(topGO)
 
 ## ----sample_data---------------------------------------------------------
 #  library(RCAS)
@@ -126,7 +121,7 @@ knitr::opts_chunk$set(warning = FALSE, message = FALSE, eval = FALSE)
 ## ----motif_analysis------------------------------------------------------
 #  motifResults <- runMotifRG(queryRegions = queryRegions,
 #                             genomeVersion = 'hg19',
-#                             motifN = 2)
+#                             motifN = 2, nCores = 2)
 #  
 #  par(mfrow = c(1,2), mar = c(2,2,2,2))
 #  for (i in 1:length(motifResults$motifs)) {
