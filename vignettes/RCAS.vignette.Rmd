@@ -16,7 +16,7 @@ vignette: >
 
 
 ```{r global_options, include=FALSE}
-knitr::opts_chunk$set(warning = FALSE, message = FALSE, eval = TRUE)
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, eval = FALSE)
 ```
 
 
@@ -275,7 +275,7 @@ RCAS uses motifRG library to find enriched motifs among the query regions.
 ```{r motif_analysis}
 motifResults <- runMotifRG(queryRegions = queryRegions, 
                            genomeVersion = 'hg19', 
-                           motifN = 2)
+                           motifN = 2, nCores = 2)
 
 par(mfrow = c(1,2), mar = c(2,2,2,2))
 for (i in 1:length(motifResults$motifs)) {
