@@ -1,3 +1,8 @@
+# RCAS 0.99.2 
+Made two minor revisions asked by the reviewer:
+- manual loading of some packages manually in the vignette is cancelled
+- a NOTE flagged by R CMD Check about a global variable has been fixed 
+
 # RCAS 0.99.1
 RCAS has been built on Linux, Mac, and Windows.
 The package built without errors or warnings on all platforms.
