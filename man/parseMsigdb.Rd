@@ -22,7 +22,7 @@ Database (MSIGDB)
 #First Download gene sets (with Entrez Ids) from MSIGDB database
 #from \\url{http://software.broadinstitute.org/gsea/msigdb/collections.jsp#C2}
 
-input <- system.file('msigdb_test.gmt', package='RCAS')
+input <- system.file('extdata', 'msigdb_test.gmt', package='RCAS')
 msigDB <- parseMsigdb (filePath = input)
 
 }

@@ -101,7 +101,7 @@ importGtf <- function (filePath,  saveObjectAsRds = TRUE, readFromRds = TRUE,
 #'   from an input BED file
 #'
 #' @examples
-#' input <- system.file('testfile.bed', package='RCAS')
+#' input <- system.file("extdata", "testfile.bed", package='RCAS')
 #' importBed(filePath = input, keepStandardChr = TRUE)
 #'
 #' @importFrom rtracklayer import.bed

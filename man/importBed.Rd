@@ -28,7 +28,7 @@ This function uses \code{rtracklayer::import.bed()} function to import BED
 files
 }
 \examples{
-input <- system.file('testfile.bed', package='RCAS')
+input <- system.file("extdata", "testfile.bed", package='RCAS')
 importBed(filePath = input, keepStandardChr = TRUE)
 
 }
