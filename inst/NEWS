@@ -1,3 +1,7 @@
+# RCAS 0.99.3
+Made one minor revision 
+- Cleaned up the directory inst/
+
 # RCAS 0.99.2 
 Made two minor revisions asked by the reviewer:
 - manual loading of some packages manually in the vignette is cancelled
