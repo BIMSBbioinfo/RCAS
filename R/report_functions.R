@@ -756,13 +756,14 @@ runReport <- function(queryFilePath = 'testdata',
     msigdbFilePath <- normalizePath(msigdbFilePath)
   }
 
-  reportFile <- system.file('report.Rmd', package='RCAS')
-  headerFile <- system.file('header.html', package='RCAS')
+  reportFile <- system.file("reporting_scripts", "report.Rmd", package='RCAS')
+  headerFile <- system.file("reporting_scripts", "header.html", package='RCAS')
   outFile <- paste0(basename(queryFilePath), '.RCAS.report.html')
 
   rmarkdown::render(
     input = reportFile,
     output_dir = outDir,
+    intermediates_dir = outDir,
     output_file = outFile,
     output_format = rmarkdown::html_document(
       toc = TRUE,
