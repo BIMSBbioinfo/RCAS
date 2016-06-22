@@ -23,7 +23,7 @@ goResults <- runTopGO(ontology = 'CC',
                       targetedGenes = unique(overlaps$gene_id))
 test_that("GO term analysis for cellular compartments", {
   expect_is(goResults, 'data.frame')
-  expect_equal(colnames(goResults)[7], 'bonferroni')
-  expect_equal(colnames(goResults)[8], 'bh')
+  expect_equal(colnames(goResults)[5], 'bonferroni')
+  expect_equal(colnames(goResults)[6], 'bh')
 })
 
