@@ -90,7 +90,11 @@ runTopGO <- function (ontology = 'BP',
   goResults$classicFisher <- gsub("<", "", goResults$classicFisher)
   goResults$bonferroni <- stats::p.adjust(p = goResults$classicFisher,
                                           method = "bonferroni")
+
   goResults$bh <- stats::p.adjust(goResults$classicFisher, method="BH")
+  goResults$foldEnrichment <- round(goResults$Significant/goResults$Expected, 2)
+  goResults <- subset(goResults, select = -c(Annotated, classicFisher))
+  colnames(goResults)[3] <- 'SetSize'
   return(goResults)
 }
 
@@ -372,11 +376,13 @@ runMSIGDB <- function (msigDB,
                      calculateEnrichment(targetedGenes=targetedGenes,
                                          backgroundGenes=backgroundGenes,
                                          geneSet = x )})
-  results <- do.call("rbind", results)
+  results <- BiocGenerics::do.call(BiocGenerics::rbind, results)
   results$BH <- stats::p.adjust(results$fisherPVal, method = "BH")
   results$bonferroni <- stats::p.adjust(p = results$fisherPVal,
                                         method = "bonferroni")
-  return(results[order(results$fisherPVal),])
+  results$foldEnrichment <- round(results$treatment/results$expectedInTreatment, 2)
+  results <- subset(results, select = -c(treatmentSize, fisherPVal))
+  return(results[order(results$bonferroni),])
 }
 
 
