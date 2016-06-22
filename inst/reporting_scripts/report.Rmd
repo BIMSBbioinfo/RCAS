@@ -302,21 +302,21 @@ if (!is.null(goCC)) { goSummaryCC <- TRUE }
 ```{r goBP_tabcap, results='asis', eval=goSummaryBP}
 cat("## Biological Processes\n")
 cat("**Table",tableCount,":** Significant Biological Process GO terms (BH < 0.1) enriched for genes that overlap query regions\n")  
-DT::datatable(goBP)
+DT::datatable(goBP, filter = 'top')
 tableCount <- tableCount + 1
 ```
 
 ```{r goMF_tabcap, results='asis', eval=goSummaryMF}
 cat("## Molecular Functions\n")
 cat("**Table",tableCount,":** Significant Molecular Function GO terms (BH < 0.1) enriched for genes that overlap query regions\n")  
-DT::datatable(goMF)
+DT::datatable(goMF, filter = 'top')
 tableCount <- tableCount + 1
 ```
 
 ```{r goCC_tabcap, results='asis', eval=goSummaryCC}
 cat("## Cellular Compartments\n")
 cat("**Table",tableCount,":** Significant Cellular Compartment GO terms (BH < 0.1) enriched for genes that overlap query regions\n")  
-DT::datatable(goCC)
+DT::datatable(goCC, filter = 'top')
 tableCount <- tableCount + 1
 ```
 
@@ -346,7 +346,7 @@ msigdbResults <- runMSIGDB(msigDB = msigDB,
                            targetedGenes = targetedGenes)
 
 DT::datatable(msigdbResults[msigdbResults$BH < 0.1,], 
-          extensions = 'FixedColumns', 
+          extensions = 'FixedColumns', filter = 'top',
           options = list( dom = 't', 
                           scrollX = TRUE, 
                           scrollCollapse = TRUE 
