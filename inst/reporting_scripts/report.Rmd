@@ -43,7 +43,7 @@ on biological research at various levels.
 At the level of transcriptome,
 various HTS methods have been applied to study different aspects of
 the complete set of transcripts that are produced by the genome.
-On such method is
+One such method is
 cross-linking immunoprecipitation-high-throughput
 sequencing (CLIP-Seq)
 that is used to
@@ -159,11 +159,8 @@ dt <- getTargetedGenesTable(queryRegions = queryRegions,
 dt <- dt[order(transcripts, decreasing = TRUE)][1:100]
 
 if(params$printProcessedTables == TRUE) {
-  cat('printing table')
   write.table(x = dt, file='getTargetedGenesTable.tsv', quote = FALSE, sep = '\t', row.names = FALSE)
-} else {
-  cat('not priting table')
-}
+} 
 
 DT::datatable(data = dt,
           extensions = 'FixedColumns', 
