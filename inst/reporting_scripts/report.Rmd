@@ -296,7 +296,7 @@ if (!is.null(goCC)) { goSummaryCC <- TRUE }
 cat("## Biological Processes\n")
 cat("**Table",tableCount,":** Significant Biological Process GO terms (BH < 0.1) enriched for genes that overlap query regions\n")  
 goBP <- goBP[order(goBP$foldEnrichment, decreasing = TRUE),]
-DT::datatable(goBP[goBP$bh < 0.1,], 
+DT::datatable(goBP[goBP$bonferroni < 0.1,], 
           extensions = 'FixedColumns', filter = 'bottom',
           options = list(fixedColumns = TRUE, scrollX = TRUE)
           )
@@ -308,7 +308,7 @@ tableCount <- tableCount + 1
 cat("## Molecular Functions\n")
 cat("**Table",tableCount,":** Significant Molecular Function GO terms (BH < 0.1) enriched for genes that overlap query regions\n")  
 goMF <- goMF[order(goMF$foldEnrichment, decreasing = TRUE),]
-DT::datatable(goMF[goMF$bh < 0.1,], 
+DT::datatable(goMF[goMF$bonferroni < 0.1,], 
           extensions = 'FixedColumns', filter = 'bottom',
           options = list(fixedColumns = TRUE, scrollX = TRUE)
           )
@@ -319,7 +319,7 @@ tableCount <- tableCount + 1
 cat("## Cellular Compartments\n")
 cat("**Table",tableCount,":** Significant Cellular Compartment GO terms (BH < 0.1) enriched for genes that overlap query regions\n")  
 goCC <- goCC[order(goCC$foldEnrichment, decreasing = TRUE),]
-DT::datatable(goCC[goCC$bh < 0.1,], 
+DT::datatable(goCC[goCC$bonferroni < 0.1,], 
           extensions = 'FixedColumns', filter = 'bottom',
           options = list(fixedColumns = TRUE, scrollX = TRUE)
           )
@@ -353,7 +353,7 @@ msigdbResults <- runMSIGDB(msigDB = msigDB,
                            targetedGenes = targetedGenes)
 rownames(msigdbResults) = gsub(pattern = '_', replacement = ' ', x = rownames(msigdbResults))
 msigdbResults = msigdbResults[order(msigdbResults$foldEnrichment, decreasing = TRUE),]
-DT::datatable(msigdbResults[msigdbResults$BH < 0.1,], 
+DT::datatable(msigdbResults[msigdbResults$bonferroni < 0.1,], 
           extensions = 'FixedColumns', filter = 'bottom',
           options = list(fixedColumns = TRUE, scrollX = TRUE)
           )
