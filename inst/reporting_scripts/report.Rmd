@@ -162,13 +162,9 @@ if(params$printProcessedTables == TRUE) {
   write.table(x = dt, file='getTargetedGenesTable.tsv', quote = FALSE, sep = '\t', row.names = FALSE)
 } 
 
-DT::datatable(data = dt,
-          extensions = 'FixedColumns', 
-          options = list(
-            dom = 't',
-            scrollX = TRUE, 
-            scrollCollapse = TRUE
-            )
+DT::datatable(dt, 
+          extensions = 'FixedColumns', filter = 'bottom',
+          options = list(fixedColumns = TRUE, scrollX = TRUE)
           )
 tableCount <- tableCount + 1
 
@@ -261,12 +257,9 @@ cat("**Table",tableCount,":** motifRG motif discovery statistics. fg: foreground
 
 ```{r motif_analysis_table, eval=provideMotifSummary}
 summary <- getMotifSummaryTable(motifResults)
-DT::datatable(summary, extensions = 'FixedColumns', 
-          options = list( 
-            dom = 't', 
-            scrollX = TRUE, 
-            scrollCollapse = TRUE
-            )
+DT::datatable(summary, 
+          extensions = 'FixedColumns', filter = 'bottom',
+          options = list(fixedColumns = TRUE, scrollX = TRUE)
           )
 tableCount <- tableCount + 1
 ```
@@ -302,21 +295,35 @@ if (!is.null(goCC)) { goSummaryCC <- TRUE }
 ```{r goBP_tabcap, results='asis', eval=goSummaryBP}
 cat("## Biological Processes\n")
 cat("**Table",tableCount,":** Significant Biological Process GO terms (BH < 0.1) enriched for genes that overlap query regions\n")  
-DT::datatable(goBP, filter = 'top')
+goBP <- goBP[order(goBP$foldEnrichment, decreasing = TRUE),]
+DT::datatable(goBP[goBP$bh < 0.1,], 
+          extensions = 'FixedColumns', filter = 'bottom',
+          options = list(fixedColumns = TRUE, scrollX = TRUE)
+          )
+
 tableCount <- tableCount + 1
 ```
 
 ```{r goMF_tabcap, results='asis', eval=goSummaryMF}
 cat("## Molecular Functions\n")
 cat("**Table",tableCount,":** Significant Molecular Function GO terms (BH < 0.1) enriched for genes that overlap query regions\n")  
-DT::datatable(goMF, filter = 'top')
+goMF <- goMF[order(goMF$foldEnrichment, decreasing = TRUE),]
+DT::datatable(goMF[goMF$bh < 0.1,], 
+          extensions = 'FixedColumns', filter = 'bottom',
+          options = list(fixedColumns = TRUE, scrollX = TRUE)
+          )
 tableCount <- tableCount + 1
 ```
 
 ```{r goCC_tabcap, results='asis', eval=goSummaryCC}
 cat("## Cellular Compartments\n")
 cat("**Table",tableCount,":** Significant Cellular Compartment GO terms (BH < 0.1) enriched for genes that overlap query regions\n")  
-DT::datatable(goCC, filter = 'top')
+goCC <- goCC[order(goCC$foldEnrichment, decreasing = TRUE),]
+DT::datatable(goCC[goCC$bh < 0.1,], 
+          extensions = 'FixedColumns', filter = 'bottom',
+          options = list(fixedColumns = TRUE, scrollX = TRUE)
+          )
+
 tableCount <- tableCount + 1
 ```
 
@@ -344,13 +351,11 @@ if (params$species != 'human') {
 msigdbResults <- runMSIGDB(msigDB = msigDB,
                            backgroundGenes = backgroundGenes, 
                            targetedGenes = targetedGenes)
-
+rownames(msigdbResults) = gsub(pattern = '_', replacement = ' ', x = rownames(msigdbResults))
+msigdbResults = msigdbResults[order(msigdbResults$foldEnrichment, decreasing = TRUE),]
 DT::datatable(msigdbResults[msigdbResults$BH < 0.1,], 
-          extensions = 'FixedColumns', filter = 'top',
-          options = list( dom = 't', 
-                          scrollX = TRUE, 
-                          scrollCollapse = TRUE 
-                          )
+          extensions = 'FixedColumns', filter = 'bottom',
+          options = list(fixedColumns = TRUE, scrollX = TRUE)
           )
 ```
 
