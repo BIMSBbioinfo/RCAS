@@ -13,6 +13,7 @@ params:
   genomeVersion: 'hg19'
   species: 'human'
   printProcessedTables: FALSE
+  sampleN: 0
   workdir: '.'
 ---
 
@@ -88,7 +89,7 @@ if(params$query == 'testdata') {
   data(queryRegions) 
 } else {
   cat('importing BED from filepath',params$query,'\n')
-  queryRegions <- importBed(filePath = params$query, sampleN = 10000)
+  queryRegions <- importBed(filePath = params$query, sampleN = params$sampleN)
 }
 
 if(params$gff == 'testdata') {
@@ -294,8 +295,10 @@ if (!is.null(goCC)) { goSummaryCC <- TRUE }
 
 ```{r goBP_tabcap, results='asis', eval=goSummaryBP}
 cat("## Biological Processes\n")
-cat("**Table",tableCount,":** Significant Biological Process GO terms (BH < 0.1) enriched for genes that overlap query regions\n")  
+cat("**Table",tableCount,":** Significant Biological Process GO terms (bonferroni < 0.1) enriched for genes that overlap query regions\n")  
 goBP <- goBP[order(goBP$foldEnrichment, decreasing = TRUE),]
+rownames(goBP) <- goBP$GO.ID
+goBP <- subset(goBP, select = -c(bh, GO.ID))
 DT::datatable(goBP[goBP$bonferroni < 0.1,], 
           extensions = 'FixedColumns', filter = 'bottom',
           options = list(fixedColumns = TRUE, scrollX = TRUE)
@@ -306,8 +309,11 @@ tableCount <- tableCount + 1
 
 ```{r goMF_tabcap, results='asis', eval=goSummaryMF}
 cat("## Molecular Functions\n")
-cat("**Table",tableCount,":** Significant Molecular Function GO terms (BH < 0.1) enriched for genes that overlap query regions\n")  
+cat("**Table",tableCount,":** Significant Molecular Function GO terms (bonferroni < 0.1) enriched for genes that overlap query regions\n")  
 goMF <- goMF[order(goMF$foldEnrichment, decreasing = TRUE),]
+rownames(goMF) <- goMF$GO.ID
+goMF <- subset(goMF, select = -c(bh, GO.ID))
+
 DT::datatable(goMF[goMF$bonferroni < 0.1,], 
           extensions = 'FixedColumns', filter = 'bottom',
           options = list(fixedColumns = TRUE, scrollX = TRUE)
@@ -317,8 +323,11 @@ tableCount <- tableCount + 1
 
 ```{r goCC_tabcap, results='asis', eval=goSummaryCC}
 cat("## Cellular Compartments\n")
-cat("**Table",tableCount,":** Significant Cellular Compartment GO terms (BH < 0.1) enriched for genes that overlap query regions\n")  
+cat("**Table",tableCount,":** Significant Cellular Compartment GO terms (bonferroni < 0.1) enriched for genes that overlap query regions\n")  
 goCC <- goCC[order(goCC$foldEnrichment, decreasing = TRUE),]
+rownames(goCC) <- goCC$GO.ID
+goCC <- subset(goCC, select = -c(bh, GO.ID))
+
 DT::datatable(goCC[goCC$bonferroni < 0.1,], 
           extensions = 'FixedColumns', filter = 'bottom',
           options = list(fixedColumns = TRUE, scrollX = TRUE)
@@ -329,7 +338,7 @@ tableCount <- tableCount + 1
 
 ```{r GSEA_msigdb_tabcap, results='asis', eval=params$msigdbAnalysis}
 cat("# Gene Set Enrichment Analysis Results\n")
-cat("**Table",tableCount,":** Significant MSigDB Gene Sets (BH < 0.1) enriched for genes that overlap query regions\n")
+cat("**Table",tableCount,":** Significant MSigDB Gene Sets (bonferroni < 0.1) enriched for genes that overlap query regions\n")
 ```
 
 ```{r msigdb_analysis, eval=params$msigdbAnalysis}
@@ -353,6 +362,8 @@ msigdbResults <- runMSIGDB(msigDB = msigDB,
                            targetedGenes = targetedGenes)
 rownames(msigdbResults) = gsub(pattern = '_', replacement = ' ', x = rownames(msigdbResults))
 msigdbResults = msigdbResults[order(msigdbResults$foldEnrichment, decreasing = TRUE),]
+msigdbResults <- subset(msigdbResults, select = -c(BH))
+
 DT::datatable(msigdbResults[msigdbResults$bonferroni < 0.1,], 
           extensions = 'FixedColumns', filter = 'bottom',
           options = list(fixedColumns = TRUE, scrollX = TRUE)

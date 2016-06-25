@@ -652,6 +652,11 @@ findLongLines <- function (myfile, lineLimit = 80) {
 #'   directory)
 #' @param printProcessedTables boolean value (default: FALSE). If set to TRUE,
 #'   raw data tables that are used for plots/tables will be printed to files.
+#' @param sampleN integer value (default: 0). A parameter to determine if the
+#'   input query regions should be downsampled to a smaller size in order to
+#'   make report generation quicker. When set to 0, downsampling won't be done.
+#'   To activate the sampling a positive integer value that is smaller than
+#'   the total number of query regions should be given.
 #' @return An html generated using rmarkdown/knitr/pandoc that contains
 #'   interactive figures, tables, and text that provide an overview of the
 #'   experiment
@@ -701,7 +706,8 @@ runReport <- function(queryFilePath = 'testdata',
                       motifAnalysis = TRUE,
                       genomeVersion = 'hg19',
                       outDir = getwd(),
-                      printProcessedTables = FALSE) {
+                      printProcessedTables = FALSE,
+                      sampleN = 0) {
 
   if (genomeVersion == 'hg19') {
     species <- 'human'
@@ -782,6 +788,7 @@ runReport <- function(queryFilePath = 'testdata',
                   genomeVersion = genomeVersion,
                   species = species,
                   printProcessedTables = printProcessedTables,
+                  sampleN = sampleN,
                   workdir = outDir)
     )
 }
