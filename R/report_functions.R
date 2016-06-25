@@ -452,7 +452,7 @@ calculateCoverageProfile = function (queryRegions, targetRegions, sampleN = 0){
 
   if (length(windows) > 0) {
     if (sampleN > 0 && sampleN < length(windows)) {
-      windows <- windows[sample(length(windows), sampleN)]
+      windows <- sort(windows[sample(length(windows), sampleN)])
     }
     sm <- genomation::ScoreMatrixBin(target = queryRegions,
                                      windows = windows,
