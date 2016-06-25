@@ -196,29 +196,21 @@ figureCount <- figureCount + 1
 ```
 
 
-```{r tssCoverage_figcap, results='asis', eval=params$annotationSummary}
-cat("## Coverage profile of query regions at Transcription Start Sites\n")
-cat("**Figure",figureCount,":** The depth of coverage of query regions at and around Transcription Start Sites (TSS)\n")
+```{r tssCoverage_figcap, results='asis'}
+cat("## Coverage profile of query regions at/around Transcription Start/End Sites\n")
+cat("**Figure",figureCount,":** The depth of coverage of query regions at and around Transcription Start/End Sites\n")
 ```
 
-```{r tssCoverage, eval=params$annotationSummary}
-cvg <- getTSSCoverage(queryRegions = queryRegions, transcripts = txdbFeatures$transcripts, flankSize = 1000)
-p = plot_ly(data = cvg, x = bases, y = coverage)
-layout(p)
-
-figureCount <- figureCount + 1
-```
-
-```{r tesCoverage_figcap, results='asis', eval=params$annotationSummary}
-cat("## Coverage profile of query regions at Transcription End Sites\n")
-cat("**Figure",figureCount,":** The depth of coverage of query regions at and around Transcription End Sites (TES)\n")
-```
-
-```{r tesCoverage, eval=params$annotationSummary}
-cvg <- getTESCoverage(queryRegions = queryRegions, transcripts = txdbFeatures$transcripts, flankSize = 1000)
-p = plot_ly(data = cvg, x = bases, y = coverage)
-layout(p)
-
+```{r tssCoverage}
+tss <- getTSSCoverage(queryRegions = queryRegions, transcripts = txdbFeatures$transcripts, flankSize = 1000)
+tes <- getTESCoverage(queryRegions = queryRegions, transcripts = txdbFeatures$transcripts, flankSize = 1000)
+p <- subplot(
+  plot_ly(data = tss, x = bases, y = coverage),
+  plot_ly(data = tes, x = bases, y = coverage),
+  margin = 0.05
+) %>% layout (xaxis = list(title = 'Distance (bp) to TSS'), 
+              xaxis2 = list(title = 'Distance (bp) to TES'), showlegend = FALSE) 
+layout(p) 
 figureCount <- figureCount + 1
 ```
 
