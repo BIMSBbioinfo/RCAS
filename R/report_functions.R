@@ -419,7 +419,7 @@ queryGff <- function(queryRegions, gff) {
 }
 
 #' @export
-getTSSCoverage <- function (transcripts, flankSize = 500) {
+getTSSCoverage <- function (queryRegions, transcripts, flankSize = 500) {
   tssFlanks <- GenomicRanges::flank(x = transcripts,
                                     width = flankSize,
                                     both = TRUE
@@ -433,7 +433,7 @@ getTSSCoverage <- function (transcripts, flankSize = 500) {
 }
 
 #' @export
-getTESCoverage <- function (transcripts, flankSize = 500) {
+getTESCoverage <- function (queryRegions, transcripts, flankSize = 500) {
   tesFlanks <- GenomicRanges::flank(x = transcripts,
                                     width = flankSize,
                                     start = FALSE,

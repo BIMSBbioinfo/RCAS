@@ -195,6 +195,34 @@ layout(p = p,
 figureCount <- figureCount + 1
 ```
 
+
+```{r tssCoverage_figcap, results='asis', eval=params$annotationSummary}
+cat("## Coverage profile of query regions at Transcription Start Sites\n")
+cat("**Figure",figureCount,":** The depth of coverage of query regions at and around Transcription Start Sites (TSS)\n")
+```
+
+```{r tssCoverage, eval=params$annotationSummary}
+cvg <- getTSSCoverage(queryRegions = queryRegions, transcripts = txdbFeatures$transcripts, flankSize = 1000)
+p = plot_ly(data = cvg, x = bases, y = coverage)
+layout(p)
+
+figureCount <- figureCount + 1
+```
+
+```{r tesCoverage_figcap, results='asis', eval=params$annotationSummary}
+cat("## Coverage profile of query regions at Transcription End Sites\n")
+cat("**Figure",figureCount,":** The depth of coverage of query regions at and around Transcription End Sites (TES)\n")
+```
+
+```{r tesCoverage, eval=params$annotationSummary}
+cvg <- getTESCoverage(queryRegions = queryRegions, transcripts = txdbFeatures$transcripts, flankSize = 1000)
+p = plot_ly(data = cvg, x = bases, y = coverage)
+layout(p)
+
+figureCount <- figureCount + 1
+```
+
+
 ```{r coverageprofilelist_figcap, results='asis', eval=params$annotationSummary}
 cat("## Coverage profile of query regions across the length of different gene features\n")
 cat("**Figure",figureCount,":** The query regions are overlaid with the genomic coordinates of features. Each entry corresponding to a feature is divided into 100 bins of equal length and for each bin the number of query regions that cover the corresponding bin is counted. Features shorter than 100bp are excluded. Thus, a coverage profile is obtained based on the distribution of the query regions. The strandedness of the features are taken into account. The coverage profile is plotted in the 5' to 3' direction.\n")
