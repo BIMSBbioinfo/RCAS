@@ -418,6 +418,34 @@ queryGff <- function(queryRegions, gff) {
   return (overlapsGff)
 }
 
+#' @export
+getTSSCoverage <- function (transcripts, flankSize = 500) {
+  tssFlanks <- GenomicRanges::flank(x = transcripts,
+                                    width = flankSize,
+                                    both = TRUE
+  )
+
+  cvg <- genomation::ScoreMatrix(target = queryRegions, windows = tssFlanks, strand.aware = TRUE)
+  mdata <- as.data.frame(colSums(cvg))
+  mdata$bases <- c(-flankSize:(flankSize-1))
+  colnames(mdata) <- c('coverage', 'bases')
+  return(mdata)
+}
+
+#' @export
+getTESCoverage <- function (transcripts, flankSize = 500) {
+  tesFlanks <- GenomicRanges::flank(x = transcripts,
+                                    width = flankSize,
+                                    start = FALSE,
+                                    both = TRUE)
+  cvg <- genomation::ScoreMatrix(target = queryRegions, windows = tesFlanks, strand.aware = TRUE)
+  mdata <- as.data.frame(colSums(cvg))
+  mdata$bases <- c(-flankSize:(flankSize-1))
+  colnames(mdata) <- c('coverage', 'bases')
+  return(mdata)
+}
+
+
 #' calculateCoverageProfile
 #'
 #' This function checks overlaps betwenn input query regions and annotation
@@ -457,6 +485,7 @@ calculateCoverageProfile = function (queryRegions, targetRegions, sampleN = 0){
     sm <- genomation::ScoreMatrixBin(target = queryRegions,
                                      windows = windows,
                                      bin.num = 100,
+                                     bin.op = 'max',
                                      strand.aware = TRUE)
     mdata <- as.data.frame(colSums(sm))
     mdata$bins <- c(1:100)
