@@ -419,32 +419,41 @@ queryGff <- function(queryRegions, gff) {
 }
 
 #' @export
-getTSSCoverage <- function (queryRegions, transcripts, flankSize = 500) {
-  tssFlanks <- GenomicRanges::flank(x = transcripts,
-                                    width = flankSize,
-                                    both = TRUE
+getFeatureBoundaryCoverage <- function (queryRegions,
+                                        featureCoords,
+                                        flankSize = 500,
+                                        sampleN = 0) {
+
+  if (sampleN > 0 && sampleN < length(featureCoords)) {
+    featureCoords <- sort(featureCoords[sample(length(featureCoords), sampleN)])
+  }
+
+  #flanking regions at/around 5' site of the features
+  fivePrimeFlanks <- GenomicRanges::flank(x = featureCoords,
+                                          width = flankSize,
+                                          start = TRUE,
+                                          both = TRUE
   )
+  #flanking regions at/around 3' site of the features
+  threePrimeFlanks <- GenomicRanges::flank(x = featureCoords,
+                                           width = flankSize,
+                                           start = FALSE,
+                                           both = TRUE)
 
-  cvg <- genomation::ScoreMatrix(target = queryRegions, windows = tssFlanks, strand.aware = TRUE)
-  mdata <- as.data.frame(colSums(cvg))
-  mdata$bases <- c(-flankSize:(flankSize-1))
-  colnames(mdata) <- c('coverage', 'bases')
+  cvgFivePrime <- genomation::ScoreMatrix(target = queryRegions,
+                                          windows = fivePrimeFlanks,
+                                          strand.aware = TRUE)
+
+  cvgThreePrime <- genomation::ScoreMatrix(target = queryRegions,
+                                           windows = threePrimeFlanks,
+                                           strand.aware = TRUE)
+
+  mdata <- data.frame('fivePrime' = colSums(cvgFivePrime),
+                      'threePrime' = colSums(cvgThreePrime),
+                      'bases' =  c(-flankSize:(flankSize-1)))
+
   return(mdata)
 }
-
-#' @export
-getTESCoverage <- function (queryRegions, transcripts, flankSize = 500) {
-  tesFlanks <- GenomicRanges::flank(x = transcripts,
-                                    width = flankSize,
-                                    start = FALSE,
-                                    both = TRUE)
-  cvg <- genomation::ScoreMatrix(target = queryRegions, windows = tesFlanks, strand.aware = TRUE)
-  mdata <- as.data.frame(colSums(cvg))
-  mdata$bases <- c(-flankSize:(flankSize-1))
-  colnames(mdata) <- c('coverage', 'bases')
-  return(mdata)
-}
-
 
 #' calculateCoverageProfile
 #'
