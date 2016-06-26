@@ -436,9 +436,51 @@ getFeatureBoundaryCoverage <- function (queryRegions,
   return(mdata)
 }
 
+#' @export
+getFeatureBoundaryCoverageBin <- function (queryRegions,
+                                           featureCoords,
+                                           flankSize = 50,
+                                           sampleN = 0) {
+
+  if (sampleN > 0 && sampleN < length(featureCoords)) {
+    featureCoords <- sort(featureCoords[sample(length(featureCoords), sampleN)])
+  }
+
+  #flanking regions at/around 5' site of the features
+  fivePrimeFlanks <- GenomicRanges::flank(x = featureCoords,
+                                          width = flankSize,
+                                          start = TRUE,
+                                          both = TRUE
+  )
+  #flanking regions at/around 3' site of the features
+  threePrimeFlanks <- GenomicRanges::flank(x = featureCoords,
+                                           width = flankSize,
+                                           start = FALSE,
+                                           both = TRUE)
+
+  cvgFivePrime <- genomation::ScoreMatrixBin(target = queryRegions,
+                                             windows = fivePrimeFlanks,
+                                             bin.num = 100,
+                                             bin.op = 'max',
+                                             strand.aware = TRUE)
+
+  cvgThreePrime <- genomation::ScoreMatrixBin(target = queryRegions,
+                                              windows = threePrimeFlanks,
+                                              bin.num = 100,
+                                              bin.op = 'max',
+                                              strand.aware = TRUE)
+
+  mdata <- data.frame('fivePrime' = colSums(cvgFivePrime),
+                      'threePrime' = colSums(cvgThreePrime),
+                      'bins' =  c(-50:-1, 1:50))
+
+  return(mdata)
+}
+
+
 #' calculateCoverageProfile
 #'
-#' This function checks overlaps betwenn input query regions and annotation
+#' This function checks overlaps between input query regions and annotation
 #' features, and then calculates coverage profile along target regions.
 #'
 #' @param queryRegions GRanges object imported from a BED file using
