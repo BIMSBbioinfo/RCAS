@@ -16,7 +16,7 @@ A list of GRanges objects
 \description{
 This function takes as input a txdb object from GenomicFeatures library. Then
 extracts the coordinates of gene features such as promoters, introns, exons,
-intron-exon boundaries, 5'/3' UTRs, and whole transcripts.
+5'/3' UTRs, and whole transcripts.
 }
 \examples{
 data(gff)

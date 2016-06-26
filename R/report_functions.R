@@ -134,7 +134,7 @@ importBed <- function (filePath, sampleN = 0, keepStandardChr = TRUE) {
 #'
 #' This function takes as input a txdb object from GenomicFeatures library. Then
 #' extracts the coordinates of gene features such as promoters, introns, exons,
-#' intron-exon boundaries, 5'/3' UTRs, and whole transcripts.
+#' 5'/3' UTRs, and whole transcripts.
 #'
 #' @param txdb A txdb object imported by GenomicFeatures::makeTxDb family of
 #'   functions
@@ -162,17 +162,6 @@ getTxdbFeatures <- function (txdb) {
   introns <- BiocGenerics::unlist(tmp)
   introns$tx_name <- names(introns)
 
-  tmp1 <- GenomicRanges::flank(x = introns[GenomicRanges::width(introns) > 99],
-                               width = 50,
-                               start = TRUE,
-                               both = TRUE)
-  tmp2 <- GenomicRanges::flank(x = introns[GenomicRanges::width(introns) > 99],
-                               width=50,
-                               start=FALSE,
-                               both=TRUE)
-  exonIntronBoundaries <- c(tmp1, tmp2)
-  exonIntronBoundaries$tx_name <- names(exonIntronBoundaries)
-
   promoters <- GenomicFeatures::promoters(txdb)
 
   tmp <- GenomicFeatures::fiveUTRsByTranscript(x = txdb, use.names = TRUE)
@@ -193,7 +182,6 @@ getTxdbFeatures <- function (txdb) {
     'promoters'   = promoters,
     'fiveUTRs'    = fiveUTRs,
     'introns'     = introns,
-    'exonIntronBoundaries' = exonIntronBoundaries,
     'cds'         = cds,
     'threeUTRs'   = threeUTRs
   )
@@ -204,7 +192,7 @@ getTxdbFeatures <- function (txdb) {
 #'
 #' This function takes as input a GRanges object from the output of
 #' \code{importGtf} function. Then extracts the coordinates of gene features
-#' such as promoters, introns, exons, intron-exon boundaries, 5'/3' UTRs and
+#' such as promoters, introns, exons, 5'/3' UTRs and
 #' whole transcripts.
 #'
 #' @param gff A GRanges object imported by \code{importGtf} function
@@ -238,12 +226,6 @@ getTxdbFeaturesFromGff <- function (gff) {
   m <- match(names(introns), gff$transcript_id)
   introns$gene_name <- gff[m]$gene_name
 
-  tmp1 <- GenomicRanges::flank(introns[GenomicRanges::width(introns) >= 100],
-                               width = 50, start = TRUE, both = TRUE)
-  tmp2 <- GenomicRanges::flank(introns[GenomicRanges::width(introns) >= 100],
-                               width = 50, start = FALSE, both = TRUE)
-  exonIntronBoundaries <- c(tmp1, tmp2)
-
   promoters <- GenomicFeatures::promoters(txdb)
   m <- match(promoters$tx_name, gff$transcript_id)
   promoters$gene_name <- gff[m]$gene_name
@@ -271,7 +253,6 @@ getTxdbFeaturesFromGff <- function (gff) {
     'promoters'   = promoters,
     'fiveUTRs'    = fiveUTRs,
     'introns'     = introns,
-    'exonIntronBoundaries' = exonIntronBoundaries,
     'cds'         = cds,
     'threeUTRs'   = threeUTRs
   )
@@ -305,13 +286,13 @@ processHits <- function(queryRegions, tx, type) {
 #' This function provides a list of genes which are targeted by query regions
 #' and their corresponding numbers from an input BED file. Then, the hits are
 #' categorized by the gene features such as promoters, introns, exons,
-#' intron-exon boundaries, 5'/3' UTRs and whole transcripts.
+#' 5'/3' UTRs and whole transcripts.
 #'
 #' @param queryRegions GRanges object containing coordinates of input query
 #'   regions imported by the \code{\link{importBed}} function
 #' @param txdbFeatures A list of GRanges objects where each GRanges object
 #'   corresponds to the genomic coordinates of gene features such as promoters,
-#'   introns, exons, intron-exon boundaries, 5'/3' UTRs and whole transcripts.
+#'   introns, exons, 5'/3' UTRs and whole transcripts.
 #'   This list of GRanges objects are obtained by the function
 #'   \code{\link{getTxdbFeaturesFromGff}} or \code{\link{getTxdbFeatures}}.
 #'
@@ -591,7 +572,7 @@ calculateCoverageProfileListFromTxdb <- function (queryRegions,
 #'   downsampled to \code{sampleN} regions
 #' @param type A character string defining the type of gene feature for which a
 #'   profile should be calculated. The options are: transcripts, exons, introns,
-#'   exonIntronBoundaries, promoters, fiveUTRs, threeUTRs, and cds.
+#'   promoters, fiveUTRs, threeUTRs, and cds.
 #' @return A data.frame object consisting of two columns: 1. coverage level 2.
 #'   bins. The target regions are divided into 100 equal sized bins and coverage
 #'   level is summarized in a strand-specific manner using the
@@ -621,18 +602,6 @@ calculateCoverageProfileFromTxdb <- function (queryRegions,
   } else if (type == 'introns') {
     tmp <- GenomicFeatures::intronsByTranscript(x = txdb, use.names = TRUE)
     targetRegions <- BiocGenerics::unlist(tmp)
-  } else if (type == 'exonIntronBoundaries') {
-    tmp <- GenomicFeatures::intronsByTranscript(x = txdb, use.names = TRUE)
-    introns <- BiocGenerics::unlist(tmp)
-    tmp1 <- GenomicRanges::flank(introns[GenomicRanges::width(introns) >= 100],
-                                 width = 50,
-                                 start = TRUE,
-                                 both = TRUE)
-    tmp2 <- GenomicRanges::flank(introns[GenomicRanges::width(introns) >= 100],
-                                 width = 50,
-                                 start = FALSE,
-                                 both = TRUE)
-    targetRegions <- c(tmp1, tmp2)
   } else if (type == 'promoters') {
     targetRegions <- GenomicFeatures::promoters(txdb)
   } else if (type == 'fiveUTRs') {
@@ -646,7 +615,7 @@ calculateCoverageProfileFromTxdb <- function (queryRegions,
     targetRegions <- BiocGenerics::unlist(tmp)
   } else {
     stop ("Can calculate coverage profiles for only:
-          transcripts, exons, introns, exonIntronBoundaries,
+          transcripts, exons, introns,
           promoters, fiveUTRs, threeUTRs, and cds")
   }
   result = calculateCoverageProfile(queryRegions = queryRegions,

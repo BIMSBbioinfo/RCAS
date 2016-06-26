@@ -12,7 +12,7 @@ regions imported by the \code{\link{importBed}} function}
 
 \item{txdbFeatures}{A list of GRanges objects where each GRanges object
 corresponds to the genomic coordinates of gene features such as promoters,
-introns, exons, intron-exon boundaries, 5'/3' UTRs and whole transcripts.
+introns, exons, 5'/3' UTRs and whole transcripts.
 This list of GRanges objects are obtained by the function
 \code{\link{getTxdbFeaturesFromGff}} or \code{\link{getTxdbFeatures}}.}
 }
@@ -24,7 +24,7 @@ A data.frame object where rows correspond to genes and columns
 This function provides a list of genes which are targeted by query regions
 and their corresponding numbers from an input BED file. Then, the hits are
 categorized by the gene features such as promoters, introns, exons,
-intron-exon boundaries, 5'/3' UTRs and whole transcripts.
+5'/3' UTRs and whole transcripts.
 }
 \examples{
 data(gff)
