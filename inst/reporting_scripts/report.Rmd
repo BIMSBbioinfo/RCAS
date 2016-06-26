@@ -305,6 +305,21 @@ cat('# motifRG analysis results \n')
 motifResults <- runMotifRG(queryRegions = queryRegions, 
                            genomeVersion = params$genomeVersion, 
                            motifN = 4)
+querySeqs <- extractSequences(queryRegions = queryRegions, 
+                              genomeVersion = params$genomeVersion)
+querySeqs <- querySeqs[width(querySeqs) > 10,]
+
+motifPWMs <- list()
+patterns <- c()
+for (i in 1:length(motifResults$motifs)) {
+  motifPattern <- motifResults$motifs[[i]]@pattern
+  pwm.match <- refinePWMMotif(motifs = motifResults$motifs[[i]]@match$pattern,
+                              seqs = querySeqs)
+  motifPWMs[[length(motifPWMs)+1]] <- pwm.match
+  patterns <- c(patterns, motifPattern)
+}
+names(motifPWMs) <- patterns
+
 if (length(motifResults$motifs) > 0) {
   provideMotifSummary <- TRUE
 }
@@ -315,14 +330,14 @@ cat('## Top motifs discovered using motifRG \n')
 ```
 
 ```{r motif_analysis_plot, results='asis', eval=params$motifAnalysis}
-if (length(motifResults$motifs) > 0) {
-  cat("**Figure-",figureCount,":** Top motifs discovered in the sequences of the query regions\n")
-  par(mfrow = c(2,2), mar = c(2,2,2,2))
+if (length(motifPWMs) > 0) {
+  cat("**Figure",figureCount,":** Top motifs discovered in the sequences of the query regions\n\n")
   for (i in 1:length(motifResults$motifs)) {
-    motifPattern <- motifResults$motifs[[i]]@pattern
-    motifRG::plotMotif(match = motifResults$motifs[[i]]@match$pattern, 
-                       main = paste0('Motif-',i,': ',motifPattern),
-                       entropy = T)
+    motifPattern <- names(motifPWMs)[i]
+    pwm.match <- motifPWMs[[motifPattern]]
+    cat("**Motif",i,":** Consensus:",motifPattern,"\n")
+    seqLogo(pwm.match$model$prob)
+    cat('\n\n')
   }
   figureCount <- figureCount + 1
 } else {
