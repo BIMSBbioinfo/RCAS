@@ -195,25 +195,84 @@ layout(p = p,
 figureCount <- figureCount + 1
 ```
 
-
-```{r tssCoverage_figcap, results='asis'}
+```{r transcriptBoundaryCoverage_figcap, results='asis', eval = params$annotationSummary}
 cat("## Coverage profile of query regions at/around Transcription Start/End Sites\n")
 cat("**Figure",figureCount,":** The depth of coverage of query regions at and around Transcription Start/End Sites\n")
 ```
 
-```{r tssCoverage}
-tss <- getTSSCoverage(queryRegions = queryRegions, transcripts = txdbFeatures$transcripts, flankSize = 1000)
-tes <- getTESCoverage(queryRegions = queryRegions, transcripts = txdbFeatures$transcripts, flankSize = 1000)
+```{r transcriptBoundaryCoverage, eval = params$annotationSummary}
+cvg <- getFeatureBoundaryCoverage(queryRegions = queryRegions,
+                                  featureCoords = txdbFeatures$transcripts,
+                                  flankSize = 1000, 
+                                  sampleN = 10000)
+
+yLimit <- (as.integer(max(c(cvg$fivePrime, cvg$threePrime))/10)+1)*10
+
 p <- subplot(
-  plot_ly(data = tss, x = bases, y = coverage),
-  plot_ly(data = tes, x = bases, y = coverage),
+  plot_ly(x = cvg$bases, y = cvg$fivePrime),
+  plot_ly(x = cvg$bases, y = cvg$threePrime),
   margin = 0.05
 ) %>% layout (xaxis = list(title = 'Distance (bp) to TSS'), 
-              xaxis2 = list(title = 'Distance (bp) to TES'), showlegend = FALSE) 
+              xaxis2 = list(title = 'Distance (bp) to TES'), 
+              yaxis = list(title = 'coverage', range = c(0, yLimit)),
+              yaxis2 = list(title = 'coverage', range = c(0, yLimit)),
+                           showlegend = FALSE) 
 layout(p) 
 figureCount <- figureCount + 1
 ```
 
+```{r cdsIntronCoverage_figcap, results='asis', eval = params$annotationSummary}
+cat("## Coverage profile of query regions Coding Exon - Intron Boundaries\n")
+cat("**Figure",figureCount,":** The depth of coverage of query regions at coding exon - intron junctions\n")
+```
+
+```{r cdsIntronCoverage, eval = params$annotationSummary}
+cvg <- getFeatureBoundaryCoverageBin(queryRegions = queryRegions,
+                                  featureCoords = txdbFeatures$cds,
+                                  flankSize = 50,
+                                  sampleN = 10000)
+
+yLimit <- (as.integer(max(c(cvg$fivePrime, cvg$threePrime))/10)+1)*10
+
+p <- plot_ly(x = cvg$bins, y = cvg$fivePrime) 
+layout (p, xaxis = list(showticklabels = F, title =  'Junction'), 
+        yaxis = list(title = 'coverage', range = c(-10, yLimit)),
+              annotations = list(list(x = -25,
+                               y = -10,
+                               text = '< Intron (last 50 bp) >',
+                               bordercolor = "rgb(250,0,0)",
+                               borderwidth = 3,
+                               showarrow = F), 
+                               
+                               list(x = 25,
+                               y = -10,
+                               text = '< Coding Exon (first 50 bp) >',
+                               bordercolor = "rgb(250,0,0)",
+                               borderwidth = 3,
+                               showarrow = F)),
+              showlegend = FALSE) 
+
+p <- plot_ly(x = cvg$bins, y = cvg$threePrime)
+layout (p, xaxis = list(showticklabels = F, title = 'Junction'), 
+        yaxis = list(title = 'coverage', range = c(-10, yLimit)),
+              annotations = list(list(x = -25,
+                               y = -10,
+                               text = '< Coding Exon (last 50 bp) >',
+                               bordercolor = "rgb(250,0,0)",
+                               borderwidth = 3,
+                               showarrow = F), 
+                               
+                               list(x = 25,
+                               y = -10,
+                               text = '< Intron (first 50 bp) >',
+                               bordercolor = "rgb(250,0,0)",
+                               borderwidth = 3,
+                               showarrow = F)),
+              showlegend = FALSE) 
+
+figureCount <- figureCount + 1
+
+```
 
 ```{r coverageprofilelist_figcap, results='asis', eval=params$annotationSummary}
 cat("## Coverage profile of query regions across the length of different gene features\n")
