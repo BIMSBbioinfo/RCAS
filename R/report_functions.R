@@ -164,11 +164,11 @@ getTxdbFeatures <- function (txdb) {
 
   promoters <- GenomicFeatures::promoters(txdb)
 
-  tmp <- GenomicFeatures::fiveUTRsByTranscript(x = txdb, use.names = TRUE)
+  tmp <- range(GenomicFeatures::fiveUTRsByTranscript(x = txdb, use.names = TRUE))
   fiveUTRs <- BiocGenerics::unlist(tmp)
   fiveUTRs$tx_name <- names(fiveUTRs)
 
-  tmp <- GenomicFeatures::threeUTRsByTranscript(x = txdb, use.names = TRUE)
+  tmp <- range(GenomicFeatures::threeUTRsByTranscript(x = txdb, use.names = TRUE))
   threeUTRs <- BiocGenerics::unlist(tmp)
   threeUTRs$tx_name <- names(threeUTRs)
 
@@ -230,13 +230,21 @@ getTxdbFeaturesFromGff <- function (gff) {
   m <- match(promoters$tx_name, gff$transcript_id)
   promoters$gene_name <- gff[m]$gene_name
 
-  tmp <- GenomicFeatures::fiveUTRsByTranscript(x = txdb, use.names = TRUE)
+  #fiveUTRsByTranscript will return exonic regions of UTRs. These exonic regions
+  #must be turned into a single region containing both exons and introns using
+  #the range function we can get min-start and max-end of all UTR regions per
+  #transcript
+  tmp <- range(GenomicFeatures::fiveUTRsByTranscript(x = txdb, use.names = TRUE))
   fiveUTRs <- BiocGenerics::unlist(tmp)
   fiveUTRs$tx_name <- names(fiveUTRs)
   m <- match(names(fiveUTRs), gff$transcript_id)
   fiveUTRs$gene_name <- gff[m]$gene_name
 
-  tmp <- GenomicFeatures::threeUTRsByTranscript(x = txdb, use.names = TRUE)
+  #threeUTRsByTranscript will return exonic regions of UTRs. These exonic regions
+  #must be turned into a single region containing both exons and introns using
+  #the range function we can get min-start and max-end of all UTR regions per
+  #transcript
+  tmp <- range(GenomicFeatures::threeUTRsByTranscript(x = txdb, use.names = TRUE))
   threeUTRs <- BiocGenerics::unlist(tmp)
   threeUTRs$tx_name <- names(threeUTRs)
   m <- match(names(threeUTRs), gff$transcript_id)
