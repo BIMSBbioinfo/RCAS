@@ -407,6 +407,37 @@ queryGff <- function(queryRegions, gff) {
   return (overlapsGff)
 }
 
+
+#' getFeatureBoundaryCoverage
+#'
+#' This function extracts the flanking regions of 5' and 3' boundaries of a
+#' given set of genomic features and computes the per-base coverage of query
+#' regions across these boundaries.
+#'
+#' @param queryRegions GRanges object imported from a BED file using
+#'   \code{importBed} function
+#' @param featureCoords GRanges object containing the target feature coordinates
+#' @param flankSize Positive integer that determines the number of base pairs to
+#'   extract around a given genomic feature boundary
+#' @param sampleN A positive integer value less than the total number of featuer
+#'   coordinates that determines whether the target feature coordinates should
+#'   be randomly downsampled. If set to 0, no downsampling will happen. If
+#' @return a data frame containin three columns. 1. fivePrime: Coverage at 5'
+#'   end of features 2. threePrime: Coverage at 3' end of features; 3. bases:
+#'   distance (in bp) to the boundary
+#'
+#' @examples
+#' data(queryRegions)
+#' data(gff)
+#' txdb <- GenomicFeatures::makeTxDbFromGRanges(gff)
+#' transcriptCoords <- GenomicFeatures::transcripts(txdb)
+#' transcriptEndCoverage <- getFeatureBoundaryCoverage (
+#'                                      queryRegions = queryRegions,
+#'                                     featureCoords = transcriptCoords,
+#'                                     flankSize = 100,
+#'                                     sampleN = 1000)
+#' @import GenomicRanges
+#' @importFrom genomation ScoreMatrix
 #' @export
 getFeatureBoundaryCoverage <- function (queryRegions,
                                         featureCoords,
@@ -444,6 +475,37 @@ getFeatureBoundaryCoverage <- function (queryRegions,
   return(mdata)
 }
 
+
+#' getFeatureBoundaryCoverage
+#'
+#' This function extracts the flanking regions of 5' and 3' boundaries of a
+#' given set of genomic features, splits them into 100 equally sized bins and
+#' computes the per-bin coverage of query regions across these boundaries.
+#'
+#' @param queryRegions GRanges object imported from a BED file using
+#'   \code{importBed} function
+#' @param featureCoords GRanges object containing the target feature coordinates
+#' @param flankSize Positive integer that determines the number of base pairs to
+#'   extract around a given genomic feature boundary
+#' @param sampleN A positive integer value less than the total number of featuer
+#'   coordinates that determines whether the target feature coordinates should
+#'   be randomly downsampled. If set to 0, no downsampling will happen. If
+#' @return a data frame containin three columns. 1. fivePrime: Coverage at 5'
+#'   end of features 2. threePrime: Coverage at 3' end of features; 3. bases:
+#'   distance (in bp) to the boundary
+#'
+#' @examples
+#' data(queryRegions)
+#' data(gff)
+#' txdb <- GenomicFeatures::makeTxDbFromGRanges(gff)
+#' transcriptCoords <- GenomicFeatures::transcripts(txdb)
+#' transcriptEndCoverageBin <- getFeatureBoundaryCoverageBin (
+#'                                      queryRegions = queryRegions,
+#'                                     featureCoords = transcriptCoords,
+#'                                     flankSize = 100,
+#'                                     sampleN = 1000)
+#' @import GenomicRanges
+#' @importFrom genomation ScoreMatrix
 #' @export
 getFeatureBoundaryCoverageBin <- function (queryRegions,
                                            featureCoords,

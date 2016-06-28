@@ -10,17 +10,17 @@ test_that("Importing txdb", {
 features <- getTxdbFeatures(txdb)
 test_that("Parsing features from txdb", {
   expect_is(features, 'list')
-  expect_equal(length(names(features)), 8)
+  expect_equal(length(names(features)), 7)
   expect_match(names(features)[1], "transcripts")
-  expect_match(names(features)[8], "threeUTRs")
+  expect_match(names(features)[7], "threeUTRs")
 })
 
 features <- getTxdbFeaturesFromGff(gff = gff)
 test_that("Parsing features from GFF", {
   expect_is(features, 'list')
-  expect_equal(length(names(features)), 8)
+  expect_equal(length(names(features)), 7)
   expect_match(names(features)[1], "transcripts")
-  expect_match(names(features)[8], "threeUTRs")
+  expect_match(names(features)[7], "threeUTRs")
 })
 
 data(queryRegions)
@@ -28,10 +28,10 @@ mytable <- getTargetedGenesTable(queryRegions = queryRegions,
                                  txdbFeatures = features)
 test_that("Getting table of targeted genes", {
   expect_is(mytable, 'data.table')
-  expect_equal(nrow(mytable), 2097)
-  expect_equal(ncol(mytable), 9)
+  expect_equal(nrow(mytable), 2094)
+  expect_equal(ncol(mytable), 8)
   expect_match(colnames(mytable)[1], "tx_name")
-  expect_match(colnames(mytable)[9], "threeUTRs")
+  expect_match(colnames(mytable)[8], "threeUTRs")
 })
 
 summary <- summarizeQueryRegions(queryRegions = queryRegions,
@@ -80,5 +80,30 @@ test_that("Getting a list of coverage profiles
             expect_equal(length(names(profileList)), length(features))
           })
 
+transcriptEndCoverage <- getFeatureBoundaryCoverage(
+                                queryRegions = queryRegions,
+                                featureCoords = features$transcripts[1:1000],
+                                flankSize = 100,
+                                sampleN = 0
+                                )
+
+test_that("Calculating per base coverage profile at TSS and TES boundaries", {
+  expect_equal(colnames(transcriptEndCoverage), c("fivePrime","threePrime","bases"))
+  expect_is(transcriptEndCoverage, 'data.frame')
+  expect_equal(as.vector(colSums(transcriptEndCoverage)), c(28, 463, -100))
+})
+
+transcriptEndCoverageBin <- getFeatureBoundaryCoverageBin(
+  queryRegions = queryRegions,
+  featureCoords = features$transcripts[1:1000],
+  flankSize = 100,
+  sampleN = 0
+)
+
+test_that("Calculating per bin coverage profile at TSS and TES boundaries", {
+  expect_equal(colnames(transcriptEndCoverageBin), c("fivePrime","threePrime","bins"))
+  expect_is(transcriptEndCoverageBin, 'data.frame')
+  expect_equal(as.vector(colSums(transcriptEndCoverageBin)), c(15, 241, 0))
+})
 
 
