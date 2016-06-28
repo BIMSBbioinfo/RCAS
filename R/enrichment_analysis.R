@@ -43,7 +43,6 @@
 #' @importFrom topGO annFUN.org
 #' @importFrom stats p.adjust
 #' @importFrom stats fisher.test
-#' @importFrom methods new
 #' @export
 runTopGO <- function (ontology = 'BP',
                       species = 'human',
