@@ -392,7 +392,7 @@ cat("## Biological Processes\n")
 cat("**Table",tableCount,":** Significant Biological Process GO terms (bonferroni < 0.1) enriched for genes that overlap query regions\n")  
 goBP <- goBP[order(goBP$foldEnrichment, decreasing = TRUE),]
 rownames(goBP) <- goBP$GO.ID
-goBP <- subset(goBP, select = -c(bh, GO.ID))
+goBP <- subset(goBP, select = -c(Annotated,classicFisher, bh, GO.ID))
 DT::datatable(goBP[goBP$bonferroni < 0.1,], 
           extensions = 'FixedColumns', filter = 'bottom',
           options = list(fixedColumns = TRUE, scrollX = TRUE)
@@ -406,7 +406,7 @@ cat("## Molecular Functions\n")
 cat("**Table",tableCount,":** Significant Molecular Function GO terms (bonferroni < 0.1) enriched for genes that overlap query regions\n")  
 goMF <- goMF[order(goMF$foldEnrichment, decreasing = TRUE),]
 rownames(goMF) <- goMF$GO.ID
-goMF <- subset(goMF, select = -c(bh, GO.ID))
+goMF <- subset(goMF, select = -c(Annotated,classicFisher, bh, GO.ID))
 
 DT::datatable(goMF[goMF$bonferroni < 0.1,], 
           extensions = 'FixedColumns', filter = 'bottom',
@@ -420,7 +420,7 @@ cat("## Cellular Compartments\n")
 cat("**Table",tableCount,":** Significant Cellular Compartment GO terms (bonferroni < 0.1) enriched for genes that overlap query regions\n")  
 goCC <- goCC[order(goCC$foldEnrichment, decreasing = TRUE),]
 rownames(goCC) <- goCC$GO.ID
-goCC <- subset(goCC, select = -c(bh, GO.ID))
+goCC <- subset(goCC, select = -c(Annotated,classicFisher, bh, GO.ID))
 
 DT::datatable(goCC[goCC$bonferroni < 0.1,], 
           extensions = 'FixedColumns', filter = 'bottom',
@@ -456,7 +456,7 @@ msigdbResults <- runMSIGDB(msigDB = msigDB,
                            targetedGenes = targetedGenes)
 rownames(msigdbResults) = gsub(pattern = '_', replacement = ' ', x = rownames(msigdbResults))
 msigdbResults = msigdbResults[order(msigdbResults$foldEnrichment, decreasing = TRUE),]
-msigdbResults <- subset(msigdbResults, select = -c(BH))
+msigdbResults <- subset(msigdbResults, select = -c(BH, treatmentSize, fisherPVal))
 
 DT::datatable(msigdbResults[msigdbResults$bonferroni < 0.1,], 
           extensions = 'FixedColumns', filter = 'bottom',

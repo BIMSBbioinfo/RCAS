@@ -24,6 +24,8 @@
 #' @examples
 #' \dontrun{
 #' #get all genes from the gff data
+#' data(gff)
+#' data(queryRegions)
 #' backgroundGenes <- unique(gff$gene_id)
 #' #get genes that overlap query regions
 #' overlaps <- queryGff(queryRegions, gff)
@@ -93,8 +95,6 @@ runTopGO <- function (ontology = 'BP',
 
   goResults$bh <- stats::p.adjust(goResults$classicFisher, method="BH")
   goResults$foldEnrichment <- round(goResults$Significant/goResults$Expected, 2)
-  goResults <- subset(goResults, select = -c(Annotated, classicFisher))
-  colnames(goResults)[3] <- 'SetSize'
   return(goResults)
 }
 
@@ -342,7 +342,7 @@ calculateEnrichment <- function (targetedGenes, backgroundGenes, geneSet) {
 #' #get genes that overlap query regions
 #' overlaps <- queryGff(queryRegions, gff)
 #' targetedGenes <- unique(overlaps$gene_id)
-#' runMSIGDB(msigDB = msigDB,
+#' msigdbResults <- runMSIGDB(msigDB = msigDB,
 #'           species = 'human',
 #'           backgroundGenes = backgroundGenes,
 #'           targetedGenes = targetedGenes)
@@ -381,7 +381,6 @@ runMSIGDB <- function (msigDB,
   results$bonferroni <- stats::p.adjust(p = results$fisherPVal,
                                         method = "bonferroni")
   results$foldEnrichment <- round(results$treatment/results$expectedInTreatment, 2)
-  results <- subset(results, select = -c(treatmentSize, fisherPVal))
   return(results[order(results$bonferroni),])
 }
 

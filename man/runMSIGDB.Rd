@@ -42,7 +42,7 @@ backgroundGenes <- unique(gff$gene_id)
 #get genes that overlap query regions
 overlaps <- queryGff(queryRegions, gff)
 targetedGenes <- unique(overlaps$gene_id)
-runMSIGDB(msigDB = msigDB,
+msigdbResults <- runMSIGDB(msigDB = msigDB,
           species = 'human',
           backgroundGenes = backgroundGenes,
           targetedGenes = targetedGenes)

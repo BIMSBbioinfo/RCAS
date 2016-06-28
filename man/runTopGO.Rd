@@ -34,6 +34,8 @@ A wrapper function to facilitate GO term enrichment analysis using
 \examples{
 \dontrun{
 #get all genes from the gff data
+data(gff)
+data(queryRegions)
 backgroundGenes <- unique(gff$gene_id)
 #get genes that overlap query regions
 overlaps <- queryGff(queryRegions, gff)
