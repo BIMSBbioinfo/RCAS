@@ -531,13 +531,13 @@ getFeatureBoundaryCoverageBin <- function (queryRegions,
   cvgFivePrime <- genomation::ScoreMatrixBin(target = queryRegions,
                                              windows = fivePrimeFlanks,
                                              bin.num = 100,
-                                             bin.op = 'max',
+                                             bin.op = 'mean',
                                              strand.aware = TRUE)
 
   cvgThreePrime <- genomation::ScoreMatrixBin(target = queryRegions,
                                               windows = threePrimeFlanks,
                                               bin.num = 100,
-                                              bin.op = 'max',
+                                              bin.op = 'mean',
                                               strand.aware = TRUE)
 
   mdata <- data.frame('fivePrime' = colSums(cvgFivePrime),
@@ -587,7 +587,7 @@ calculateCoverageProfile = function (queryRegions, targetRegions, sampleN = 0){
     sm <- genomation::ScoreMatrixBin(target = queryRegions,
                                      windows = windows,
                                      bin.num = 100,
-                                     bin.op = 'max',
+                                     bin.op = 'mean',
                                      strand.aware = TRUE)
     mdata <- as.data.frame(colSums(sm))
     mdata$bins <- c(1:100)
