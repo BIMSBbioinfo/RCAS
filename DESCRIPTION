@@ -1,0 +1,51 @@
+Package: RCAS
+Type: Package
+Title: RNA Centric Annotation System
+Version: 0.99.3
+Date: 2016-03-22
+Authors@R: c(person("Bora", "Uyar", email='bora.uyar@mdc-berlin.de',
+        role=c("aut", "cre")), person("Dilmurat", "Yusuf",
+        role=c("aut")), person("Ricardo", "Wurmus", role=c("aut")),
+        person("Altuna", "Akalin", role=c("ctb")))
+Description: RNA Centric Annotation System is an automated system that
+        provides dynamic annotations for custom input files that
+        contain transcriptomic target regions. Such transcriptomic
+        target regions could be, for instance, peak regions detected by
+        CLIP-Seq analysis that detect protein-RNA interactions,
+        MeRIP-Seq analysis that detect RNA modifications (alias the
+        epitranscriptome), or any collection of target regions at the
+        level of the transcriptome. RCAS contains wrapper functions to
+        do de novo motif discovery using functions from the motifRG
+        package. RCAS overlays the input target regions with the
+        annotated protein- coding genes and calculates the Gene
+        Ontology (GO) terms that may be enriched or depleted in the
+        input target regions compared to the background list of
+        protein- coding genes. A Classical Fisher's Exact Test is
+        applied for each GO term and the p-values obtained for each GO
+        term is corrected for multiple testing using both the False
+        Discovery Rate and the Family-Wise Error Rate. Similarly to the
+        GO term enrichment analysis, RCAS also detects sets of genes as
+        annotated in the Molecular Signatures Database that are
+        enriched or depleted in the queried target regions. Results are
+        corrected for multiple-testing according to both the False
+        Discovery Rate and the Family-Wise Error Rate.
+License: Artistic-2.0
+LazyData: TRUE
+Depends: R (>= 3.3.0), plotly, DT, data.table, topGO, motifRG,
+Imports: biomaRt, AnnotationDbi, GenomicRanges,
+        BSgenome.Hsapiens.UCSC.hg19, GenomeInfoDb, Biostrings,
+        rtracklayer, org.Hs.eg.db, GenomicFeatures, genomation,
+        rmarkdown (>= 0.9.5), knitr (>= 1.12.3), BiocGenerics,
+        S4Vectors, stats,
+RoxygenNote: 5.0.1
+Suggests: BSgenome.Mmusculus.UCSC.mm9, BSgenome.Celegans.UCSC.ce10,
+        BSgenome.Dmelanogaster.UCSC.dm3, org.Mm.eg.db, org.Ce.eg.db,
+        org.Dm.eg.db, testthat
+SystemRequirements: pandoc (>= 1.12.3)
+VignetteBuilder: knitr
+biocViews: Software, GeneTarget, MotifAnnotation, MotifDiscovery, GO,
+        Transcriptomics, GenomeAnnotation, GeneSetEnrichment, Coverage
+NeedsCompilation: no
+Author: Bora Uyar [aut, cre], Dilmurat Yusuf [aut], Ricardo Wurmus
+        [aut], Altuna Akalin [ctb]
+Maintainer: Bora Uyar <bora.uyar@mdc-berlin.de>
