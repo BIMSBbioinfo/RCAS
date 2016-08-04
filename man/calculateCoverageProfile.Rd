@@ -23,7 +23,7 @@ A data.frame object consisting of two columns: 1. coverage level 2.
   \code{genomation::ScoreMatrixBin} function.
 }
 \description{
-This function checks overlaps betwenn input query regions and annotation
+This function checks overlaps between input query regions and annotation
 features, and then calculates coverage profile along target regions.
 }
 \examples{

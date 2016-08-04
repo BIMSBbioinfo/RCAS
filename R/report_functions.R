@@ -134,7 +134,7 @@ importBed <- function (filePath, sampleN = 0, keepStandardChr = TRUE) {
 #'
 #' This function takes as input a txdb object from GenomicFeatures library. Then
 #' extracts the coordinates of gene features such as promoters, introns, exons,
-#' intron-exon boundaries, 5'/3' UTRs, and whole transcripts.
+#' 5'/3' UTRs, and whole transcripts.
 #'
 #' @param txdb A txdb object imported by GenomicFeatures::makeTxDb family of
 #'   functions
@@ -162,24 +162,13 @@ getTxdbFeatures <- function (txdb) {
   introns <- BiocGenerics::unlist(tmp)
   introns$tx_name <- names(introns)
 
-  tmp1 <- GenomicRanges::flank(x = introns[GenomicRanges::width(introns) > 99],
-                               width = 50,
-                               start = TRUE,
-                               both = TRUE)
-  tmp2 <- GenomicRanges::flank(x = introns[GenomicRanges::width(introns) > 99],
-                               width=50,
-                               start=FALSE,
-                               both=TRUE)
-  exonIntronBoundaries <- c(tmp1, tmp2)
-  exonIntronBoundaries$tx_name <- names(exonIntronBoundaries)
-
   promoters <- GenomicFeatures::promoters(txdb)
 
-  tmp <- GenomicFeatures::fiveUTRsByTranscript(x = txdb, use.names = TRUE)
+  tmp <- range(GenomicFeatures::fiveUTRsByTranscript(x = txdb, use.names = TRUE))
   fiveUTRs <- BiocGenerics::unlist(tmp)
   fiveUTRs$tx_name <- names(fiveUTRs)
 
-  tmp <- GenomicFeatures::threeUTRsByTranscript(x = txdb, use.names = TRUE)
+  tmp <- range(GenomicFeatures::threeUTRsByTranscript(x = txdb, use.names = TRUE))
   threeUTRs <- BiocGenerics::unlist(tmp)
   threeUTRs$tx_name <- names(threeUTRs)
 
@@ -193,7 +182,6 @@ getTxdbFeatures <- function (txdb) {
     'promoters'   = promoters,
     'fiveUTRs'    = fiveUTRs,
     'introns'     = introns,
-    'exonIntronBoundaries' = exonIntronBoundaries,
     'cds'         = cds,
     'threeUTRs'   = threeUTRs
   )
@@ -204,7 +192,7 @@ getTxdbFeatures <- function (txdb) {
 #'
 #' This function takes as input a GRanges object from the output of
 #' \code{importGtf} function. Then extracts the coordinates of gene features
-#' such as promoters, introns, exons, intron-exon boundaries, 5'/3' UTRs and
+#' such as promoters, introns, exons, 5'/3' UTRs and
 #' whole transcripts.
 #'
 #' @param gff A GRanges object imported by \code{importGtf} function
@@ -238,23 +226,25 @@ getTxdbFeaturesFromGff <- function (gff) {
   m <- match(names(introns), gff$transcript_id)
   introns$gene_name <- gff[m]$gene_name
 
-  tmp1 <- GenomicRanges::flank(introns[GenomicRanges::width(introns) >= 100],
-                               width = 50, start = TRUE, both = TRUE)
-  tmp2 <- GenomicRanges::flank(introns[GenomicRanges::width(introns) >= 100],
-                               width = 50, start = FALSE, both = TRUE)
-  exonIntronBoundaries <- c(tmp1, tmp2)
-
   promoters <- GenomicFeatures::promoters(txdb)
   m <- match(promoters$tx_name, gff$transcript_id)
   promoters$gene_name <- gff[m]$gene_name
 
-  tmp <- GenomicFeatures::fiveUTRsByTranscript(x = txdb, use.names = TRUE)
+  #fiveUTRsByTranscript will return exonic regions of UTRs. These exonic regions
+  #must be turned into a single region containing both exons and introns using
+  #the range function we can get min-start and max-end of all UTR regions per
+  #transcript
+  tmp <- range(GenomicFeatures::fiveUTRsByTranscript(x = txdb, use.names = TRUE))
   fiveUTRs <- BiocGenerics::unlist(tmp)
   fiveUTRs$tx_name <- names(fiveUTRs)
   m <- match(names(fiveUTRs), gff$transcript_id)
   fiveUTRs$gene_name <- gff[m]$gene_name
 
-  tmp <- GenomicFeatures::threeUTRsByTranscript(x = txdb, use.names = TRUE)
+  #threeUTRsByTranscript will return exonic regions of UTRs. These exonic regions
+  #must be turned into a single region containing both exons and introns using
+  #the range function we can get min-start and max-end of all UTR regions per
+  #transcript
+  tmp <- range(GenomicFeatures::threeUTRsByTranscript(x = txdb, use.names = TRUE))
   threeUTRs <- BiocGenerics::unlist(tmp)
   threeUTRs$tx_name <- names(threeUTRs)
   m <- match(names(threeUTRs), gff$transcript_id)
@@ -271,7 +261,6 @@ getTxdbFeaturesFromGff <- function (gff) {
     'promoters'   = promoters,
     'fiveUTRs'    = fiveUTRs,
     'introns'     = introns,
-    'exonIntronBoundaries' = exonIntronBoundaries,
     'cds'         = cds,
     'threeUTRs'   = threeUTRs
   )
@@ -305,13 +294,13 @@ processHits <- function(queryRegions, tx, type) {
 #' This function provides a list of genes which are targeted by query regions
 #' and their corresponding numbers from an input BED file. Then, the hits are
 #' categorized by the gene features such as promoters, introns, exons,
-#' intron-exon boundaries, 5'/3' UTRs and whole transcripts.
+#' 5'/3' UTRs and whole transcripts.
 #'
 #' @param queryRegions GRanges object containing coordinates of input query
 #'   regions imported by the \code{\link{importBed}} function
 #' @param txdbFeatures A list of GRanges objects where each GRanges object
 #'   corresponds to the genomic coordinates of gene features such as promoters,
-#'   introns, exons, intron-exon boundaries, 5'/3' UTRs and whole transcripts.
+#'   introns, exons, 5'/3' UTRs and whole transcripts.
 #'   This list of GRanges objects are obtained by the function
 #'   \code{\link{getTxdbFeaturesFromGff}} or \code{\link{getTxdbFeatures}}.
 #'
@@ -418,9 +407,150 @@ queryGff <- function(queryRegions, gff) {
   return (overlapsGff)
 }
 
+
+#' getFeatureBoundaryCoverage
+#'
+#' This function extracts the flanking regions of 5' and 3' boundaries of a
+#' given set of genomic features and computes the per-base coverage of query
+#' regions across these boundaries.
+#'
+#' @param queryRegions GRanges object imported from a BED file using
+#'   \code{importBed} function
+#' @param featureCoords GRanges object containing the target feature coordinates
+#' @param flankSize Positive integer that determines the number of base pairs to
+#'   extract around a given genomic feature boundary
+#' @param sampleN A positive integer value less than the total number of featuer
+#'   coordinates that determines whether the target feature coordinates should
+#'   be randomly downsampled. If set to 0, no downsampling will happen. If
+#' @return a data frame containin three columns. 1. fivePrime: Coverage at 5'
+#'   end of features 2. threePrime: Coverage at 3' end of features; 3. bases:
+#'   distance (in bp) to the boundary
+#'
+#' @examples
+#' data(queryRegions)
+#' data(gff)
+#' txdb <- GenomicFeatures::makeTxDbFromGRanges(gff)
+#' transcriptCoords <- GenomicFeatures::transcripts(txdb)
+#' transcriptEndCoverage <- getFeatureBoundaryCoverage (
+#'                                      queryRegions = queryRegions,
+#'                                     featureCoords = transcriptCoords,
+#'                                     flankSize = 100,
+#'                                     sampleN = 1000)
+#' @import GenomicRanges
+#' @importFrom genomation ScoreMatrix
+#' @export
+getFeatureBoundaryCoverage <- function (queryRegions,
+                                        featureCoords,
+                                        flankSize = 500,
+                                        sampleN = 0) {
+
+  if (sampleN > 0 && sampleN < length(featureCoords)) {
+    featureCoords <- sort(featureCoords[sample(length(featureCoords), sampleN)])
+  }
+
+  #flanking regions at/around 5' site of the features
+  fivePrimeFlanks <- GenomicRanges::flank(x = featureCoords,
+                                          width = flankSize,
+                                          start = TRUE,
+                                          both = TRUE
+  )
+  #flanking regions at/around 3' site of the features
+  threePrimeFlanks <- GenomicRanges::flank(x = featureCoords,
+                                           width = flankSize,
+                                           start = FALSE,
+                                           both = TRUE)
+
+  cvgFivePrime <- genomation::ScoreMatrix(target = queryRegions,
+                                          windows = fivePrimeFlanks,
+                                          strand.aware = TRUE)
+
+  cvgThreePrime <- genomation::ScoreMatrix(target = queryRegions,
+                                           windows = threePrimeFlanks,
+                                           strand.aware = TRUE)
+
+  mdata <- data.frame('fivePrime' = colSums(cvgFivePrime),
+                      'threePrime' = colSums(cvgThreePrime),
+                      'bases' =  c(-flankSize:(flankSize-1)))
+
+  return(mdata)
+}
+
+
+#' getFeatureBoundaryCoverage
+#'
+#' This function extracts the flanking regions of 5' and 3' boundaries of a
+#' given set of genomic features, splits them into 100 equally sized bins and
+#' computes the per-bin coverage of query regions across these boundaries.
+#'
+#' @param queryRegions GRanges object imported from a BED file using
+#'   \code{importBed} function
+#' @param featureCoords GRanges object containing the target feature coordinates
+#' @param flankSize Positive integer that determines the number of base pairs to
+#'   extract around a given genomic feature boundary
+#' @param sampleN A positive integer value less than the total number of featuer
+#'   coordinates that determines whether the target feature coordinates should
+#'   be randomly downsampled. If set to 0, no downsampling will happen. If
+#' @return a data frame containin three columns. 1. fivePrime: Coverage at 5'
+#'   end of features 2. threePrime: Coverage at 3' end of features; 3. bases:
+#'   distance (in bp) to the boundary
+#'
+#' @examples
+#' data(queryRegions)
+#' data(gff)
+#' txdb <- GenomicFeatures::makeTxDbFromGRanges(gff)
+#' transcriptCoords <- GenomicFeatures::transcripts(txdb)
+#' transcriptEndCoverageBin <- getFeatureBoundaryCoverageBin (
+#'                                      queryRegions = queryRegions,
+#'                                     featureCoords = transcriptCoords,
+#'                                     flankSize = 100,
+#'                                     sampleN = 1000)
+#' @import GenomicRanges
+#' @importFrom genomation ScoreMatrix
+#' @export
+getFeatureBoundaryCoverageBin <- function (queryRegions,
+                                           featureCoords,
+                                           flankSize = 50,
+                                           sampleN = 0) {
+
+  if (sampleN > 0 && sampleN < length(featureCoords)) {
+    featureCoords <- sort(featureCoords[sample(length(featureCoords), sampleN)])
+  }
+
+  #flanking regions at/around 5' site of the features
+  fivePrimeFlanks <- GenomicRanges::flank(x = featureCoords,
+                                          width = flankSize,
+                                          start = TRUE,
+                                          both = TRUE
+  )
+  #flanking regions at/around 3' site of the features
+  threePrimeFlanks <- GenomicRanges::flank(x = featureCoords,
+                                           width = flankSize,
+                                           start = FALSE,
+                                           both = TRUE)
+
+  cvgFivePrime <- genomation::ScoreMatrixBin(target = queryRegions,
+                                             windows = fivePrimeFlanks,
+                                             bin.num = 100,
+                                             bin.op = 'max',
+                                             strand.aware = TRUE)
+
+  cvgThreePrime <- genomation::ScoreMatrixBin(target = queryRegions,
+                                              windows = threePrimeFlanks,
+                                              bin.num = 100,
+                                              bin.op = 'max',
+                                              strand.aware = TRUE)
+
+  mdata <- data.frame('fivePrime' = colSums(cvgFivePrime),
+                      'threePrime' = colSums(cvgThreePrime),
+                      'bins' =  c(-50:-1, 1:50))
+
+  return(mdata)
+}
+
+
 #' calculateCoverageProfile
 #'
-#' This function checks overlaps betwenn input query regions and annotation
+#' This function checks overlaps between input query regions and annotation
 #' features, and then calculates coverage profile along target regions.
 #'
 #' @param queryRegions GRanges object imported from a BED file using
@@ -452,11 +582,12 @@ calculateCoverageProfile = function (queryRegions, targetRegions, sampleN = 0){
 
   if (length(windows) > 0) {
     if (sampleN > 0 && sampleN < length(windows)) {
-      windows <- windows[sample(length(windows), sampleN)]
+      windows <- sort(windows[sample(length(windows), sampleN)])
     }
     sm <- genomation::ScoreMatrixBin(target = queryRegions,
                                      windows = windows,
                                      bin.num = 100,
+                                     bin.op = 'max',
                                      strand.aware = TRUE)
     mdata <- as.data.frame(colSums(sm))
     mdata$bins <- c(1:100)
@@ -553,7 +684,7 @@ calculateCoverageProfileListFromTxdb <- function (queryRegions,
 #'   downsampled to \code{sampleN} regions
 #' @param type A character string defining the type of gene feature for which a
 #'   profile should be calculated. The options are: transcripts, exons, introns,
-#'   exonIntronBoundaries, promoters, fiveUTRs, threeUTRs, and cds.
+#'   promoters, fiveUTRs, threeUTRs, and cds.
 #' @return A data.frame object consisting of two columns: 1. coverage level 2.
 #'   bins. The target regions are divided into 100 equal sized bins and coverage
 #'   level is summarized in a strand-specific manner using the
@@ -583,18 +714,6 @@ calculateCoverageProfileFromTxdb <- function (queryRegions,
   } else if (type == 'introns') {
     tmp <- GenomicFeatures::intronsByTranscript(x = txdb, use.names = TRUE)
     targetRegions <- BiocGenerics::unlist(tmp)
-  } else if (type == 'exonIntronBoundaries') {
-    tmp <- GenomicFeatures::intronsByTranscript(x = txdb, use.names = TRUE)
-    introns <- BiocGenerics::unlist(tmp)
-    tmp1 <- GenomicRanges::flank(introns[GenomicRanges::width(introns) >= 100],
-                                 width = 50,
-                                 start = TRUE,
-                                 both = TRUE)
-    tmp2 <- GenomicRanges::flank(introns[GenomicRanges::width(introns) >= 100],
-                                 width = 50,
-                                 start = FALSE,
-                                 both = TRUE)
-    targetRegions <- c(tmp1, tmp2)
   } else if (type == 'promoters') {
     targetRegions <- GenomicFeatures::promoters(txdb)
   } else if (type == 'fiveUTRs') {
@@ -608,7 +727,7 @@ calculateCoverageProfileFromTxdb <- function (queryRegions,
     targetRegions <- BiocGenerics::unlist(tmp)
   } else {
     stop ("Can calculate coverage profiles for only:
-          transcripts, exons, introns, exonIntronBoundaries,
+          transcripts, exons, introns,
           promoters, fiveUTRs, threeUTRs, and cds")
   }
   result = calculateCoverageProfile(queryRegions = queryRegions,
@@ -652,6 +771,11 @@ findLongLines <- function (myfile, lineLimit = 80) {
 #'   directory)
 #' @param printProcessedTables boolean value (default: FALSE). If set to TRUE,
 #'   raw data tables that are used for plots/tables will be printed to files.
+#' @param sampleN integer value (default: 0). A parameter to determine if the
+#'   input query regions should be downsampled to a smaller size in order to
+#'   make report generation quicker. When set to 0, downsampling won't be done.
+#'   To activate the sampling a positive integer value that is smaller than
+#'   the total number of query regions should be given.
 #' @return An html generated using rmarkdown/knitr/pandoc that contains
 #'   interactive figures, tables, and text that provide an overview of the
 #'   experiment
@@ -701,7 +825,8 @@ runReport <- function(queryFilePath = 'testdata',
                       motifAnalysis = TRUE,
                       genomeVersion = 'hg19',
                       outDir = getwd(),
-                      printProcessedTables = FALSE) {
+                      printProcessedTables = FALSE,
+                      sampleN = 10000) {
 
   if (genomeVersion == 'hg19') {
     species <- 'human'
@@ -782,6 +907,7 @@ runReport <- function(queryFilePath = 'testdata',
                   genomeVersion = genomeVersion,
                   species = species,
                   printProcessedTables = printProcessedTables,
+                  sampleN = sampleN,
                   workdir = outDir)
     )
 }

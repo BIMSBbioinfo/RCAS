@@ -15,7 +15,7 @@ family of functions}
 
 \item{type}{A character string defining the type of gene feature for which a
 profile should be calculated. The options are: transcripts, exons, introns,
-exonIntronBoundaries, promoters, fiveUTRs, threeUTRs, and cds.}
+promoters, fiveUTRs, threeUTRs, and cds.}
 
 \item{sampleN}{If set to a positive integer, the targetRegions will be
 downsampled to \code{sampleN} regions}

@@ -13,6 +13,7 @@ params:
   genomeVersion: 'hg19'
   species: 'human'
   printProcessedTables: FALSE
+  sampleN: 0
   workdir: '.'
 ---
 
@@ -43,7 +44,7 @@ on biological research at various levels.
 At the level of transcriptome,
 various HTS methods have been applied to study different aspects of
 the complete set of transcripts that are produced by the genome.
-On such method is
+One such method is
 cross-linking immunoprecipitation-high-throughput
 sequencing (CLIP-Seq)
 that is used to
@@ -88,7 +89,7 @@ if(params$query == 'testdata') {
   data(queryRegions) 
 } else {
   cat('importing BED from filepath',params$query,'\n')
-  queryRegions <- importBed(filePath = params$query, sampleN = 10000)
+  queryRegions <- importBed(filePath = params$query, sampleN = params$sampleN)
 }
 
 if(params$gff == 'testdata') {
@@ -159,19 +160,12 @@ dt <- getTargetedGenesTable(queryRegions = queryRegions,
 dt <- dt[order(transcripts, decreasing = TRUE)][1:100]
 
 if(params$printProcessedTables == TRUE) {
-  cat('printing table')
   write.table(x = dt, file='getTargetedGenesTable.tsv', quote = FALSE, sep = '\t', row.names = FALSE)
-} else {
-  cat('not priting table')
-}
+} 
 
-DT::datatable(data = dt,
-          extensions = 'FixedColumns', 
-          options = list(
-            dom = 't',
-            scrollX = TRUE, 
-            scrollCollapse = TRUE
-            )
+DT::datatable(dt, 
+          extensions = 'FixedColumns', filter = 'bottom',
+          options = list(fixedColumns = TRUE, scrollX = TRUE)
           )
 tableCount <- tableCount + 1
 
@@ -199,6 +193,85 @@ layout(p = p,
        yaxis = list(title = paste("percentage of query regions,", 
                                   "n =", length(queryRegions))))
 figureCount <- figureCount + 1
+```
+
+```{r transcriptBoundaryCoverage_figcap, results='asis', eval = params$annotationSummary}
+cat("## Coverage profile of query regions at/around Transcription Start/End Sites\n")
+cat("**Figure",figureCount,":** The depth of coverage of query regions at and around Transcription Start/End Sites\n")
+```
+
+```{r transcriptBoundaryCoverage, eval = params$annotationSummary}
+cvg <- getFeatureBoundaryCoverage(queryRegions = queryRegions,
+                                  featureCoords = txdbFeatures$transcripts,
+                                  flankSize = 1000, 
+                                  sampleN = 10000)
+
+yLimit <- (as.integer(max(c(cvg$fivePrime, cvg$threePrime))/10)+1)*10
+
+p <- subplot(
+  plot_ly(x = cvg$bases, y = cvg$fivePrime),
+  plot_ly(x = cvg$bases, y = cvg$threePrime),
+  margin = 0.05
+) %>% layout (xaxis = list(title = 'Distance (bp) to TSS'), 
+              xaxis2 = list(title = 'Distance (bp) to TES'), 
+              yaxis = list(title = 'coverage', range = c(0, yLimit)),
+              yaxis2 = list(title = 'coverage', range = c(0, yLimit)),
+                           showlegend = FALSE) 
+layout(p) 
+figureCount <- figureCount + 1
+```
+
+```{r cdsIntronCoverage_figcap, results='asis', eval = params$annotationSummary}
+cat("## Coverage profile of query regions Coding Exon - Intron Boundaries\n")
+cat("**Figure",figureCount,":** The depth of coverage of query regions at coding exon - intron junctions\n")
+```
+
+```{r cdsIntronCoverage, eval = params$annotationSummary}
+cvg <- getFeatureBoundaryCoverageBin(queryRegions = queryRegions,
+                                  featureCoords = txdbFeatures$cds,
+                                  flankSize = 50,
+                                  sampleN = 10000)
+
+yLimit <- (as.integer(max(c(cvg$fivePrime, cvg$threePrime))/10)+1)*10
+
+p <- plot_ly(x = cvg$bins, y = cvg$fivePrime) 
+layout (p, xaxis = list(showticklabels = F, title =  'Junction'), 
+        yaxis = list(title = 'coverage', range = c(-10, yLimit)),
+              annotations = list(list(x = -25,
+                               y = -10,
+                               text = '< Intron (last 50 bp) >',
+                               bordercolor = "rgb(250,0,0)",
+                               borderwidth = 3,
+                               showarrow = F), 
+                               
+                               list(x = 25,
+                               y = -10,
+                               text = '< Coding Exon (first 50 bp) >',
+                               bordercolor = "rgb(250,0,0)",
+                               borderwidth = 3,
+                               showarrow = F)),
+              showlegend = FALSE) 
+
+p <- plot_ly(x = cvg$bins, y = cvg$threePrime)
+layout (p, xaxis = list(showticklabels = F, title = 'Junction'), 
+        yaxis = list(title = 'coverage', range = c(-10, yLimit)),
+              annotations = list(list(x = -25,
+                               y = -10,
+                               text = '< Coding Exon (last 50 bp) >',
+                               bordercolor = "rgb(250,0,0)",
+                               borderwidth = 3,
+                               showarrow = F), 
+                               
+                               list(x = 25,
+                               y = -10,
+                               text = '< Intron (first 50 bp) >',
+                               bordercolor = "rgb(250,0,0)",
+                               borderwidth = 3,
+                               showarrow = F)),
+              showlegend = FALSE) 
+
+figureCount <- figureCount + 1
+
 ```
 
 ```{r coverageprofilelist_figcap, results='asis', eval=params$annotationSummary}
@@ -232,7 +305,23 @@ cat('# motifRG analysis results \n')
 motifResults <- runMotifRG(queryRegions = queryRegions, 
                            genomeVersion = params$genomeVersion, 
                            motifN = 4)
+motifPWMs <- list()
+
 if (length(motifResults$motifs) > 0) {
+  querySeqs <- extractSequences(queryRegions = queryRegions, 
+                                genomeVersion = params$genomeVersion)
+  querySeqs <- querySeqs[width(querySeqs) > 10,]
+  
+  patterns <- c()
+  for (i in 1:length(motifResults$motifs)) {
+    motifPattern <- motifResults$motifs[[i]]@pattern
+    pwm.match <- refinePWMMotif(motifs = motifResults$motifs[[i]]@match$pattern,
+                                seqs = querySeqs)
+    motifPWMs[[length(motifPWMs)+1]] <- pwm.match
+    patterns <- c(patterns, motifPattern)
+  }
+  names(motifPWMs) <- patterns
+
   provideMotifSummary <- TRUE
 }
 ```
@@ -242,14 +331,14 @@ cat('## Top motifs discovered using motifRG \n')
 ```
 
 ```{r motif_analysis_plot, results='asis', eval=params$motifAnalysis}
-if (length(motifResults$motifs) > 0) {
-  cat("**Figure-",figureCount,":** Top motifs discovered in the sequences of the query regions\n")
-  par(mfrow = c(2,2), mar = c(2,2,2,2))
+if (length(motifPWMs) > 0) {
+  cat("**Figure",figureCount,":** Top motifs discovered in the sequences of the query regions\n\n")
   for (i in 1:length(motifResults$motifs)) {
-    motifPattern <- motifResults$motifs[[i]]@pattern
-    motifRG::plotMotif(match = motifResults$motifs[[i]]@match$pattern, 
-                       main = paste0('Motif-',i,': ',motifPattern),
-                       entropy = T)
+    motifPattern <- names(motifPWMs)[i]
+    pwm.match <- motifPWMs[[motifPattern]]
+    cat("**Motif",i,":** Consensus:",motifPattern,"\n")
+    seqLogo(pwm.match$model$prob)
+    cat('\n\n')
   }
   figureCount <- figureCount + 1
 } else {
@@ -264,12 +353,9 @@ cat("**Table",tableCount,":** motifRG motif discovery statistics. fg: foreground
 
 ```{r motif_analysis_table, eval=provideMotifSummary}
 summary <- getMotifSummaryTable(motifResults)
-DT::datatable(summary, extensions = 'FixedColumns', 
-          options = list( 
-            dom = 't', 
-            scrollX = TRUE, 
-            scrollCollapse = TRUE
-            )
+DT::datatable(summary, 
+          extensions = 'FixedColumns', filter = 'bottom',
+          options = list(fixedColumns = TRUE, scrollX = TRUE)
           )
 tableCount <- tableCount + 1
 ```
@@ -304,28 +390,50 @@ if (!is.null(goCC)) { goSummaryCC <- TRUE }
 
 ```{r goBP_tabcap, results='asis', eval=goSummaryBP}
 cat("## Biological Processes\n")
-cat("**Table",tableCount,":** Significant Biological Process GO terms (BH < 0.1) enriched for genes that overlap query regions\n")  
-DT::datatable(goBP)
+cat("**Table",tableCount,":** Significant Biological Process GO terms (bonferroni < 0.1) enriched for genes that overlap query regions\n")  
+goBP <- goBP[order(goBP$foldEnrichment, decreasing = TRUE),]
+rownames(goBP) <- goBP$GO.ID
+goBP <- subset(goBP, select = -c(Annotated,classicFisher, bh, GO.ID))
+DT::datatable(goBP[goBP$bonferroni < 0.1,], 
+          extensions = 'FixedColumns', filter = 'bottom',
+          options = list(fixedColumns = TRUE, scrollX = TRUE)
+          )
+
 tableCount <- tableCount + 1
 ```
 
 ```{r goMF_tabcap, results='asis', eval=goSummaryMF}
 cat("## Molecular Functions\n")
-cat("**Table",tableCount,":** Significant Molecular Function GO terms (BH < 0.1) enriched for genes that overlap query regions\n")  
-DT::datatable(goMF)
+cat("**Table",tableCount,":** Significant Molecular Function GO terms (bonferroni < 0.1) enriched for genes that overlap query regions\n")  
+goMF <- goMF[order(goMF$foldEnrichment, decreasing = TRUE),]
+rownames(goMF) <- goMF$GO.ID
+goMF <- subset(goMF, select = -c(Annotated,classicFisher, bh, GO.ID))
+
+DT::datatable(goMF[goMF$bonferroni < 0.1,], 
+          extensions = 'FixedColumns', filter = 'bottom',
+          options = list(fixedColumns = TRUE, scrollX = TRUE)
+          )
 tableCount <- tableCount + 1
 ```
 
 ```{r goCC_tabcap, results='asis', eval=goSummaryCC}
 cat("## Cellular Compartments\n")
-cat("**Table",tableCount,":** Significant Cellular Compartment GO terms (BH < 0.1) enriched for genes that overlap query regions\n")  
-DT::datatable(goCC)
+cat("**Table",tableCount,":** Significant Cellular Compartment GO terms (bonferroni < 0.1) enriched for genes that overlap query regions\n")  
+goCC <- goCC[order(goCC$foldEnrichment, decreasing = TRUE),]
+rownames(goCC) <- goCC$GO.ID
+goCC <- subset(goCC, select = -c(Annotated,classicFisher, bh, GO.ID))
+
+DT::datatable(goCC[goCC$bonferroni < 0.1,], 
+          extensions = 'FixedColumns', filter = 'bottom',
+          options = list(fixedColumns = TRUE, scrollX = TRUE)
+          )
+
 tableCount <- tableCount + 1
 ```
 
 ```{r GSEA_msigdb_tabcap, results='asis', eval=params$msigdbAnalysis}
 cat("# Gene Set Enrichment Analysis Results\n")
-cat("**Table",tableCount,":** Significant MSigDB Gene Sets (BH < 0.1) enriched for genes that overlap query regions\n")
+cat("**Table",tableCount,":** Significant MSigDB Gene Sets (bonferroni < 0.1) enriched for genes that overlap query regions\n")
 ```
 
 ```{r msigdb_analysis, eval=params$msigdbAnalysis}
@@ -347,13 +455,13 @@ if (params$species != 'human') {
 msigdbResults <- runMSIGDB(msigDB = msigDB,
                            backgroundGenes = backgroundGenes, 
                            targetedGenes = targetedGenes)
+rownames(msigdbResults) = gsub(pattern = '_', replacement = ' ', x = rownames(msigdbResults))
+msigdbResults = msigdbResults[order(msigdbResults$foldEnrichment, decreasing = TRUE),]
+msigdbResults <- subset(msigdbResults, select = -c(BH, treatmentSize, fisherPVal))
 
-DT::datatable(msigdbResults[msigdbResults$BH < 0.1,], 
-          extensions = 'FixedColumns', 
-          options = list( dom = 't', 
-                          scrollX = TRUE, 
-                          scrollCollapse = TRUE 
-                          )
+DT::datatable(msigdbResults[msigdbResults$bonferroni < 0.1,], 
+          extensions = 'FixedColumns', filter = 'bottom',
+          options = list(fixedColumns = TRUE, scrollX = TRUE)
           )
 ```
 

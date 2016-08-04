@@ -24,6 +24,8 @@
 #' @examples
 #' \dontrun{
 #' #get all genes from the gff data
+#' data(gff)
+#' data(queryRegions)
 #' backgroundGenes <- unique(gff$gene_id)
 #' #get genes that overlap query regions
 #' overlaps <- queryGff(queryRegions, gff)
@@ -90,7 +92,9 @@ runTopGO <- function (ontology = 'BP',
   goResults$classicFisher <- gsub("<", "", goResults$classicFisher)
   goResults$bonferroni <- stats::p.adjust(p = goResults$classicFisher,
                                           method = "bonferroni")
+
   goResults$bh <- stats::p.adjust(goResults$classicFisher, method="BH")
+  goResults$foldEnrichment <- round(goResults$Significant/goResults$Expected, 2)
   return(goResults)
 }
 
@@ -203,9 +207,10 @@ getBioMartConnection <- function (genomeVersion) {
                               host = 'dec2014.archive.ensembl.org',
                               dataset = "dmelanogaster_gene_ensembl")
   } else if (genomeVersion == 'ce10') {
+    #ENSEMBL v67 hosts WBcel215 version of C.elegans (WS215 - WS234)
     mart <- biomaRt::useMart( biomart = 'ENSEMBL_MART_ENSEMBL',
-                              host = 'jan2013.archive.ensembl.org',
-                              dataset = "celegans_gene_ensembl")
+                              host = 'may2012.archive.ensembl.org',
+                              dataset = "celegans_gene_ensembl") 
   } else {
     stop ("Cannot create a BioMart connection for genome versions except:
           hg19, ce10, dm3, and mm9\n")
@@ -338,7 +343,7 @@ calculateEnrichment <- function (targetedGenes, backgroundGenes, geneSet) {
 #' #get genes that overlap query regions
 #' overlaps <- queryGff(queryRegions, gff)
 #' targetedGenes <- unique(overlaps$gene_id)
-#' runMSIGDB(msigDB = msigDB,
+#' msigdbResults <- runMSIGDB(msigDB = msigDB,
 #'           species = 'human',
 #'           backgroundGenes = backgroundGenes,
 #'           targetedGenes = targetedGenes)
@@ -372,11 +377,12 @@ runMSIGDB <- function (msigDB,
                      calculateEnrichment(targetedGenes=targetedGenes,
                                          backgroundGenes=backgroundGenes,
                                          geneSet = x )})
-  results <- do.call("rbind", results)
+  results <- BiocGenerics::do.call(BiocGenerics::rbind, results)
   results$BH <- stats::p.adjust(results$fisherPVal, method = "BH")
   results$bonferroni <- stats::p.adjust(p = results$fisherPVal,
                                         method = "bonferroni")
-  return(results[order(results$fisherPVal),])
+  results$foldEnrichment <- round(results$treatment/results$expectedInTreatment, 2)
+  return(results[order(results$bonferroni),])
 }
 
 

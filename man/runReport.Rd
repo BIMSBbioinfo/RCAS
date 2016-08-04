@@ -7,7 +7,8 @@
 runReport(queryFilePath = "testdata", gffFilePath = "testdata",
   msigdbFilePath = "testdata", annotationSummary = TRUE,
   goAnalysis = TRUE, msigdbAnalysis = TRUE, motifAnalysis = TRUE,
-  genomeVersion = "hg19", outDir = getwd(), printProcessedTables = FALSE)
+  genomeVersion = "hg19", outDir = getwd(), printProcessedTables = FALSE,
+  sampleN = 10000)
 }
 \arguments{
 \item{queryFilePath}{a BED format file which contains genomic coordinates of
@@ -40,6 +41,12 @@ directory)}
 
 \item{printProcessedTables}{boolean value (default: FALSE). If set to TRUE,
 raw data tables that are used for plots/tables will be printed to files.}
+
+\item{sampleN}{integer value (default: 0). A parameter to determine if the
+input query regions should be downsampled to a smaller size in order to
+make report generation quicker. When set to 0, downsampling won't be done.
+To activate the sampling a positive integer value that is smaller than
+the total number of query regions should be given.}
 }
 \value{
 An html generated using rmarkdown/knitr/pandoc that contains

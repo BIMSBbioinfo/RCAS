@@ -15,6 +15,7 @@ test_that("Gene set enrichment analysis using MSIGDB gene sets", {
   expect_is(results, 'data.frame')
   expect_equal(colnames(results)[5], 'BH')
   expect_equal(colnames(results)[6], 'bonferroni')
+  expect_equal(colnames(results)[7], 'foldEnrichment')
 })
 
 test_that("Creating biomart connections for different genome versions",{
