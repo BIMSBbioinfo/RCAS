@@ -207,9 +207,10 @@ getBioMartConnection <- function (genomeVersion) {
                               host = 'dec2014.archive.ensembl.org',
                               dataset = "dmelanogaster_gene_ensembl")
   } else if (genomeVersion == 'ce10') {
+    #ENSEMBL v67 hosts WBcel215 version of C.elegans (WS215 - WS234)
     mart <- biomaRt::useMart( biomart = 'ENSEMBL_MART_ENSEMBL',
-                              host = 'jan2013.archive.ensembl.org',
-                              dataset = "celegans_gene_ensembl")
+                              host = 'may2012.archive.ensembl.org',
+                              dataset = "celegans_gene_ensembl") 
   } else {
     stop ("Cannot create a BioMart connection for genome versions except:
           hg19, ce10, dm3, and mm9\n")
