@@ -1,3 +1,9 @@
+# RCAS 0.99.4
+New features: 
+- Additional coverage profile plots for Transcription Start/End Sites
+- Better ranking of GO and MSIGDB terms using both FDR and fold change values
+- Minor bug fix for motif analysis in the reporting script
+
 # RCAS 0.99.3
 Made one minor revision 
 - Cleaned up the directory inst/
