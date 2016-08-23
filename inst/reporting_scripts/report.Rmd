@@ -133,9 +133,9 @@ df <- data.frame(summary)
 df$percent <- round((df$count / length(queryRegions)), 3) * 100
 p <- plot_ly( data = df, 
               x = rownames(df), 
-              y = percent, 
+              y = df$percent, 
               type = 'bar',
-              text = paste("count:", count), 
+              text = paste("count:", df$count), 
               color = rownames(df)
               )
 layout(p = p, 
@@ -184,9 +184,9 @@ df$percent <- round(df$count / length(queryRegions) * 100, 1)
 df <- df[order(count, decreasing = TRUE)]
 p <- plot_ly(data = df, 
              type = "bar",
-             x = feature,
-             y = percent,
-             text = paste("count:", count), color=feature)
+             x = df$feature,
+             y = df$percent,
+             text = paste("count:", df$count), color=df$feature)
 layout(p = p, 
        margin = list(l=100, r=100, b=150), 
        xaxis = list(showticklabels = TRUE,  tickangle = 90), 
@@ -290,7 +290,7 @@ df$bins <- c(1:100)
 colnames(df) <- gsub(pattern = ".coverage", replacement = "", x = colnames(df))
 mdf <- reshape2::melt(df, id.vars = c('bins'))
 colnames(mdf) <- c('bins', 'feature', 'coverage')
-p = plot_ly(data = mdf, x = bins, y = coverage, color = feature)
+p = plot_ly(data = mdf, x = mdf$bins, y = mdf$coverage, color = mdf$feature)
 layout(p)
 
 figureCount <- figureCount + 1
