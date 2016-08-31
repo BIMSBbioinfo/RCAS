@@ -338,8 +338,8 @@ to find out which gene sets are enriched
 among the genes targeted by the query regions
 ```{r msigdb_analysis}
 #msigDB <- parseMsigdb(msigdbFile)
-data(msigDB)
-msigdbResults <- runMSIGDB(msigDB = msigDB,
+data(geneSets)
+msigdbResults <- runMSIGDB(msigDB = geneSets,
     backgroundGenes = backgroundGenes, targetedGenes = targetedGenes)
 
 datatable(msigdbResults[1:10,],
