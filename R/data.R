@@ -24,14 +24,15 @@
 "queryRegions"
 
 
-#' MSIGDB gene sets
+#' Random test gene sets
 #'
-#' This dataset contains curated sets of genes with Entrez ids from Molecular
-#' Signatures Database. The data is imported using the \code{parseMsigdb}
-#' function.
+#' This dataset contains random sets of genes with Entrez ids that is designed
+#' to represent the data that can be parsed from MSIGDB database. 
+#' using the \code{parseMsigdb} function. 
+#' 
+#' Actual curated datasets must be downloaded from the MSIGDB database
 #'
 #' @return A list object
-#' @format A list of vectors, where each list element corresponds to a curated
-#'   pathways gene set, where genes are represented by Entrez ids.
-#' @source \url{http://software.broadinstitute.org/gsea/msigdb}
-"msigDB"
+#' @format A list of vectors, where each list element corresponds to a (randomized)
+#' gene set, where genes are represented by Entrez ids.
+"geneSets"

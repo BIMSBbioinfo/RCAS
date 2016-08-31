@@ -445,14 +445,14 @@ if (params$species != 'human') {
   
   printMsigdbDataset(dataset = targetMSIGDB, 
                      outputFilename = msigdbOutFile)
-  msigDB <- parseMsigdb(filePath = msigdbOutFile)
+  geneSets <- parseMsigdb(filePath = msigdbOutFile)
 } else if (params$msigdb == 'testdata') {
-  data(msigDB)
+  data(geneSets)
 } else {
-  msigDB <- parseMsigdb(filePath = params$msigdb)
+  geneSets <- parseMsigdb(filePath = params$msigdb)
 }
 
-msigdbResults <- runMSIGDB(msigDB = msigDB,
+msigdbResults <- runMSIGDB(msigDB = geneSets,
                            backgroundGenes = backgroundGenes, 
                            targetedGenes = targetedGenes)
 rownames(msigdbResults) = gsub(pattern = '_', replacement = ' ', x = rownames(msigdbResults))

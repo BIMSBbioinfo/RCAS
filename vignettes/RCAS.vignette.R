@@ -165,8 +165,8 @@ knitr::opts_chunk$set(warning = FALSE, message = FALSE, eval = FALSE)
 
 ## ----msigdb_analysis-----------------------------------------------------
 #  #msigDB <- parseMsigdb(msigdbFile)
-#  data(msigDB)
-#  msigdbResults <- runMSIGDB(msigDB = msigDB,
+#  data(geneSets)
+#  msigdbResults <- runMSIGDB(msigDB = geneSets,
 #      backgroundGenes = backgroundGenes, targetedGenes = targetedGenes)
 #  
 #  datatable(msigdbResults[1:10,],
