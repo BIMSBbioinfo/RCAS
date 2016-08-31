@@ -1,5 +1,5 @@
 library(RCAS)
-context("Functions to do MSIGDB gene set enrichment analysis")
+context("Functions to do gene set enrichment analysis")
 
 data(gff)
 data(queryRegions)

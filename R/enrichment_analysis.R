@@ -138,8 +138,8 @@ parseMsigdb <- function(filePath){
 #' @param outputFilename A character string that denotes the output file name
 #' @return A text file printed to the current directory
 #' @examples
-#' data(msigDB)
-#' printMsigdbDataset(msigDB, 'output.gmt')
+#' data(geneSets)
+#' printMsigdbDataset(geneSets, 'output.gmt')
 #'
 #' @export
 printMsigdbDataset = function(dataset, outputFilename){

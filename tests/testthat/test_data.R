@@ -19,5 +19,5 @@ data(geneSets)
 test_that("geneSets is a list of vectors containing gene sets", {
   expect_is(object = geneSets, 'list')
   expect_equal(length(geneSets), 100)
-  expect_match(names(msigDB)[1], 'randomGeneSet1')
+  expect_match(names(geneSets)[1], 'randomGeneSet1')
 })
