@@ -154,6 +154,11 @@ layout(p = p,
                     ), 
        margin = list(b = 150, r = 50)
        )
+
+if(params$printProcessedTables == TRUE) {
+  write.table(x = df, file=paste0('Figure',figureCount,'.summarizeQueryRegions.data.tsv'), quote = FALSE, sep = '\t', row.names = TRUE)
+} 
+
 figureCount <- figureCount + 1
 ```
 
@@ -165,13 +170,9 @@ cat("**Table",tableCount,":** Interactive table of top 100 genes that overlap qu
 ```{r getTargetedGenesTable, eval=annotationSummary} 
 dt <- getTargetedGenesTable(queryRegions = queryRegions, 
                            txdbFeatures = txdbFeatures)
-dt <- dt[order(transcripts, decreasing = TRUE)][1:100]
+dt <- dt[order(transcripts, decreasing = TRUE)]
 
-if(params$printProcessedTables == TRUE) {
-  write.table(x = dt, file='getTargetedGenesTable.tsv', quote = FALSE, sep = '\t', row.names = FALSE)
-} 
-
-DT::datatable(dt, 
+DT::datatable(dt[1:100], 
           extensions = c('Buttons', 'FixedColumns'), 
           options = list(fixedColumns = TRUE, 
                          scrollX = TRUE,
@@ -179,8 +180,10 @@ DT::datatable(dt,
                          buttons = c('copy', 'print', 'csv','excel', 'pdf')),
           filter = 'bottom'
           )
+if(params$printProcessedTables == TRUE) {
+  write.table(x = dt, file=paste0('Table',tableCount,'.getTargetedGenesTable.data.tsv'), quote = FALSE, sep = '\t', row.names = TRUE)
+} 
 tableCount <- tableCount + 1
-
 ```
 
 ```{r query_gene_types_figcap, results='asis', eval=annotationSummary}
@@ -204,6 +207,9 @@ layout(p = p,
        xaxis = list(showticklabels = TRUE,  tickangle = 90), 
        yaxis = list(title = paste("percentage of query regions,", 
                                   "n =", length(queryRegions))))
+if(params$printProcessedTables == TRUE) {
+  write.table(x = df, file=paste0('Figure',figureCount,'.query_gene_types.data.tsv'), quote = FALSE, sep = '\t', row.names = TRUE)
+} 
 figureCount <- figureCount + 1
 ```
 
@@ -230,6 +236,11 @@ p <- subplot(
               yaxis2 = list(title = 'coverage', range = c(0, yLimit)),
                            showlegend = FALSE) 
 layout(p) 
+
+if(params$printProcessedTables == TRUE) {
+  write.table(x = cvg, file=paste0('Figure',figureCount,'.transcriptBoundaryCoverage.data.tsv'), quote = FALSE, sep = '\t', row.names = TRUE)
+} 
+
 figureCount <- figureCount + 1
 ```
 
@@ -269,6 +280,11 @@ plotly::add_annotations(p = p,
                         showarrow = F,
                         text = c('< Coding Exon (last 50 bp) >', '< Intron (first 50 bp) >'),
                         x = c(-25, 25), y = c(-10, -10))
+
+if(params$printProcessedTables == TRUE) {
+  write.table(x = cvg, file=paste0('Figure',figureCount,'.cdsIntronCoverage.data.tsv'), quote = FALSE, sep = '\t', row.names = TRUE)
+} 
+
 figureCount <- figureCount + 1
 ```
 
@@ -291,7 +307,9 @@ colnames(mdf) <- c('bins', 'feature', 'coverage')
 p = plot_ly(data = mdf, x = ~bins, y = ~coverage, 
             type = 'scatter', mode = 'lines', color = ~feature)
 layout(p)
-
+if(params$printProcessedTables == TRUE) {
+  write.table(x = df, file=paste0('Figure',figureCount,'.coverageprofilelist.data.tsv'), quote = FALSE, sep = '\t', row.names = TRUE)
+} 
 figureCount <- figureCount + 1
 ```
 
@@ -360,6 +378,11 @@ DT::datatable(summary,
                          buttons = c('copy', 'print', 'csv','excel', 'pdf')),
           filter = 'bottom'
           )
+
+if(params$printProcessedTables == TRUE) {
+  write.table(x = summary, file=paste0('Table',tableCount,'.motif_analysis_table.data.tsv'), quote = FALSE, sep = '\t', row.names = TRUE)
+} 
+
 tableCount <- tableCount + 1
 ```
 
@@ -406,6 +429,10 @@ DT::datatable(goBP[goBP$bonferroni < 0.1,],
           filter = 'bottom'
           )
 
+if(params$printProcessedTables == TRUE) {
+  write.table(x = goBP, file=paste0('Table',tableCount,'.goBP.data.tsv'), quote = FALSE, sep = '\t', row.names = TRUE)
+} 
+
 tableCount <- tableCount + 1
 ```
 
@@ -424,6 +451,11 @@ DT::datatable(goMF[goMF$bonferroni < 0.1,],
                          buttons = c('copy', 'print', 'csv','excel', 'pdf')),
           filter = 'bottom'
           )
+
+if(params$printProcessedTables == TRUE) {
+  write.table(x = goMF, file=paste0('Table',tableCount,'.goMF.data.tsv'), quote = FALSE, sep = '\t', row.names = TRUE)
+} 
+
 tableCount <- tableCount + 1
 ```
 
@@ -443,6 +475,9 @@ DT::datatable(goCC[goCC$bonferroni < 0.1,],
           filter = 'bottom'
           )
 
+if(params$printProcessedTables == TRUE) {
+  write.table(x = goCC, file=paste0('Table',tableCount,'.goCC.data.tsv'), quote = FALSE, sep = '\t', row.names = TRUE)
+} 
 tableCount <- tableCount + 1
 ```
 
@@ -482,8 +517,13 @@ DT::datatable(msigdbResults[msigdbResults$bonferroni < 0.1,],
                          buttons = c('copy', 'print', 'csv', 'excel', 'pdf')),
           filter = 'bottom'
           )
-```
 
+if(params$printProcessedTables == TRUE) {
+  write.table(x = msigdbResults, file=paste0('Table',tableCount,'.GSEA.data.tsv'), quote = FALSE, sep = '\t', row.names = TRUE)
+} 
+
+tableCount <- tableCount + 1
+```
 
 # Acknowledgements
 
