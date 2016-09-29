@@ -8,7 +8,7 @@ runReport(queryFilePath = "testdata", gffFilePath = "testdata",
   msigdbFilePath = "testdata", annotationSummary = TRUE,
   goAnalysis = TRUE, msigdbAnalysis = TRUE, motifAnalysis = TRUE,
   genomeVersion = "hg19", outDir = getwd(), printProcessedTables = FALSE,
-  sampleN = 10000)
+  sampleN = 0)
 }
 \arguments{
 \item{queryFilePath}{a BED format file which contains genomic coordinates of

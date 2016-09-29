@@ -826,7 +826,7 @@ runReport <- function(queryFilePath = 'testdata',
                       genomeVersion = 'hg19',
                       outDir = getwd(),
                       printProcessedTables = FALSE,
-                      sampleN = 10000) {
+                      sampleN = 0) {
 
   if (genomeVersion == 'hg19') {
     species <- 'human'
