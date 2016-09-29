@@ -48,6 +48,50 @@ figureCount <- 1
 tableCount <- 1
 ```
 
+# Input Settings
+```{r printInputSettings}
+inputParameterDesc <- c('Query BED file', 
+                     'Target GTF file',
+                     'Gene set Annotations',
+                     'Annotation Summary Module',
+                     'GO Analysis Module',
+                     'Gene Set Enrichment Analysis Module',
+                     'Motif Analysis Module',
+                     'Genome Version',
+                     'Species',
+                     'Print Processed Tables?',
+                     'Randomly sample query regions down to (N)',
+                     'Working Directory')
+inputParameterValues <- c(params$query, 
+                          params$gff,
+                          params$msigdb,
+                          params$annotationSummary,
+                          params$goAnalysis,
+                          params$msigdbAnalysis,
+                          params$motifAnalysis,
+                          params$genomeVersion,
+                          params$species,
+                          params$printProcessedTables,
+                          params$sampleN,
+                          params$workdir)
+
+inputSettings <- data.frame(parameters = inputParameterDesc,
+                            values = inputParameterValues, 
+                            stringsAsFactors = FALSE)
+
+#inputSettings[inputSettings$values==TRUE,]$values <- 'ON'
+#inputSettings[inputSettings$values==FALSE,]$values <- 'OFF'
+#inputSettings[inputSettings$values==0,]$values <- 'OFF'
+
+DT::datatable(data = inputSettings,
+              extensions = 'FixedColumns',
+              options = list(fixedColumns = TRUE, 
+                         scrollX = TRUE, 
+                         pageLength = 20,
+                         dom = 't'))
+```
+
+
 ```{r getInput, results='hide'}
 if(params$query == 'testdata') {
   data(queryRegions) 
