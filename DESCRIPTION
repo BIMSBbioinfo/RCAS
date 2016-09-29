@@ -6,24 +6,25 @@ Date: 2016-03-22
 Authors@R: c(person("Bora", "Uyar", email='bora.uyar@mdc-berlin.de', role=c("aut", "cre")),
               person("Dilmurat", "Yusuf", role=c("aut")),
               person("Ricardo", "Wurmus", role=c("aut")),
-              person("Altuna", "Akalin", role=c("ctb")))
-Description: RNA Centric Annotation System is an automated system that provides
-    dynamic annotations for custom input files that contain transcriptomic target
-    regions. Such transcriptomic target regions could be, for instance, peak regions
-    detected by CLIP-Seq analysis that detect protein-RNA interactions, MeRIP-Seq
-    analysis that detect RNA modifications (alias the epitranscriptome), or any
-    collection of target regions at the level of the transcriptome. RCAS contains
-    wrapper functions to do de novo motif discovery using functions from the motifRG
-    package. RCAS overlays the input target regions with the annotated protein-
-    coding genes and calculates the Gene Ontology (GO) terms that may be enriched or
-    depleted in the input target regions compared to the background list of protein-
-    coding genes. A Classical Fisher's Exact Test is applied for each GO term and
-    the p-values obtained for each GO term is corrected for multiple testing using
-    both the False Discovery Rate and the Family-Wise Error Rate. Similarly to the
-    GO term enrichment analysis, RCAS also detects sets of genes as annotated in
-    the Molecular Signatures Database that are enriched or depleted in the queried
-    target regions. Results are corrected for multiple-testing according to both the
-    False Discovery Rate and the Family-Wise Error Rate.
+              person("Altuna", "Akalin", role=c("aut")))
+Description: RCAS is an automated system that provides dynamic genome annotations for custom 
+input files that contain transcriptomic regions. Such transcriptomic regions could be, 
+for instance, peak regions detected by CLIP-Seq analysis that detect protein-RNA interactions, 
+RNA modifications (alias the epitranscriptome), CAGE-tag locations, or any other collection of 
+target regions at the level of the transcriptome. RCAS is designed as a reporting tool for the 
+functional analysis of RNA-binding sites detected by high-throughput experiments. It takes as 
+input a BED format file containing the genomic coordinates of the RNA binding sites and a GTF 
+file that contains the genomic annotation features usually provided by publicly available 
+databases such as Ensembl and UCSC. RCAS performs overlap operations between the genomic 
+coordinates of the RNA binding sites and the genomic annotation features and produces 
+in-depth annotation summaries such as the distribution of binding sites with respect to 
+gene features (exons, introns, 5’/3’ UTR regions, exon-intron boundaries, promoter regions, 
+and whole transcripts). Moreover, by detecting the collection of targeted transcripts, RCAS 
+can carry out functional annotation tables for enriched gene sets (annotated by the Molecular 
+Signatures Database) and GO terms. As one of the most important questions that arise during 
+protein-RNA interaction analysis; RCAS has a module for detecting sequence motifs enriched in 
+the targeted regions of the transcriptome. The final report of RCAS consists of high-quality 
+dynamic figures and tables, which are readily applicable for publications or other academic usage.
 License: Artistic-2.0
 LazyData: TRUE
 Depends: R (>= 3.3.1),
