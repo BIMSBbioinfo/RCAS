@@ -33,7 +33,7 @@ Description: RCAS is an automated system that provides dynamic genome
     interactive figures and tables that are ready for publication purposes.
 License: Artistic-2.0
 LazyData: TRUE
-Depends: R (>= 3.3.1),
+Depends: R (>= 3.3.0),
     plotly (>= 4.5.2),
     DT (>= 0.2),
     data.table,
