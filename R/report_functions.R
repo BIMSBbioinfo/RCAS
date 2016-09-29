@@ -886,7 +886,7 @@ runReport <- function(queryFilePath = 'testdata',
   outFile <- paste0(basename(queryFilePath), '.RCAS.report.html')
 
   rmarkdown::render(
-    input = reportFile,
+    input = reportFile, 
     output_dir = outDir,
     intermediates_dir = outDir,
     output_file = outFile,
@@ -908,7 +908,8 @@ runReport <- function(queryFilePath = 'testdata',
                   species = species,
                   printProcessedTables = printProcessedTables,
                   sampleN = sampleN,
-                  workdir = outDir)
+                  workdir = outDir),
+    quiet = TRUE
     )
 }
 
