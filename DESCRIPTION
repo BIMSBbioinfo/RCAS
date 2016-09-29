@@ -28,7 +28,7 @@ License: Artistic-2.0
 LazyData: TRUE
 Depends: R (>= 3.3.1),
     plotly (>= 4.5.2),
-    DT,
+    DT (>= 0.2),
     data.table,
     topGO,
     motifRG,
