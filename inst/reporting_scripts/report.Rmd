@@ -119,7 +119,7 @@ targetedGenes <- unique(overlaps$gene_id)
 ```
 
 ```{r getTxdbFeatures, eval=annotationSummary}
-txdbFeatures <- getTxdbFeaturesFromGff(gff)
+txdbFeatures <- getTxdbFeaturesFromGRanges(gffData = gff)
 ```
 
 ```{r summaryOverlapsHeader, results='asis', eval=annotationSummary}
@@ -481,35 +481,32 @@ if(params$printProcessedTables == TRUE) {
 tableCount <- tableCount + 1
 ```
 
-```{r GSEA_msigdb_tabcap, results='asis', eval=msigdbAnalysis}
+```{r GSEA_tabcap, results='asis', eval=msigdbAnalysis}
 cat("# Gene Set Enrichment Analysis Results\n")
 cat("**Table",tableCount,":** Significant MSigDB Gene Sets (bonferroni < 0.1) enriched for genes that overlap query regions\n")
 ```
 
-```{r msigdb_analysis, eval=msigdbAnalysis}
+```{r GSEA, eval=msigdbAnalysis}
 if (params$species != 'human') {
-  targetMSIGDB <- createOrthologousMsigdbDataset(refMsigdbFilePath = params$msigdb, 
+  refGeneSets <- parseMsigdb(filePath = params$msigdb)
+  geneSets <- createOrthologousGeneSetList(referenceGeneSetList = refGeneSets, 
                                                 refGenomeVersion = 'hg19', 
                                                 targetGenomeVersion = params$genomeVersion)
-  msigdbOutFile <- paste(params$genomeVersion, 'msigdb.gmt', sep='.')
-  
-  printMsigdbDataset(dataset = targetMSIGDB, 
-                     outputFilename = msigdbOutFile)
-  geneSets <- parseMsigdb(filePath = msigdbOutFile)
 } else if (params$msigdb == 'testdata') {
   data(geneSets)
 } else {
   geneSets <- parseMsigdb(filePath = params$msigdb)
 }
 
-msigdbResults <- runMSIGDB(msigDB = geneSets,
-                           backgroundGenes = backgroundGenes, 
-                           targetedGenes = targetedGenes)
-rownames(msigdbResults) = gsub(pattern = '_', replacement = ' ', x = rownames(msigdbResults))
-msigdbResults = msigdbResults[order(msigdbResults$foldEnrichment, decreasing = TRUE),]
-msigdbResults <- subset(msigdbResults, select = -c(BH, treatmentSize, fisherPVal))
+resultsGSEA <- runGSEA(geneSetList = geneSets, 
+                       species = params$species,
+                       backgroundGenes = backgroundGenes, 
+                       targetedGenes = targetedGenes)
 
-DT::datatable(msigdbResults[msigdbResults$bonferroni < 0.1,], 
+rownames(resultsGSEA) = gsub(pattern = '_', replacement = ' ', x = rownames(resultsGSEA))
+resultsGSEA <- subset(resultsGSEA, select = -c(BH, treatmentSize, fisherPVal))
+
+DT::datatable(resultsGSEA[resultsGSEA$bonferroni < 0.1,], 
           extensions = c('Buttons', 'FixedColumns'), 
           options = list(fixedColumns = TRUE, 
                          scrollX = TRUE,
@@ -519,7 +516,7 @@ DT::datatable(msigdbResults[msigdbResults$bonferroni < 0.1,],
           )
 
 if(params$printProcessedTables == TRUE) {
-  write.table(x = msigdbResults, file=paste0('Table',tableCount,'.GSEA.data.tsv'), quote = FALSE, sep = '\t', row.names = TRUE)
+  write.table(x = resultsGSEA, file=paste0('Table',tableCount,'.GSEA.data.tsv'), quote = FALSE, sep = '\t', row.names = TRUE)
 } 
 
 tableCount <- tableCount + 1

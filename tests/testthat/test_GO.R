@@ -9,7 +9,7 @@ test_that("Importing test data", {
   expect_is(queryRegions, 'GRanges')
 })
 
-overlaps <- queryGff(queryRegions = queryRegions, gff = gff)
+overlaps <- queryGff(queryRegions = queryRegions, gffData = gff)
 test_that("Testing queryGff function", {
   expect_is(overlaps, 'GRanges')
   expect_equal(length(overlaps), 12200)

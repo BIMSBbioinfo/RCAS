@@ -4,7 +4,7 @@ context("Functions to do gene set enrichment analysis")
 data(gff)
 data(queryRegions)
 data(geneSets)
-overlaps <- queryGff(queryRegions = queryRegions, gff = gff)
+overlaps <- queryGff(queryRegions = queryRegions, gffData = gff)
 
 results <- runGSEA(geneSetList = geneSets,
                      species = 'human',

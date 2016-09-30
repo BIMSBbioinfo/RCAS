@@ -15,7 +15,7 @@ test_that("Parsing features from txdb", {
   expect_match(names(features)[7], "threeUTRs")
 })
 
-features <- getTxdbFeaturesFromGff(gff = gff)
+features <- getTxdbFeaturesFromGRanges(gffData = gff)
 test_that("Parsing features from GFF", {
   expect_is(features, 'list')
   expect_equal(length(names(features)), 7)
