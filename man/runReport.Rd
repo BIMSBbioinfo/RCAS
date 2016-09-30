@@ -8,7 +8,7 @@ runReport(queryFilePath = "testdata", gffFilePath = "testdata",
   msigdbFilePath = "testdata", annotationSummary = TRUE,
   goAnalysis = TRUE, msigdbAnalysis = TRUE, motifAnalysis = TRUE,
   genomeVersion = "hg19", outDir = getwd(), printProcessedTables = FALSE,
-  sampleN = 0)
+  sampleN = 0, quiet = FALSE)
 }
 \arguments{
 \item{queryFilePath}{a BED format file which contains genomic coordinates of 
@@ -52,6 +52,9 @@ input query regions should be downsampled to a smaller size in order to
 make report generation quicker. When set to 0, downsampling won't be done. 
 To activate the sampling a positive integer value that is smaller than the
 total number of query regions should be given.}
+
+\item{quiet}{boolean value (default: FALSE). If set to TRUE, progress bars 
+and chunk labels will be suppressed while knitting the Rmd file.}
 }
 \value{
 An html generated using rmarkdown/knitr/pandoc that contains 

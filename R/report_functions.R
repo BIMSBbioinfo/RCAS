@@ -783,6 +783,8 @@ findLongLines <- function (myfile, lineLimit = 80) {
 #'   make report generation quicker. When set to 0, downsampling won't be done. 
 #'   To activate the sampling a positive integer value that is smaller than the
 #'   total number of query regions should be given.
+#' @param quiet boolean value (default: FALSE). If set to TRUE, progress bars 
+#' and chunk labels will be suppressed while knitting the Rmd file. 
 #' @return An html generated using rmarkdown/knitr/pandoc that contains 
 #'   interactive figures, tables, and text that provide an overview of the 
 #'   experiment
@@ -833,7 +835,8 @@ runReport <- function(queryFilePath = 'testdata',
                       genomeVersion = 'hg19',
                       outDir = getwd(),
                       printProcessedTables = FALSE,
-                      sampleN = 0) {
+                      sampleN = 0,
+                      quiet = FALSE) {
 
   if (genomeVersion == 'hg19') {
     species <- 'human'
@@ -915,7 +918,8 @@ runReport <- function(queryFilePath = 'testdata',
                   species = species,
                   printProcessedTables = printProcessedTables,
                   sampleN = sampleN,
-                  workdir = outDir)
+                  workdir = outDir),
+    quiet = quiet
     )
 }
 
