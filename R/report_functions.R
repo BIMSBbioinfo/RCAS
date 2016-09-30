@@ -188,18 +188,19 @@ getTxdbFeatures <- function (txdb) {
   return(txdbFeatures)
 }
 
-#' getTxdbFeaturesFromGff
+#' getTxdbFeaturesFromGRanges
 #'
-#' This function takes as input a GRanges object from the output of
-#' \code{importGtf} function. Then extracts the coordinates of gene features
+#' This function takes as input a GRanges object that contains GTF file contents
+#' (e.g from the output of \code{importGtf} function). 
+#' Then extracts the coordinates of gene features
 #' such as promoters, introns, exons, 5'/3' UTRs and
 #' whole transcripts.
 #'
-#' @param gff A GRanges object imported by \code{importGtf} function
+#' @param gffData A GRanges object imported by \code{importGtf} function
 #'
 #' @examples
 #' data(gff)
-#' txdbFeatures <- getTxdbFeaturesFromGff(gff)
+#' txdbFeatures <- getTxdbFeaturesFromGRanges(gffData = gff)
 #'
 #' @return A list of GRanges objects
 #'
@@ -207,28 +208,28 @@ getTxdbFeatures <- function (txdb) {
 #' @import GenomicRanges
 #' @importFrom BiocGenerics unlist
 #' @export
-getTxdbFeaturesFromGff <- function (gff) {
+getTxdbFeaturesFromGRanges <- function (gffData) {
 
-  txdb <- GenomicFeatures::makeTxDbFromGRanges(gff)
+  txdb <- GenomicFeatures::makeTxDbFromGRanges(gffData)
 
   transcripts <- GenomicFeatures::transcripts(txdb)
-  m <- match(transcripts$tx_name, gff$transcript_id)
-  transcripts$gene_name <- gff[m]$gene_name
+  m <- match(transcripts$tx_name, gffData$transcript_id)
+  transcripts$gene_name <- gffData[m]$gene_name
 
   tmp <- GenomicFeatures::exonsBy(x = txdb, by = "tx", use.names = TRUE)
   exons <- BiocGenerics::unlist(tmp)
   exons$tx_name <- names(exons)
-  exons$gene_name <- gff[match(names(exons), gff$transcript_id)]$gene_name
+  exons$gene_name <- gffData[match(names(exons), gffData$transcript_id)]$gene_name
 
   tmp <- GenomicFeatures::intronsByTranscript(x = txdb, use.names = TRUE)
   introns <- BiocGenerics::unlist(tmp)
   introns$tx_name <- names(introns)
-  m <- match(names(introns), gff$transcript_id)
-  introns$gene_name <- gff[m]$gene_name
+  m <- match(names(introns), gffData$transcript_id)
+  introns$gene_name <- gffData[m]$gene_name
 
   promoters <- GenomicFeatures::promoters(txdb)
-  m <- match(promoters$tx_name, gff$transcript_id)
-  promoters$gene_name <- gff[m]$gene_name
+  m <- match(promoters$tx_name, gffData$transcript_id)
+  promoters$gene_name <- gffData[m]$gene_name
 
   #fiveUTRsByTranscript will return exonic regions of UTRs. These exonic regions
   #must be turned into a single region containing both exons and introns using
@@ -237,8 +238,8 @@ getTxdbFeaturesFromGff <- function (gff) {
   tmp <- range(GenomicFeatures::fiveUTRsByTranscript(x = txdb, use.names = TRUE))
   fiveUTRs <- BiocGenerics::unlist(tmp)
   fiveUTRs$tx_name <- names(fiveUTRs)
-  m <- match(names(fiveUTRs), gff$transcript_id)
-  fiveUTRs$gene_name <- gff[m]$gene_name
+  m <- match(names(fiveUTRs), gffData$transcript_id)
+  fiveUTRs$gene_name <- gffData[m]$gene_name
 
   #threeUTRsByTranscript will return exonic regions of UTRs. These exonic regions
   #must be turned into a single region containing both exons and introns using
@@ -247,13 +248,13 @@ getTxdbFeaturesFromGff <- function (gff) {
   tmp <- range(GenomicFeatures::threeUTRsByTranscript(x = txdb, use.names = TRUE))
   threeUTRs <- BiocGenerics::unlist(tmp)
   threeUTRs$tx_name <- names(threeUTRs)
-  m <- match(names(threeUTRs), gff$transcript_id)
-  threeUTRs$gene_name <- gff[m]$gene_name
+  m <- match(names(threeUTRs), gffData$transcript_id)
+  threeUTRs$gene_name <- gffData[m]$gene_name
 
   tmp <- GenomicFeatures::cdsBy(x = txdb, by = "tx", use.names = TRUE)
   cds <- BiocGenerics::unlist(tmp)
   cds$tx_name <- names(cds)
-  cds$gene_name <- gff[match(names(cds), gff$transcript_id)]$gene_name
+  cds$gene_name <- gffData[match(names(cds), gffData$transcript_id)]$gene_name
 
   txdbFeatures = list(
     'transcripts' = transcripts,
@@ -302,12 +303,12 @@ processHits <- function(queryRegions, tx, type) {
 #'   corresponds to the genomic coordinates of gene features such as promoters,
 #'   introns, exons, 5'/3' UTRs and whole transcripts.
 #'   This list of GRanges objects are obtained by the function
-#'   \code{\link{getTxdbFeaturesFromGff}} or \code{\link{getTxdbFeatures}}.
+#'   \code{\link{getTxdbFeaturesFromGRanges}} or \code{\link{getTxdbFeatures}}.
 #'
 #' @examples
 #' data(gff)
 #' data(queryRegions)
-#' txdbFeatures <- getTxdbFeaturesFromGff(gff)
+#' txdbFeatures <- getTxdbFeaturesFromGRanges(gffData = gff)
 #' featuresTable <- getTargetedGenesTable(queryRegions = queryRegions,
 #'                                        txdbFeatures = txdbFeatures)
 #'
@@ -346,13 +347,13 @@ getTargetedGenesTable <- function (queryRegions, txdbFeatures) {
 #' @param queryRegions GRanges object imported from a BED file using
 #'   \code{importBed} function
 #' @param txdbFeatures List of GRanges objects - outputs of
-#'   \code{getTxdbFeaturesFromGff} and \code{getTxdbFeatures} functions
+#'   \code{getTxdbFeaturesFromGRanges} and \code{getTxdbFeatures} functions
 #' @return A data frame with two columns where first column holds features and
 #'   second column holds corresponding counts
 #' @examples
 #' data(gff)
 #' data(queryRegions)
-#' txdbFeatures <- getTxdbFeaturesFromGff(gff)
+#' txdbFeatures <- getTxdbFeaturesFromGRanges(gffData = gff)
 #' summary <- summarizeQueryRegions(queryRegions = queryRegions,
 #'                                  txdbFeatures = txdbFeatures)
 #'
@@ -379,7 +380,7 @@ summarizeQueryRegions <- function(queryRegions, txdbFeatures) {
 #'
 #' @param queryRegions GRanges object imported from a BED file using
 #'   \code{importBed} function
-#' @param gff GRanges object imported from a GTF file using \code{importGtf}
+#' @param gffData GRanges object imported from a GTF file using \code{importGtf}
 #'   function
 #' @return a GRanges object (a subset of input gff) with an additional column
 #'   'overlappingQuery' that contains the coordinates of query regions that
@@ -388,17 +389,17 @@ summarizeQueryRegions <- function(queryRegions, txdbFeatures) {
 #' @examples
 #' data(queryRegions)
 #' data(gff)
-#' overlaps <- queryGff(queryRegions = queryRegions, gff = gff)
+#' overlaps <- queryGff(queryRegions = queryRegions, gffData = gff)
 #'
 #' @import GenomicRanges
 #' @importFrom S4Vectors queryHits
 #' @importFrom S4Vectors subjectHits
 #' @export
-queryGff <- function(queryRegions, gff) {
+queryGff <- function(queryRegions, gffData) {
   #find all overlapping pairs of intervals between gff features and BED file
-  overlaps = GenomicRanges::findOverlaps(queryRegions, gff)
+  overlaps = GenomicRanges::findOverlaps(queryRegions, gffData)
   overlapsQuery = queryRegions[S4Vectors::queryHits(overlaps)]
-  overlapsGff = gff[S4Vectors::subjectHits(overlaps)]
+  overlapsGff = gffData[S4Vectors::subjectHits(overlaps)]
   overlapsGff$overlappingQuery = paste(GenomicRanges::seqnames(overlapsQuery),
                                        GenomicRanges::start(overlapsQuery),
                                        GenomicRanges::end(overlapsQuery),
@@ -476,7 +477,7 @@ getFeatureBoundaryCoverage <- function (queryRegions,
 }
 
 
-#' getFeatureBoundaryCoverage
+#' getFeatureBoundaryCoverageBin
 #'
 #' This function extracts the flanking regions of 5' and 3' boundaries of a
 #' given set of genomic features, splits them into 100 equally sized bins and
@@ -567,7 +568,7 @@ getFeatureBoundaryCoverageBin <- function (queryRegions,
 #' @examples
 #' data(gff)
 #' data(queryRegions)
-#' txdbFeatures <- getTxdbFeaturesFromGff(gff)
+#' txdbFeatures <- getTxdbFeaturesFromGRanges(gffData = gff)
 #' df <- calculateCoverageProfile(queryRegions = queryRegions,
 #'                               targetRegions = txdbFeatures$exons,
 #'                                     sampleN = 1000)
@@ -619,8 +620,8 @@ calculateCoverageProfile = function (queryRegions, targetRegions, sampleN = 0){
 #' @examples
 #' data(gff)
 #' data(queryRegions)
-#' txdbFeatures <- getTxdbFeaturesFromGff(gff)
-#' list.df <- calculateCoverageProfileList(queryRegions = queryRegions,
+#' txdbFeatures <- getTxdbFeaturesFromGRanges(gffData = gff)
+#' dfList <- calculateCoverageProfileList(queryRegions = queryRegions,
 #'                               targetRegionsList = txdbFeatures,
 #'                                     sampleN = 1000)
 #' @export
@@ -742,49 +743,55 @@ findLongLines <- function (myfile, lineLimit = 80) {
   return(names(counts)[counts > lineLimit])
 }
 
-#' Generate a RCAS Report for a CLIP-Seq-based experiment
-#'
-#' This is the main report generation function for RCAS. This function can take
-#' a BED file, a GTF file and optionally an MSIGDB annotation; and use these
-#' input to run multiple RCAS functions to create a summary report regarding the
-#' annotation data that overlap the input BED file, enrichment analysis for GO
-#' terms, gene sets from MSIGDB, and motif analysis.
-#'
-#' @param queryFilePath a BED format file which contains genomic coordinates of
+#' Generate a RCAS Report for a list of transcriptome-level segments
+#' 
+#' This is the main report generation function for RCAS. This function can take 
+#' a BED file, a GTF file and optionally an MSIGDB gene set annotation (or any
+#' text file containing annotations with the same structure as defined in
+#' MSIGDB); and use these input to run multiple RCAS functions to create a
+#' summary report regarding the annotation data that overlap the input BED file,
+#' enrichment analysis for GO terms, gene sets from MSIGDB, and motif analysis.
+#' 
+#' @param queryFilePath a BED format file which contains genomic coordinates of 
 #'   protein-RNA binding sites
-#' @param gffFilePath A GTF format file which contains genome annotations
+#' @param gffFilePath A GTF format file which contains genome annotations 
 #'   (preferably from ENSEMBL)
-#' @param msigdbFilePath Gene set annotations for Homo sapiens from Molecular
-#'   Signatures Database
-#' @param annotationSummary TRUE/FALSE (default: TRUE) A switch to decide if
+#' @param msigdbFilePath Gene set annotations for Homo sapiens from Molecular 
+#'   Signatures Database or any text file that has the same structure. 
+#'   Regardless of which species is being studied (see genomeVersion parameter),
+#'   msigdbFilePath must contain annotations for human genes. The gene sets will
+#'   be mapped from human to other species if genomeVersion is set to anything
+#'   except human genome versions (e.g. mm9 or dm3).
+#' @param annotationSummary TRUE/FALSE (default: TRUE) A switch to decide if 
 #'   RCAS should provide annotation summaries from overlap operations
-#' @param goAnalysis TRUE/FALSE (default: TRUE) A switch to decide if RCAS
+#' @param goAnalysis TRUE/FALSE (default: TRUE) A switch to decide if RCAS 
 #'   should run GO term enrichment analysis
-#' @param msigdbAnalysis TRUE/FALSE (default: TRUE) A switch to decide if RCAS
+#' @param msigdbAnalysis TRUE/FALSE (default: TRUE) A switch to decide if RCAS 
 #'   should run gene set enrichment analysis
-#' @param motifAnalysis TRUE/FALSE (default: TRUE) A switch to decide if RCAS
+#' @param motifAnalysis TRUE/FALSE (default: TRUE) A switch to decide if RCAS 
 #'   should run motif analysis
-#' @param genomeVersion  A character string to denote for which genome version
-#'   the analysis is being done. Available options are hg19 (human), mm9
+#' @param genomeVersion  A character string to denote for which genome version 
+#'   the analysis is being done. Available options are hg19 (human), mm9 
 #'   (mouse), ce10 (worm) and dm3 (fly).
-#' @param outDir Path to the output directory. (default: current working
+#' @param outDir Path to the output directory. (default: current working 
 #'   directory)
-#' @param printProcessedTables boolean value (default: FALSE). If set to TRUE,
-#'   raw data tables that are used for plots/tables will be printed to files.
-#' @param sampleN integer value (default: 0). A parameter to determine if the
-#'   input query regions should be downsampled to a smaller size in order to
-#'   make report generation quicker. When set to 0, downsampling won't be done.
-#'   To activate the sampling a positive integer value that is smaller than
-#'   the total number of query regions should be given.
-#' @return An html generated using rmarkdown/knitr/pandoc that contains
-#'   interactive figures, tables, and text that provide an overview of the
+#' @param printProcessedTables boolean value (default: FALSE). If set to TRUE, 
+#'   raw data tables that are used for plots/tables will be printed to text
+#'   files.
+#' @param sampleN integer value (default: 0). A parameter to determine if the 
+#'   input query regions should be downsampled to a smaller size in order to 
+#'   make report generation quicker. When set to 0, downsampling won't be done. 
+#'   To activate the sampling a positive integer value that is smaller than the
+#'   total number of query regions should be given.
+#' @return An html generated using rmarkdown/knitr/pandoc that contains 
+#'   interactive figures, tables, and text that provide an overview of the 
 #'   experiment
 #' @examples
 #' #Default run will generate a report using built-in test data for hg19 genome.
 #' \dontrun{
 #' runReport()
 #' }
-#'
+#' 
 #' #A custom run for human
 #' \dontrun{
 #' runReport( queryFilePath = 'input.BED',
@@ -908,8 +915,7 @@ runReport <- function(queryFilePath = 'testdata',
                   species = species,
                   printProcessedTables = printProcessedTables,
                   sampleN = sampleN,
-                  workdir = outDir),
-    quiet = TRUE
+                  workdir = outDir)
     )
 }
 

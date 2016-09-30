@@ -11,7 +11,7 @@ summarizeQueryRegions(queryRegions, txdbFeatures)
 \code{importBed} function}
 
 \item{txdbFeatures}{List of GRanges objects - outputs of
-\code{getTxdbFeaturesFromGff} and \code{getTxdbFeatures} functions}
+\code{getTxdbFeaturesFromGRanges} and \code{getTxdbFeatures} functions}
 }
 \value{
 A data frame with two columns where first column holds features and
@@ -24,7 +24,7 @@ types of gene features.
 \examples{
 data(gff)
 data(queryRegions)
-txdbFeatures <- getTxdbFeaturesFromGff(gff)
+txdbFeatures <- getTxdbFeaturesFromGRanges(gffData = gff)
 summary <- summarizeQueryRegions(queryRegions = queryRegions,
                                  txdbFeatures = txdbFeatures)
 

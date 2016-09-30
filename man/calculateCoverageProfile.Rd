@@ -29,7 +29,7 @@ features, and then calculates coverage profile along target regions.
 \examples{
 data(gff)
 data(queryRegions)
-txdbFeatures <- getTxdbFeaturesFromGff(gff)
+txdbFeatures <- getTxdbFeaturesFromGRanges(gffData = gff)
 df <- calculateCoverageProfile(queryRegions = queryRegions,
                               targetRegions = txdbFeatures$exons,
                                     sampleN = 1000)

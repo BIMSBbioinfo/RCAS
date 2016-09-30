@@ -4,13 +4,13 @@
 \alias{queryGff}
 \title{queryGff}
 \usage{
-queryGff(queryRegions, gff)
+queryGff(queryRegions, gffData)
 }
 \arguments{
 \item{queryRegions}{GRanges object imported from a BED file using
 \code{importBed} function}
 
-\item{gff}{GRanges object imported from a GTF file using \code{importGtf}
+\item{gffData}{GRanges object imported from a GTF file using \code{importGtf}
 function}
 }
 \value{
@@ -26,7 +26,7 @@ format. Both data are imported as GRanges object.
 \examples{
 data(queryRegions)
 data(gff)
-overlaps <- queryGff(queryRegions = queryRegions, gff = gff)
+overlaps <- queryGff(queryRegions = queryRegions, gffData = gff)
 
 }
 

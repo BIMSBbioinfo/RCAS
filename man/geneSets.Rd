@@ -18,8 +18,7 @@ to represent the data that can be parsed from MSIGDB database.
 using the \code{parseMsigdb} function.
 }
 \details{
-Actual curated datasets must be downloaded from the MSIGDB database or any 
-gene set must be represented using lists.
+Actual curated datasets must be downloaded from the MSIGDB database
 }
 \keyword{datasets}
 
