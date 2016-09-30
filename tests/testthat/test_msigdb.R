@@ -6,7 +6,7 @@ data(queryRegions)
 data(geneSets)
 overlaps <- queryGff(queryRegions = queryRegions, gff = gff)
 
-results <- runMSIGDB(msigDB = geneSets,
+results <- runGSEA(geneSetList = geneSets,
                      species = 'human',
                      backgroundGenes = unique(gff$gene_id),
                      targetedGenes = unique(overlaps$gene_id))
