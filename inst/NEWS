@@ -1,3 +1,18 @@
+# RCAS 0.99.5
+New features:
+- DT::datatables in the report now contain buttons to export data tables to CSV, Excel, PDF, or
+print or copy the data. 
+- with a new option in runReport function 'printProcessedTables', when set to TRUE, the raw data generated to make all tables and figures can be printed to text files in the working directory. 
+- A new table is added at the beginning of the runReport output, that shows the input settings
+used to run the document
+- A sessionInfo() is added to the end of the runReport output
+- Added 'quiet' option to runReport function to optionally suppress progress bars and messages during report generation.
+
+Bug fixes
+- With the new plotly version release, the download button for plotly generated figures in the 
+report html works. 
+
+
 # RCAS 0.99.4
 New features: 
 - Additional coverage profile plots for Transcription Start/End Sites
