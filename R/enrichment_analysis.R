@@ -138,8 +138,8 @@ parseMsigdb <- function(filePath){
 #' @param outputFilename A character string that denotes the output file name
 #' @return A text file printed to the current directory
 #' @examples
-#' data(msigDB)
-#' printMsigdbDataset(msigDB, 'output.gmt')
+#' data(geneSets)
+#' printMsigdbDataset(geneSets, 'output.gmt')
 #'
 #' @export
 printMsigdbDataset = function(dataset, outputFilename){
@@ -219,43 +219,41 @@ getBioMartConnection <- function (genomeVersion) {
 }
 
 #' createOrthologousMsigdbDataset
-#'
-#' MSIGDB curates gene sets for human but not for other species. This function
-#' is used to create such gene sets for other species such as mouse, fly, and
-#' worm via orthologous relationships to human genes.
-#'
-#' @param refMsigdbFilePath Path to a file containing gene sets from MSIGDB. The
-#'   gene ids must be in Entrez format.
+#' 
+#' Gene set annotations in public databases are usually geared towards human. 
+#' This function is used to utilize human gene set annotations to create such
+#' gene sets for other species such as mouse, fly, and worm via orthologous
+#' relationships to human genes.
+#' 
+#' @param referenceGeneSetList A named list of vectors where each vector
+#'   consists of a set of Entrez gene ids (for instance, returned by
+#'   \code{parseMsigdb} function
 #' @param refGenomeVersion Genome version of a reference species. (default:hg19)
-#' @param targetGenomeVersion Genome version of a target species. Available
+#' @param targetGenomeVersion Genome version of a target species. Available 
 #'   options are mm9, dm3, and ce10
-#'
-#' @return A list of vectors where each vector consists of a set of Entrez gene
+#'   
+#' @return A list of vectors where each vector consists of a set of Entrez gene 
 #'   ids
-#'
+#'   
 #' @examples
-#' #First Download gene sets (with Entrez Ids) from MSIGDB database
+#' #Recommended gene sets (with Entrez Ids) from MSIGDB database can be downloaded
 #' #from \url{http://software.broadinstitute.org/gsea/msigdb/collections.jsp#C2}
-#'
+#' #Here we use built-in random gene sets to show how the function works
+#' data(geneSets)
 #' #Map the gene sets to a target genome (supported genomes: mm9, dm3, or ce10)
-#' \dontrun{
-#' createOrthologousMsigdbDataset(refMsigdbFilePath = 'msigdb.entrez.txt',
-#'                                refGenomeVersion = 'hg19',
-#'                                targetGenomeVersion = 'mm9')
-#'                                }
+#' orthGeneSets <- createOrthologousGeneSetList(
+#'                              referenceGeneSetList = geneSets,
+#'                              refGenomeVersion = 'hg19',
+#'                              targetGenomeVersion = 'mm9'
+#'                              )
+#' 
 #' @export
-createOrthologousMsigdbDataset <- function(refMsigdbFilePath,
+createOrthologousGeneSetList <- function(referenceGeneSetList,
                                            refGenomeVersion = 'hg19',
                                            targetGenomeVersion) {
-  #parse lists of genes from MSigDB
-  referenceGeneSets <- parseMsigdb(filePath = refMsigdbFilePath)
-  cat("got", length(names(referenceGeneSets)),
-      "gene lists from", refMsigdbFilePath, "\n")
 
   #define all available reference genes in all the given gene sets
-  refGenes <- unique(paste(unlist(referenceGeneSets)))
-  cat('Retrieved', length(refGenes),
-      'genes for reference genome in the MSIGDB input file\n')
+  refGenes <- unique(paste(unlist(referenceGeneSetList)))
 
   # to be able to retrieve orthologs of the genes in the input gene sets - use
   # biomaRt to get ortholog data from Ensembl
@@ -273,15 +271,15 @@ createOrthologousMsigdbDataset <- function(refMsigdbFilePath,
       'and', length(unique(orthologs[,2])),
       "genes from", targetGenomeVersion,"\n")
 
-  orthMsigdbDataset <- list()
-  for (i in 1:length(referenceGeneSets)){
-    refSet <- unique(as.numeric(paste(unlist(referenceGeneSets[i]))))
+  orthGeneSetList <- list()
+  for (i in 1:length(referenceGeneSetList)){
+    refSet <- unique(as.numeric(paste(unlist(referenceGeneSetList[i]))))
     s <- orthologs$EntrezGene.ID %in% refSet
     orthologSet <- unique(orthologs[s,]$EntrezGene.ID.1)
-    refSetName <- names(referenceGeneSets)[i]
-    orthMsigdbDataset[[refSetName]] <- orthologSet
+    refSetName <- names(referenceGeneSetList)[i]
+    orthGeneSetList[[refSetName]] <- orthologSet
   }
-  return(orthMsigdbDataset)
+  return(orthGeneSetList)
 }
 
 #' @importFrom stats fisher.test
@@ -312,30 +310,30 @@ calculateEnrichment <- function (targetedGenes, backgroundGenes, geneSet) {
   return (result)
 }
 
-#' runMSIGDB
-#'
-#' MSIGDB is a database of curated gene sets. This function is used to
-#' facilitate gene set enrichment for genes that are found to overlap query
-#' regions.
-#'
-#' @param msigDB A list of vectors where each vector consists of a set of Entrez
-#'   gene ids returned by \code{parseMsigdb} function
-#' @param species A character string denoting the species under analysis.
+#' runGSEA
+#' 
+#' This function is used to facilitate gene set enrichment analysis (GSEA) for a
+#' given set of genes
+#' 
+#' @param geneSetList A named list of vectors where each vector consists of a
+#'   set of Entrez gene ids (for instance, returned by \code{parseMsigdb}
+#'   function)
+#' @param species A character string denoting the species under analysis. 
 #'   Options are 'human', 'mouse', 'fly' and 'worm'.
-#' @param backgroundGenes A vector of Ensembl gene ids that serve as background
+#' @param backgroundGenes A vector of Ensembl gene ids that serve as background 
 #'   set of genes for GO term enrichment. In the context of RCAS, this should be
 #'   the whole set of genes found in an input GTF file.
-#' @param targetedGenes A vector of Ensembl gene ids that serve as the set for
-#'   which GO term enrichment should be carried out. In the context of RCAS,
-#'   this should be the set of genes that overlap with the query regions in an
-#'   input BED file.
-#' @return A data.frame object containing enriched MSIGDB gene sets and
-#'   associated statistics
+#' @param targetedGenes A vector of Ensembl gene ids that serve as the set for 
+#'   which GSEA should be carried out. In the context of RCAS, this should be
+#'   the set of genes that overlap the query regions
+#'   
+#' @return A data.frame object containing enriched gene sets and associated
+#'   statistics
 #'
 #' @examples
 #'
 #' #load test data
-#' data(msigDB)
+#' data(geneSets)
 #' data(gff)
 #' data(queryRegions)
 #' #get all genes from the gff data
@@ -343,7 +341,7 @@ calculateEnrichment <- function (targetedGenes, backgroundGenes, geneSet) {
 #' #get genes that overlap query regions
 #' overlaps <- queryGff(queryRegions, gff)
 #' targetedGenes <- unique(overlaps$gene_id)
-#' msigdbResults <- runMSIGDB(msigDB = msigDB,
+#' resultsGSEA <- runGSEA(geneSetList = geneSets,
 #'           species = 'human',
 #'           backgroundGenes = backgroundGenes,
 #'           targetedGenes = targetedGenes)
@@ -351,7 +349,7 @@ calculateEnrichment <- function (targetedGenes, backgroundGenes, geneSet) {
 #' @importFrom AnnotationDbi as.list
 #' @importFrom stats p.adjust
 #' @export
-runMSIGDB <- function (msigDB,
+runGSEA <- function (geneSetList,
                        species = 'human',
                        backgroundGenes,
                        targetedGenes) {
@@ -372,7 +370,7 @@ runMSIGDB <- function (msigDB,
   targetedGenes <- unique(paste(unlist(ens2eg[targetedGenes])))
   backgroundGenes <- unique(paste(unlist(ens2eg[backgroundGenes])))
 
-  results <- lapply(X = msigDB,
+  results <- lapply(X = geneSetList,
                    FUN = function(x) {
                      calculateEnrichment(targetedGenes=targetedGenes,
                                          backgroundGenes=backgroundGenes,
@@ -382,7 +380,7 @@ runMSIGDB <- function (msigDB,
   results$bonferroni <- stats::p.adjust(p = results$fisherPVal,
                                         method = "bonferroni")
   results$foldEnrichment <- round(results$treatment/results$expectedInTreatment, 2)
-  return(results[order(results$bonferroni),])
+  return(results[order(results$foldEnrichment, decreasing = TRUE),])
 }
 
 

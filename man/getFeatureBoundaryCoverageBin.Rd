@@ -2,7 +2,7 @@
 % Please edit documentation in R/report_functions.R
 \name{getFeatureBoundaryCoverageBin}
 \alias{getFeatureBoundaryCoverageBin}
-\title{getFeatureBoundaryCoverage}
+\title{getFeatureBoundaryCoverageBin}
 \usage{
 getFeatureBoundaryCoverageBin(queryRegions, featureCoords, flankSize = 50,
   sampleN = 0)

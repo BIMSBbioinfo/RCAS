@@ -14,7 +14,7 @@ regions imported by the \code{\link{importBed}} function}
 corresponds to the genomic coordinates of gene features such as promoters,
 introns, exons, 5'/3' UTRs and whole transcripts.
 This list of GRanges objects are obtained by the function
-\code{\link{getTxdbFeaturesFromGff}} or \code{\link{getTxdbFeatures}}.}
+\code{\link{getTxdbFeaturesFromGRanges}} or \code{\link{getTxdbFeatures}}.}
 }
 \value{
 A data.frame object where rows correspond to genes and columns
@@ -29,7 +29,7 @@ categorized by the gene features such as promoters, introns, exons,
 \examples{
 data(gff)
 data(queryRegions)
-txdbFeatures <- getTxdbFeaturesFromGff(gff)
+txdbFeatures <- getTxdbFeaturesFromGRanges(gffData = gff)
 featuresTable <- getTargetedGenesTable(queryRegions = queryRegions,
                                        txdbFeatures = txdbFeatures)
 

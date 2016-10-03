@@ -30,8 +30,8 @@ target regions.
 \examples{
 data(gff)
 data(queryRegions)
-txdbFeatures <- getTxdbFeaturesFromGff(gff)
-list.df <- calculateCoverageProfileList(queryRegions = queryRegions,
+txdbFeatures <- getTxdbFeaturesFromGRanges(gffData = gff)
+dfList <- calculateCoverageProfileList(queryRegions = queryRegions,
                               targetRegionsList = txdbFeatures,
                                     sampleN = 1000)
 }

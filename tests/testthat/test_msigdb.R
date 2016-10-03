@@ -1,17 +1,17 @@
 library(RCAS)
-context("Functions to do MSIGDB gene set enrichment analysis")
+context("Functions to do gene set enrichment analysis")
 
 data(gff)
 data(queryRegions)
-data(msigDB)
-overlaps <- queryGff(queryRegions = queryRegions, gff = gff)
+data(geneSets)
+overlaps <- queryGff(queryRegions = queryRegions, gffData = gff)
 
-results <- runMSIGDB(msigDB = msigDB,
+results <- runGSEA(geneSetList = geneSets,
                      species = 'human',
                      backgroundGenes = unique(gff$gene_id),
                      targetedGenes = unique(overlaps$gene_id))
 
-test_that("Gene set enrichment analysis using MSIGDB gene sets", {
+test_that("Gene set enrichment analysis using random gene sets", {
   expect_is(results, 'data.frame')
   expect_equal(colnames(results)[5], 'BH')
   expect_equal(colnames(results)[6], 'bonferroni')

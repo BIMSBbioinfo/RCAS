@@ -24,8 +24,8 @@ useful when human data is mapped to another species, and that mapping
 is required to run the report.
 }
 \examples{
-data(msigDB)
-printMsigdbDataset(msigDB, 'output.gmt')
+data(geneSets)
+printMsigdbDataset(geneSets, 'output.gmt')
 
 }
 

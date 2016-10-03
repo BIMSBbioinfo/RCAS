@@ -15,9 +15,9 @@ test_that("queryRegions is a GRanges object from a HITS-CLIP dataset", {
   expect_equal(round(mean(GenomicRanges::score(queryRegions))), 45)
 })
 
-data(msigDB)
-test_that("msigDB is a list of vectors containing gene sets", {
-  expect_is(object = msigDB, 'list')
-  expect_equal(length(msigDB), 1330)
-  expect_match(names(msigDB)[1], 'KEGG_GLYCOLYSIS_GLUCONEOGENESIS')
+data(geneSets)
+test_that("geneSets is a list of vectors containing gene sets", {
+  expect_is(object = geneSets, 'list')
+  expect_equal(length(geneSets), 100)
+  expect_match(names(geneSets)[1], 'randomGeneSet1')
 })

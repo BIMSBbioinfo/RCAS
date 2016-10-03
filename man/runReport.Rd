@@ -2,63 +2,72 @@
 % Please edit documentation in R/report_functions.R
 \name{runReport}
 \alias{runReport}
-\title{Generate a RCAS Report for a CLIP-Seq-based experiment}
+\title{Generate a RCAS Report for a list of transcriptome-level segments}
 \usage{
 runReport(queryFilePath = "testdata", gffFilePath = "testdata",
   msigdbFilePath = "testdata", annotationSummary = TRUE,
   goAnalysis = TRUE, msigdbAnalysis = TRUE, motifAnalysis = TRUE,
   genomeVersion = "hg19", outDir = getwd(), printProcessedTables = FALSE,
-  sampleN = 10000)
+  sampleN = 0, quiet = FALSE)
 }
 \arguments{
-\item{queryFilePath}{a BED format file which contains genomic coordinates of
+\item{queryFilePath}{a BED format file which contains genomic coordinates of 
 protein-RNA binding sites}
 
-\item{gffFilePath}{A GTF format file which contains genome annotations
+\item{gffFilePath}{A GTF format file which contains genome annotations 
 (preferably from ENSEMBL)}
 
-\item{msigdbFilePath}{Gene set annotations for Homo sapiens from Molecular
-Signatures Database}
+\item{msigdbFilePath}{Gene set annotations for Homo sapiens from Molecular 
+Signatures Database or any text file that has the same structure. 
+Regardless of which species is being studied (see genomeVersion parameter),
+msigdbFilePath must contain annotations for human genes. The gene sets will
+be mapped from human to other species if genomeVersion is set to anything
+except human genome versions (e.g. mm9 or dm3).}
 
-\item{annotationSummary}{TRUE/FALSE (default: TRUE) A switch to decide if
+\item{annotationSummary}{TRUE/FALSE (default: TRUE) A switch to decide if 
 RCAS should provide annotation summaries from overlap operations}
 
-\item{goAnalysis}{TRUE/FALSE (default: TRUE) A switch to decide if RCAS
+\item{goAnalysis}{TRUE/FALSE (default: TRUE) A switch to decide if RCAS 
 should run GO term enrichment analysis}
 
-\item{msigdbAnalysis}{TRUE/FALSE (default: TRUE) A switch to decide if RCAS
+\item{msigdbAnalysis}{TRUE/FALSE (default: TRUE) A switch to decide if RCAS 
 should run gene set enrichment analysis}
 
-\item{motifAnalysis}{TRUE/FALSE (default: TRUE) A switch to decide if RCAS
+\item{motifAnalysis}{TRUE/FALSE (default: TRUE) A switch to decide if RCAS 
 should run motif analysis}
 
-\item{genomeVersion}{A character string to denote for which genome version
-the analysis is being done. Available options are hg19 (human), mm9
+\item{genomeVersion}{A character string to denote for which genome version 
+the analysis is being done. Available options are hg19 (human), mm9 
 (mouse), ce10 (worm) and dm3 (fly).}
 
-\item{outDir}{Path to the output directory. (default: current working
+\item{outDir}{Path to the output directory. (default: current working 
 directory)}
 
-\item{printProcessedTables}{boolean value (default: FALSE). If set to TRUE,
-raw data tables that are used for plots/tables will be printed to files.}
+\item{printProcessedTables}{boolean value (default: FALSE). If set to TRUE, 
+raw data tables that are used for plots/tables will be printed to text
+files.}
 
-\item{sampleN}{integer value (default: 0). A parameter to determine if the
-input query regions should be downsampled to a smaller size in order to
-make report generation quicker. When set to 0, downsampling won't be done.
-To activate the sampling a positive integer value that is smaller than
-the total number of query regions should be given.}
+\item{sampleN}{integer value (default: 0). A parameter to determine if the 
+input query regions should be downsampled to a smaller size in order to 
+make report generation quicker. When set to 0, downsampling won't be done. 
+To activate the sampling a positive integer value that is smaller than the
+total number of query regions should be given.}
+
+\item{quiet}{boolean value (default: FALSE). If set to TRUE, progress bars 
+and chunk labels will be suppressed while knitting the Rmd file.}
 }
 \value{
-An html generated using rmarkdown/knitr/pandoc that contains
-  interactive figures, tables, and text that provide an overview of the
+An html generated using rmarkdown/knitr/pandoc that contains 
+  interactive figures, tables, and text that provide an overview of the 
   experiment
 }
 \description{
-This is the main report generation function for RCAS. This function can take
-a BED file, a GTF file and optionally an MSIGDB annotation; and use these
-input to run multiple RCAS functions to create a summary report regarding the
-annotation data that overlap the input BED file, enrichment analysis for GO
-terms, gene sets from MSIGDB, and motif analysis.
+This is the main report generation function for RCAS. This function can take 
+a BED file, a GTF file and optionally an MSIGDB gene set annotation (or any
+text file containing annotations with the same structure as defined in
+MSIGDB); and use these input to run multiple RCAS functions to create a
+summary report regarding the annotation data that overlap the input BED file,
+enrichment analysis for GO terms, gene sets from MSIGDB, and motif analysis.
 }
 \examples{
 #Default run will generate a report using built-in test data for hg19 genome.
