@@ -32,22 +32,25 @@ devtools::install_github('BIMSBbioinfo/RCAS')
 
 ## usage: 
 
+- GTF file (Required)
+
 Firstly, download the input datasets from ENSEMBL (GTF file) and doRiNA (BED file), and optionally gene-set annotations from the [MSIGDB](http://software.broadinstitute.org/gsea/msigdb/)
 
-- GTF file: 
 ```
 wget ftp://ftp.ensembl.org/pub/release-75/gtf/homo_sapiens/Homo_sapiens.GRCh37.75.gtf.gz
 gunzip Homo_sapiens.GRCh37.75.gtf.gz
 ```
 
-- BED file
+- BED file (Required)
+
 Sample BED file from a HITSCLIP study of LIN28A protein [Wilbert ML, et al, 2012](https://www.ncbi.nlm.nih.gov/pubmed/22959275) downloaded from DoRiNA database
 ```
 wget https://bimsbstatic.mdc-berlin.de/akalin/buyar/RCAS/HITSCLIP_LIN28AWilbert2012a_hg19.bed
 ```
 
-- Gene set annotations 
-Optionally; download the human gene set annotations from the Molecular Signatures Database. 
+- Gene set annotations (Optional)
+
+Download the human gene set annotations from the Molecular Signatures Database. 
 The recommended set of gene set annotations is the [curated gene sets](http://software.broadinstitute.org/gsea/msigdb/collections.jsp#C2) with 'Entrez' gene identifiers. 
 
 If the gene set enrichment analysis using the MSIGDB annotations is needed for other species, RCAS can take the MSIGDB annotations for human and map them to mouse and fly genomes via orthologous genes. In any case, it must be the human gene-set annotations provided to the main reporting function of RCAS (**runReport**). The mapping to other species happens in the background. 
