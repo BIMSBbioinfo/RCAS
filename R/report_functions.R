@@ -785,6 +785,10 @@ findLongLines <- function (myfile, lineLimit = 80) {
 #'   total number of query regions should be given.
 #' @param quiet boolean value (default: FALSE). If set to TRUE, progress bars 
 #' and chunk labels will be suppressed while knitting the Rmd file. 
+#' @param selfContained boolean value (default: TRUE). By default, the generated
+#' html file will be self-contained, which means that all figures and tables 
+#' will be embedded in a single html file with no external dependencies 
+#' (See rmarkdown::html_document) 
 #' @return An html generated using rmarkdown/knitr/pandoc that contains 
 #'   interactive figures, tables, and text that provide an overview of the 
 #'   experiment
@@ -906,8 +910,8 @@ runReport <- function(queryFilePath = 'testdata',
       toc_float = TRUE,
       theme = 'simplex',
       number_sections = TRUE,
-      includes = rmarkdown::includes(in_header = headerFile),
-      selfContained = selfContained
+      includes = rmarkdown::includes(in_header = headerFile), 
+      self_contained = selfContained
       ),
     params = list(query = queryFilePath,
                   gff = gffFilePath,
