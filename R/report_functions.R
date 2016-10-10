@@ -907,7 +907,7 @@ runReport <- function(queryFilePath = 'testdata',
       theme = 'simplex',
       number_sections = TRUE,
       includes = rmarkdown::includes(in_header = headerFile),
-      selfContained = selfCcontained
+      selfContained = selfContained
       ),
     params = list(query = queryFilePath,
                   gff = gffFilePath,
