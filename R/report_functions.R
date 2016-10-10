@@ -837,7 +837,7 @@ runReport <- function(queryFilePath = 'testdata',
                       printProcessedTables = FALSE,
                       sampleN = 0,
                       quiet = FALSE,
-                      self_contained = TRUE) {
+                      selfContained = TRUE) {
 
   if (genomeVersion == 'hg19') {
     species <- 'human'
@@ -907,7 +907,7 @@ runReport <- function(queryFilePath = 'testdata',
       theme = 'simplex',
       number_sections = TRUE,
       includes = rmarkdown::includes(in_header = headerFile),
-      self_contained = self_contained
+      selfContained = selfCcontained
       ),
     params = list(query = queryFilePath,
                   gff = gffFilePath,
