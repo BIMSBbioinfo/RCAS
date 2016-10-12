@@ -1,3 +1,10 @@
+# RCAS 0.99.7
+- Added selfContained argument to runReport function so that the generated html report can be arranged to be standalone (slow to load but self-contained) or not (fast to load but external dependencies have to be shipped with the html file). 
+- Updated motif analysis chunk in report.Rmd script. Query regions shorter than 15 bp are resized to 15bp to enable motif search in datasets with short interval queries. 
+
+# RCAS 0.99.6
+fixed repository issue - version bump to 0.99.6
+
 # RCAS 0.99.5
 New features:
 - DT::datatables in the report now contain buttons to export data tables to CSV, Excel, PDF, or

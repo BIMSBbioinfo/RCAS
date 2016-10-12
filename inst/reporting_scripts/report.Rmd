@@ -318,14 +318,19 @@ cat('# motifRG analysis results \n')
 ```
 
 ```{r motif_analysis, results='hide', eval=motifAnalysis}
+#extend the queryRegions if shorter than 15 bp otherwise, motif analysis is not possible for such short segments
+queryRegionsExt <- queryRegions
+queryRegionsExt[width(queryRegionsExt) < 15] <- GenomicRanges::resize(x = queryRegionsExt[width(queryRegionsExt) < 15], 
+                                                                      width = 15, 
+                                                                      fix = 'center')
 
-motifResults <- runMotifRG(queryRegions = queryRegions, 
+motifResults <- runMotifRG(queryRegions = queryRegionsExt, 
                            genomeVersion = params$genomeVersion, 
                            motifN = 4)
 motifPWMs <- list()
 
 if (length(motifResults$motifs) > 0) {
-  querySeqs <- extractSequences(queryRegions = queryRegions, 
+  querySeqs <- extractSequences(queryRegions = queryRegionsExt, 
                                 genomeVersion = params$genomeVersion)
   querySeqs <- querySeqs[width(querySeqs) > 10,]
   

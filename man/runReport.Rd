@@ -8,7 +8,7 @@ runReport(queryFilePath = "testdata", gffFilePath = "testdata",
   msigdbFilePath = "testdata", annotationSummary = TRUE,
   goAnalysis = TRUE, msigdbAnalysis = TRUE, motifAnalysis = TRUE,
   genomeVersion = "hg19", outDir = getwd(), printProcessedTables = FALSE,
-  sampleN = 0, quiet = FALSE)
+  sampleN = 0, quiet = FALSE, selfContained = TRUE)
 }
 \arguments{
 \item{queryFilePath}{a BED format file which contains genomic coordinates of 
@@ -55,6 +55,11 @@ total number of query regions should be given.}
 
 \item{quiet}{boolean value (default: FALSE). If set to TRUE, progress bars 
 and chunk labels will be suppressed while knitting the Rmd file.}
+
+\item{selfContained}{boolean value (default: TRUE). By default, the generated
+html file will be self-contained, which means that all figures and tables 
+will be embedded in a single html file with no external dependencies 
+(See rmarkdown::html_document)}
 }
 \value{
 An html generated using rmarkdown/knitr/pandoc that contains 
