@@ -31,6 +31,14 @@ library('devtools')
 devtools::install_github('BIMSBbioinfo/RCAS')
 ```
 
+### Installing via Bioconda channel
+
+`conda install rcas -c bioconda`
+
+### Installing via Guix
+
+`guix package -i r r-rcas`
+
 ## usage: 
 
 - GTF file (Required)
