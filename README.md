@@ -3,19 +3,20 @@
 [![Build Status](https://travis-ci.org/BIMSBbioinfo/RCAS.svg?branch=master)](https://travis-ci.org/BIMSBbioinfo/RCAS)
 ![codecov.io](https://codecov.io/github/BIMSBbioinfo/RCAS/coverage.svg?branch=master)
 
-Make a standalone RNA Centric Annotation System that
-provides intuitive reports and publication ready graphics.
-
-RCAS takes as input transcript-level intervals of interest (for instance CLIP-Seq peaks, epitranscriptome modification sites, 
-CAGE tags) in BED format and a GTF file for genomic feature annotations,
-and automatically generates distributions of annotation features,
-detected motifs, GO-term enrichment, gene-set enrichment and coverage profiles of signals across gene features such as exons, introns,
-promoters, UTRs, exon-intron boundaries. The main function **runReport** can generate an HTML report with interactive figures and tables. 
-
-This repository provides the R package implementing the core features
-of RCAS.  It can be used as a library.  For tools using the RCAS
-library, such as a command line tool and a web interface, please check
-the repository at <https://github.com/BIMSBbioinfo/RCAS-tools>.
+RCAS is an R/Bioconductor package designed as a generic reporting tool
+for the functional analysis of transcriptomic-wide regions of interest detected
+by high-throughput experiments. Such transcriptomic regions could be,
+for instance, signal peaks detected by CLIP-Seq analysis for protein-RNA
+interaction sites, RNA modification sites (alias the epitranscriptome),
+CAGE-tag locations, or any other collection of query regions at the level of
+the transcriptome. RCAS produces in-depth annotation summaries and
+coverage profiles based on the distribution of the query regions with respect
+to transcript features (exons, introns, 5’/3’ UTR regions, exon-intron
+boundaries, promoter regions). Moreover, RCAS can carry out functional
+enrichment analyses of annotated gene sets, GO terms, and de novo motif
+discovery. RCAS is available in the Bioconductor repository, packaged in multiple
+environments including Conda, Galaxy, and Guix, and as a webservice
+at http://rcas.mdc-berlin.de/.
 
 ## installation:
 
