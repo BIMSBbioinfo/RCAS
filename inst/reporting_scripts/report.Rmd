@@ -318,9 +318,13 @@ cat('# motifRG analysis results \n')
 ```
 
 ```{r motif_analysis, results='hide', eval=motifAnalysis}
+#downsample the query regions to 10000 intervals for motif analysis
+#as we don't need the complete set of intervals for motif discovery
+#and the motif discovery part is a bottleneck for run time.
+queryRegionsExt <- queryRegions
+queryRegionsExt <- queryRegionsExt[sample(x = 1:length(queryRegionsExt), size = 10000)]
 
 #extend the queryRegions if shorter than 15 bp otherwise, motif analysis is not possible for such short segments
-queryRegionsExt <- queryRegions
 queryRegionsExt[width(queryRegionsExt) < 15] <- GenomicRanges::resize(x = queryRegionsExt[width(queryRegionsExt) < 15], 
                                                                       width = 15, 
                                                                       fix = 'center')
