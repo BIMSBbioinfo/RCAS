@@ -6,8 +6,8 @@ var RCAS = (function () {
             data = 'data:image/svg+xml;base64,' + btoa('<svg>'+inner+'</svg>');
 
         // override link target
-        that.href=data;
-        that.click();
+        that.href = data;
+        return true;
     }
 
     function generateModebarButton (selector) {
