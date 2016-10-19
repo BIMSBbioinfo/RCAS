@@ -898,6 +898,8 @@ runReport <- function(queryFilePath = 'testdata',
 
   reportFile <- system.file("reporting_scripts", "report.Rmd", package='RCAS')
   headerFile <- system.file("reporting_scripts", "header.html", package='RCAS')
+  footerFile <- system.file("reporting_scripts", "footer.html", package='RCAS')
+  
   outFile <- paste0(basename(queryFilePath), '.RCAS.report.html')
 
   rmarkdown::render(
@@ -910,7 +912,8 @@ runReport <- function(queryFilePath = 'testdata',
       toc_float = TRUE,
       theme = 'simplex',
       number_sections = TRUE,
-      includes = rmarkdown::includes(in_header = headerFile), 
+      includes = rmarkdown::includes(in_header = headerFile, 
+                                     after_body = footerFile), 
       self_contained = selfContained
       ),
     params = list(query = queryFilePath,
