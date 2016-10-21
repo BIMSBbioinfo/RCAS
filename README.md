@@ -18,6 +18,14 @@ discovery. RCAS is available in the Bioconductor repository, packaged in multipl
 environments including Conda, Galaxy, and Guix, and as a webservice
 at http://rcas.mdc-berlin.de/.
 
+## Example RCAS reports from published RNA-based omics datasets
+
+- [RCAS report](http://rcas.mdc-berlin.de/examples/PARCLIP_PUM2_Hafner2010b_hg19.bed.RCAS.report.html) for [PUM2](http://www.uniprot.org/uniprot/Q8TB72) RNA-binding sites detected by **PAR-CLIP** technique ([Hafner et al, 2010](https://www.ncbi.nlm.nih.gov/pubmed/20371350))
+
+- [RCAS report](http://rcas.mdc-berlin.de/examples/m1Asites.dominissini.2016.resized.bed.RCAS.report.html) for m<sup>1</sup>A **methylation sites** ([Dominissini et al, 2016](https://www.ncbi.nlm.nih.gov/pubmed/26863196))
+
+- [RCAS report](http://rcas.mdc-berlin.de/examples/human_FANTOM4_tiRNAs-hg19.bed.RCAS.report.html) for tiny RNA (tiRNA) loci detected by **deepCAGE** analysis ([Taft et al. 2009](https://www.ncbi.nlm.nih.gov/pubmed/19377478)) 
+
 ## installation:
 
 ### Installing from [Bioconductor](http://bioconductor.org/packages/3.4/bioc/html/RCAS.html) 
