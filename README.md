@@ -4,7 +4,7 @@
 ![codecov.io](https://codecov.io/github/BIMSBbioinfo/RCAS/coverage.svg?branch=master)
 
 RCAS is an R/Bioconductor package designed as a generic reporting tool
-for the functional analysis of transcriptomic-wide regions of interest detected
+for the functional analysis of transcriptome-wide regions of interest detected
 by high-throughput experiments. Such transcriptomic regions could be,
 for instance, signal peaks detected by CLIP-Seq analysis for protein-RNA
 interaction sites, RNA modification sites (alias the epitranscriptome),
@@ -29,7 +29,7 @@ at http://rcas.mdc-berlin.de/.
 ## installation:
 
 ### Installing from [Bioconductor](http://bioconductor.org/packages/3.4/bioc/html/RCAS.html) 
-`source('http://bioconductor.org/biocLite.org')`
+`source('http://bioconductor.org/biocLite.R')`
 
 `biocLite('RCAS')`
 
