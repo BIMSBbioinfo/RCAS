@@ -20,11 +20,11 @@ at http://rcas.mdc-berlin.de/.
 
 ## Example RCAS reports from published RNA-based omics datasets
 
-- [RCAS report](https://bimsbstatic.mdc-berlin.de/akalin/buyar/RCAS/PARCLIP_PUM2_Hafner2010b_hg19.bed.RCAS.report.html) for [PUM2](http://www.uniprot.org/uniprot/Q8TB72) RNA-binding sites detected by **PAR-CLIP** technique ([Hafner et al, 2010](https://www.ncbi.nlm.nih.gov/pubmed/20371350))
+- [RCAS report](https://bimsbstatic.mdc-berlin.de/akalin/buyar/RCAS/1.0.0/PARCLIP_PUM2_Hafner2010b_hg19.bed.RCAS.report.html) for [PUM2](http://www.uniprot.org/uniprot/Q8TB72) RNA-binding sites detected by **PAR-CLIP** technique ([Hafner et al, 2010](https://www.ncbi.nlm.nih.gov/pubmed/20371350))
 
-- [RCAS report](https://bimsbstatic.mdc-berlin.de/akalin/buyar/RCAS/m1Asites.dominissini.2016.original.bed.RCAS.report.html) for m<sup>1</sup>A **methylation sites** ([Dominissini et al, 2016](https://www.ncbi.nlm.nih.gov/pubmed/26863196))
+- [RCAS report](https://bimsbstatic.mdc-berlin.de/akalin/buyar/RCAS/1.0.0/m1Asites.dominissini.2016.resized.bed.RCAS.report.html) for m<sup>1</sup>A **methylation sites** ([Dominissini et al, 2016](https://www.ncbi.nlm.nih.gov/pubmed/26863196))
 
-- [RCAS report](https://bimsbstatic.mdc-berlin.de/akalin/buyar/RCAS/human_FANTOM4_tiRNAs-hg19.bed.RCAS.report.html) for tiny RNA (tiRNA) loci detected by **deepCAGE** analysis ([Taft et al. 2009](https://www.ncbi.nlm.nih.gov/pubmed/19377478)) 
+- [RCAS report](https://bimsbstatic.mdc-berlin.de/akalin/buyar/RCAS/1.0.0/human_FANTOM4_tiRNAs-hg19.bed.RCAS.report.html) for tiny RNA (tiRNA) loci detected by **deepCAGE** analysis ([Taft et al. 2009](https://www.ncbi.nlm.nih.gov/pubmed/19377478)) 
 
 ## installation:
 
