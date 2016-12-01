@@ -33,7 +33,7 @@ devtools::install_github('BIMSBbioinfo/RCAS')
 
 ### Installing via Bioconda channel
 
-`conda install rcas -c bioconda`
+`conda install bioconductor-rcas -c bioconda`
 
 ### Installing via Guix
 
