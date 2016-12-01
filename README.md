@@ -18,17 +18,9 @@ discovery. RCAS is available in the Bioconductor repository, packaged in multipl
 environments including Conda, Galaxy, and Guix, and as a webservice
 at http://rcas.mdc-berlin.de/.
 
-## Example RCAS reports from published RNA-based omics datasets
-
-- [RCAS report](https://bimsbstatic.mdc-berlin.de/akalin/buyar/RCAS/1.0.0/PARCLIP_PUM2_Hafner2010b_hg19.bed.RCAS.report.html) for [PUM2](http://www.uniprot.org/uniprot/Q8TB72) RNA-binding sites detected by **PAR-CLIP** technique ([Hafner et al, 2010](https://www.ncbi.nlm.nih.gov/pubmed/20371350))
-
-- [RCAS report](https://bimsbstatic.mdc-berlin.de/akalin/buyar/RCAS/1.0.0/m1Asites.dominissini.2016.resized.bed.RCAS.report.html) for m<sup>1</sup>A **methylation sites** ([Dominissini et al, 2016](https://www.ncbi.nlm.nih.gov/pubmed/26863196))
-
-- [RCAS report](https://bimsbstatic.mdc-berlin.de/akalin/buyar/RCAS/1.0.0/human_FANTOM4_tiRNAs-hg19.bed.RCAS.report.html) for tiny RNA (tiRNA) loci detected by **deepCAGE** analysis ([Taft et al. 2009](https://www.ncbi.nlm.nih.gov/pubmed/19377478)) 
-
 ## installation:
 
-### Installing from [Bioconductor](http://bioconductor.org/packages/3.4/bioc/html/RCAS.html) 
+### Installing from [Bioconductor](http://bioconductor.org/packages/3.4/bioc/html/RCAS.html)
 `source('http://bioconductor.org/biocLite.R')`
 
 `biocLite('RCAS')`
@@ -47,7 +39,7 @@ devtools::install_github('BIMSBbioinfo/RCAS')
 
 `guix package -i r r-rcas`
 
-## usage: 
+## usage:
 
 - GTF file (Required)
 
@@ -67,12 +59,12 @@ wget https://bimsbstatic.mdc-berlin.de/akalin/buyar/RCAS/HITSCLIP_LIN28AWilbert2
 
 - Gene set annotations (Optional)
 
-Download the human gene set annotations from the Molecular Signatures Database. 
-The recommended set of gene set annotations is the [curated gene sets](http://software.broadinstitute.org/gsea/msigdb/collections.jsp#C2) with 'Entrez' gene identifiers. 
+Download the human gene set annotations from the Molecular Signatures Database.
+The recommended set of gene set annotations is the [curated gene sets](http://software.broadinstitute.org/gsea/msigdb/collections.jsp#C2) with 'Entrez' gene identifiers.
 
-If the gene set enrichment analysis using the MSIGDB annotations is needed for other species, RCAS can take the MSIGDB annotations for human and map them to mouse and fly genomes via orthologous genes. In any case, it must be the human gene-set annotations provided to the main reporting function of RCAS (**runReport**). The mapping to other species happens in the background. 
+If the gene set enrichment analysis using the MSIGDB annotations is needed for other species, RCAS can take the MSIGDB annotations for human and map them to mouse and fly genomes via orthologous genes. In any case, it must be the human gene-set annotations provided to the main reporting function of RCAS (**runReport**). The mapping to other species happens in the background.
 
-Generate an annotation report using the GTF file and built-in test data (BED format) as input. 
+Generate an annotation report using the GTF file and built-in test data (BED format) as input.
 ```
 library('RCAS')
 RCAS::runReport(gffFilePath = "./Homo_sapiens.GRCh37.75.gtf",  queryFilePath = "./HITSCLIP_LIN28AWilbert2012a_hg19.bed", msigdbFilePath = <path to MSIGDB gene-sets with ENTREZ gene ids>, genomeVersion = 'hg19')
@@ -80,7 +72,33 @@ RCAS::runReport(gffFilePath = "./Homo_sapiens.GRCh37.75.gtf",  queryFilePath = "
 
 ## Package vignette and reference manual
 
-See the [package vignette](http://bioconductor.org/packages/3.4/bioc/vignettes/RCAS/inst/doc/RCAS.vignette.html) and [the reference manual](http://bioconductor.org/packages/3.4/bioc/manuals/RCAS/man/RCAS.pdf) for more information about the detailed functions available in RCAS. 
+See the [package vignette](http://bioconductor.org/packages/3.4/bioc/vignettes/RCAS/inst/doc/RCAS.vignette.html) and [the reference manual](http://bioconductor.org/packages/3.4/bioc/manuals/RCAS/man/RCAS.pdf) for more information about the detailed functions available in RCAS.
+
+## Use cases from published RNA-based omics datasets
+
+- The reference files needed for reproducing the reports below:
+    - [Homo_sapiens.GRCh37.75.gtf.gz]( http://ftp.ensembl.org/pub/release-75/gtf/homo_sapiens/Homo_sapiens.GRCh37.75.gtf.gz)
+    - [c2.all.v5.1.entrez.gmt](http://software.broadinstitute.org/gsea/msigdb/download_file.jsp?filePath=/resources/msigdb/5.1/c2.all.v5.1.entrez.gmt)
+
+
+- [RCAS report](https://bimsbstatic.mdc-berlin.de/akalin/buyar/RCAS/1.0.0/PARCLIP_PUM2_Hafner2010b_hg19.bed.RCAS.report.html) for [PUM2](http://www.uniprot.org/uniprot/Q8TB72) RNA-binding sites detected by **PAR-CLIP** technique ([Hafner et al, 2010](https://www.ncbi.nlm.nih.gov/pubmed/20371350))
+  - input:  [PARCLIP_PUM2_Hafner2010b_hg19](http://dorina.mdc-berlin.de/api/v1.0/download/regulator/hg19/PARCLIP_PUM2_Hafner2010b_hg19)
+
+
+- [RCAS report](https://bimsbstatic.mdc-berlin.de/akalin/buyar/RCAS/1.0.0/PARCLIP_QKI_Hafner2010c_hg19.bed.RCAS.report.html) for [QKI](http://www.uniprot.org/uniprot/Q96PU8) RNA-binding sites detected by **PAR-CLIP** technique ([Hafner et al, 2010](https://www.ncbi.nlm.nih.gov/pubmed/20371350))
+  - input: [PARCLIP_QKI_Hafner2010c_hg19](http://dorina.mdc-berlin.de/api/v1.0/download/regulator/hg19/PARCLIP_QKI_Hafner2010c_hg19 )
+
+
+- [RCAS report](https://bimsbstatic.mdc-berlin.de/akalin/buyar/RCAS/1.0.0/PARCLIP_IGF2BP123_Hafner2010d_hg19.bed.RCAS.report.html) for IGF2BP[1](http://www.uniprot.org/uniprot/Q9NZI8)[2](http://www.uniprot.org/uniprot/Q9Y6M1)[3](http://www.uniprot.org/uniprot/O00425) RNA-binding sites detected by **PAR-CLIP** technique ([Hafner et al, 2010](https://www.ncbi.nlm.nih.gov/pubmed/20371350))
+  - input:  [PARCLIP_IGF2BP123_Hafner2010d_hg19](http://dorina.mdc-berlin.de/api/v1.0/download/regulator/hg19/PARCLIP_IGF2BP123_Hafner2010d_hg19)
+
+
+- [RCAS report](https://bimsbstatic.mdc-berlin.de/akalin/buyar/RCAS/1.0.0/human_FANTOM4_tiRNAs-hg19.bed.RCAS.report.html) for tiny RNA (tiRNA) loci detected by **deepCAGE** analysis ([Taft et al. 2009](https://www.ncbi.nlm.nih.gov/pubmed/19377478))
+    - input: [human_FANTOM4_tiRNAs.bed](http://fantom.gsc.riken.jp/4/download/Supplemental_Materials/Taft_et_al_2009/human_FANTOM4_tiRNAs.bed)
+
+
+- [RCAS report](https://bimsbstatic.mdc-berlin.de/akalin/buyar/RCAS/1.0.0/m1Asites.dominissini.2016.resized.bed.RCAS.report.html) for m<sup>1</sup>A **methylation sites** ([Dominissini et al, 2016](https://www.ncbi.nlm.nih.gov/pubmed/26863196))
+    - input: [GSE70485_human_peaks.txt.gz](http://www.ncbi.nlm.nih.gov/geo/download/?acc=GSE70485&format=file&file=GSE70485%5Fhuman%5Fpeaks%2Etxt%2Egz)
 
 ## Acknowledgements
 
