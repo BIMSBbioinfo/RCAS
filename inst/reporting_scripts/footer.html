@@ -1,9 +1,22 @@
 <script type="text/javascript">
 var RCAS = (function () {
     function captureSVG (that, selector) {
-        var svg  = document.querySelector(selector).parentNode,
-            inner = svg.innerHTML,
-            data = 'data:image/svg+xml;base64,' + btoa('<svg>'+inner+'</svg>');
+        var container = document.querySelector(selector).parentNode,
+            svgs = container.querySelectorAll('svg.main-svg'),
+            prefix = 'data:image/svg+xml;base64,',
+            data = '';
+
+        for (var i = 0; i < svgs.length; i++) {
+            // Remove drag layer because it looks like a black box
+            // when rendered in Inkscape.  This won't remove the
+            // element from the DOM because we use querySelectorAll,
+            // which returns a static node list.
+            for (var item of svgs[i].getElementsByClassName('draglayer')) {
+                item.remove();
+            }
+            data = data + svgs[i].innerHTML;
+        }
+        data = prefix + btoa('<svg>'+data+'</svg>');
 
         // override link target
         that.href = data;
