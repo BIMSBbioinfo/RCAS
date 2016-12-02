@@ -27,7 +27,6 @@ var RCAS = (function () {
 
     function injectLink (pathToWidget) {
         var widget = document.getElementById(pathToWidget),
-            svgs   = widget.getElementsByClassName('main-svg'),
             button = generateModebarButton('#' + pathToWidget + ' .main-svg'),
             bar    = widget.getElementsByClassName('modebar')[0];
         // insert at the very beginning
