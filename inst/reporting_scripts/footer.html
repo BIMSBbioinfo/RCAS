@@ -2,6 +2,8 @@
 var RCAS = (function () {
     function captureSVG (that, selector) {
         var container = document.querySelector(selector).parentNode,
+            height = container.offsetHeight,
+            width  = container.offsetWidth,
             svgs = container.querySelectorAll('svg.main-svg'),
             prefix = 'data:image/svg+xml;base64,',
             data = '';
@@ -16,7 +18,9 @@ var RCAS = (function () {
             }
             data = data + svgs[i].innerHTML;
         }
-        data = prefix + btoa('<svg>'+data+'</svg>');
+        data = prefix + btoa('<svg width="' + width +'" ' +
+                             'height="' + height + '"' + '>' +
+                             data + '</svg>');
 
         // override link target
         that.href = data;
