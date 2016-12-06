@@ -590,10 +590,7 @@ calculateCoverageProfile = function (queryRegions, targetRegions, sampleN = 0){
                                      bin.num = 100,
                                      bin.op = 'max',
                                      strand.aware = TRUE)
-    mdata <- as.data.frame(colSums(sm))
-    mdata$bins <- c(1:100)
-    colnames(mdata) <- c('coverage', 'bins')
-    return(mdata)
+    return(sm)
     } else {
     stop("Cannot compute coverage profile for target regions.\n
          There are no target regions longer than 100 bp\n")
@@ -617,6 +614,7 @@ calculateCoverageProfile = function (queryRegions, targetRegions, sampleN = 0){
 #'   level 2. bins. Target regions are divided into 100 equal sized bins and
 #'   coverage level is summarized in a strand-specific manner using the
 #'   \code{genomation::ScoreMatrixBin} function.
+#' @importFrom plotrix std.error
 #' @examples
 #' data(gff)
 #' data(queryRegions)
@@ -626,12 +624,19 @@ calculateCoverageProfile = function (queryRegions, targetRegions, sampleN = 0){
 #'                                     sampleN = 1000)
 #' @export
 calculateCoverageProfileList <- function (queryRegions,
-                                          targetRegionsList,
-                                          sampleN = 0) {
-  lapply(X = targetRegionsList,
-       FUN = function(x) { calculateCoverageProfile(queryRegions = queryRegions,
-                                                    targetRegions = x,
-                                                    sampleN = sampleN) })
+                                             targetRegionsList,
+                                             sampleN = 0) {
+  results <- lapply(X = names(targetRegionsList),
+                    FUN = function(x) { 
+                      sm <- calculateCoverageProfile(queryRegions = queryRegions,
+                                                        targetRegions = targetRegionsList[[x]],
+                                                        sampleN = sampleN)
+                      mdata <- data.frame('bins' = c(1:100), 
+                                          'meanCoverage' = colMeans(sm), 
+                                          'standardError' = apply(sm, 2, plotrix::std.error),
+                                          'feature' = x)
+                    })
+  return(do.call(rbind, results))
 }
 
 #' calculateCoverageProfileListFromTxdb
