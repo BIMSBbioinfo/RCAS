@@ -290,23 +290,28 @@ figureCount <- figureCount + 1
 
 ```{r coverageprofilelist_figcap, results='asis', eval=annotationSummary}
 cat("## Coverage profile of query regions across the length of different gene features\n")
-cat("**Figure",figureCount,":** The query regions are overlaid with the genomic coordinates of features. Each entry corresponding to a feature is divided into 100 bins of equal length and for each bin the number of query regions that cover the corresponding bin is counted. Features shorter than 100bp are excluded. Thus, a coverage profile is obtained based on the distribution of the query regions. The strandedness of the features are taken into account. The coverage profile is plotted in the 5' to 3' direction.\n")
+cat("**Figure",figureCount,":** The query regions are overlaid with the genomic coordinates of features. Each entry corresponding to a feature is divided into 100 bins of equal length and for each bin the number of query regions that cover the corresponding bin is counted. Features shorter than 100bp are excluded. Thus, a coverage profile is obtained based on the distribution of the query regions. Mean coverage score for each bin is represented with ribbons where the thickness of the ribbon indicates the 95% confidence interval (mean +- standard error of the mean x 1.96). The strandedness of the features are taken into account. The coverage profile is plotted in the 5' to 3' direction.\n")
 ```
 
 ```{r coverageprofilelist, eval=annotationSummary}
-covList <- calculateCoverageProfileList(queryRegions = queryRegions, 
+cvgList <- calculateCoverageProfileList(queryRegions = queryRegions, 
                                        targetRegionsList = txdbFeatures, 
                                        sampleN = 10000)
 
-df <- do.call('cbind', covList)
-df <- df[,!grepl(colnames(df), pattern = '*.bins')]
-df$bins <- c(1:100)
-colnames(df) <- gsub(pattern = ".coverage", replacement = "", x = colnames(df))
-mdf <- reshape2::melt(df, id.vars = c('bins'))
-colnames(mdf) <- c('bins', 'feature', 'coverage')
-p = plot_ly(data = mdf, x = ~bins, y = ~coverage, 
-            type = 'scatter', mode = 'lines', color = ~feature)
+p <- plotly::plot_ly(data = cvgList, type = 'scatter', mode = 'markers+lines')
+for (f in unique(cvgList$feature)){
+  data <- cvgList[cvgList$feature == f,]
+  p <- add_trace(p = p, data = data, x = ~bins, y = ~meanCoverage, 
+                 legendgroup = f, showlegend = FALSE, opacity = 0.4, color = f)
+  p <- add_ribbons(p = p, data = data, x = ~bins, 
+                   ymin = data$meanCoverage - data$standardError*1.96,
+                   ymax = data$meanCoverage + data$standardError*1.96, 
+                   opacity = 0.6, legendgroup = f, 
+                   name = f, color = f
+                   )
+}
 layout(p)
+
 if(params$printProcessedTables == TRUE) {
   write.table(x = df, file=paste0('Figure',figureCount,'.coverageprofilelist.data.tsv'), quote = FALSE, sep = '\t', row.names = TRUE)
 } 
