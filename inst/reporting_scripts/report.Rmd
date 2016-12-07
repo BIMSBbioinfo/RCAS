@@ -240,47 +240,38 @@ if(params$printProcessedTables == TRUE) {
 figureCount <- figureCount + 1
 ```
 
-```{r cdsIntronCoverage_figcap, results='asis', eval = annotationSummary}
-cat("## Coverage profile of query regions Coding Exon - Intron Boundaries\n")
-cat("**Figure",figureCount,":** The depth of coverage of query regions at coding exon - intron junctions\n")
+```{r exonIntronCoverage_figcap, results='asis', eval = annotationSummary}
+cat("## Coverage profile of query regions at Exon - Intron Boundaries\n")
+cat("**Figure",figureCount,":** The depth of coverage of query regions at exon - intron junctions\n")
 ```
 
-```{r cdsIntronCoverage, eval = annotationSummary}
-cvg <- getFeatureBoundaryCoverageBin(queryRegions = queryRegions,
-                                  featureCoords = txdbFeatures$cds,
-                                  flankSize = 50,
-                                  sampleN = 10000)
+```{r exonIntronCoverage, eval = annotationSummary}
+#split the coding-exons into corresponding transcripts
+exons <- txdbFeatures$exons
+exonCounts <- lengths(split(exons, names(exons)))
 
-yLimit <- (as.integer(max(c(cvg$fivePrime, cvg$threePrime))/10)+1)*10
+#To find the internal exons, for each transcript, remove the first and last exons from the GRanges object
+#thus we can make sure that each exon in the end we are looking at is adjacent to an intron
+internalExons <- exons[exonCounts[names(exons)] != exons$exon_rank,]
+internalExons <- internalExons[internalExons$exon_rank > 1,]
 
-p <- plot_ly(x = cvg$bins, y = cvg$fivePrime, type = 'scatter', mode = 'lines') %>% 
-  layout(p, 
-        xaxis = list(showticklabels = F, title =  'Junction'), 
-        yaxis = list(title = 'coverage', range = c(-10, yLimit)),
-        showlegend = FALSE) 
-plotly::add_annotations(p = p, 
-                        bordercolor = "rgb(250,0,0)",
-                        borderwidth = 3,
-                        showarrow = F, 
-                        text = c('< Intron (last 50 bp) >', '< Coding Exon (first 50 bp) >'), 
-                        x = c(-25, 25), y = c(-10, -10))
+cvgF <- getFeatureBoundaryCoverage2(queryRegions = queryRegions, featureCoords = internalExons, boundaryType = 'fiveprime', sampleN = 10000)
+cvgT <- getFeatureBoundaryCoverage2(queryRegions = queryRegions, featureCoords = internalExons, boundaryType = 'threeprime', sampleN = 10000)
 
-p <- plot_ly(x = cvg$bins, y = cvg$threePrime, type = 'scatter', mode = 'lines') %>% 
-  layout (p, 
-          xaxis = list(showticklabels = F, title = 'Junction'),
-          yaxis = list(title = 'coverage', range = c(-10, yLimit)), 
-          showlegend = FALSE) 
-plotly::add_annotations(p = p,
-                        bordercolor = "rgb(250,0,0)",
-                        borderwidth = 3,
-                        showarrow = F,
-                        text = c('< Coding Exon (last 50 bp) >', '< Intron (first 50 bp) >'),
-                        x = c(-25, 25), y = c(-10, -10))
+p1 <- plotly::plot_ly(data = cvgF, x = ~bases, y = ~meanCoverage, type = 'scatter', mode = 'markers+lines', opacity = 0.6, showlegend = FALSE) %>% 
+  add_ribbons(x = ~bases, ymin = cvgF$meanCoverage - cvgF$standardError*1.96, ymax = cvgF$meanCoverage + cvgF$standardError*1.96, opacity = 0.5) 
+
+p2 <- plotly::plot_ly(data = cvgT, x = ~bases, y = ~meanCoverage, type = 'scatter', mode = 'markers+lines', opacity = 0.6, showlegend = FALSE) %>% 
+  add_ribbons(x = ~bases, ymin = cvgT$meanCoverage - cvgT$standardError*1.96, ymax = cvgT$meanCoverage + cvgT$standardError*1.96, opacity = 0.5) 
+
+plotly::subplot(p1, p2, shareY = TRUE) %>% 
+  layout (xaxis = list(title = "5' end of exon-intron junction"), 
+          xaxis2 = list(title = "3' end of exon-intron junction"))
 
 if(params$printProcessedTables == TRUE) {
-  write.table(x = cvg, file=paste0('Figure',figureCount,'.cdsIntronCoverage.data.tsv'), quote = FALSE, sep = '\t', row.names = TRUE)
+  write.table(x = cvgF, file=paste0('Figure',figureCount,'.exonIntronBoundaryCoverage.fiveprime.data.tsv'), quote = FALSE, sep = '\t', row.names = TRUE)
+  write.table(x = cvgT, file=paste0('Figure',figureCount,'.exonIntronBoundaryCoverage.threeprime.data.tsv'), quote = FALSE, sep = '\t', row.names = TRUE)
 } 
-
 figureCount <- figureCount + 1
 ```
 
