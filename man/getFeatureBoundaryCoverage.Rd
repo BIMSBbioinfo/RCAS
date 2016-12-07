@@ -5,10 +5,10 @@
 \title{getFeatureBoundaryCoverage}
 \usage{
 getFeatureBoundaryCoverage(queryRegions, featureCoords, flankSize = 500,
-  sampleN = 0)
+  boundaryType, sampleN = 0)
 }
 \arguments{
-\item{queryRegions}{GRanges object imported from a BED file using
+\item{queryRegions}{GRanges object imported from a BED file using 
 \code{importBed} function}
 
 \item{featureCoords}{GRanges object containing the target feature coordinates}
@@ -16,18 +16,21 @@ getFeatureBoundaryCoverage(queryRegions, featureCoords, flankSize = 500,
 \item{flankSize}{Positive integer that determines the number of base pairs to
 extract around a given genomic feature boundary}
 
+\item{boundaryType}{(Options: fiveprime or threeprime). Denotes which side of
+the feature's boundary is to be profiled.}
+
 \item{sampleN}{A positive integer value less than the total number of featuer
-coordinates that determines whether the target feature coordinates should
+coordinates that determines whether the target feature coordinates should 
 be randomly downsampled. If set to 0, no downsampling will happen. If}
 }
 \value{
-a data frame containin three columns. 1. fivePrime: Coverage at 5'
-  end of features 2. threePrime: Coverage at 3' end of features; 3. bases:
+a data frame containin three columns. 1. fivePrime: Coverage at 5' 
+  end of features 2. threePrime: Coverage at 3' end of features; 3. bases: 
   distance (in bp) to the boundary
 }
 \description{
-This function extracts the flanking regions of 5' and 3' boundaries of a
-given set of genomic features and computes the per-base coverage of query
+This function extracts the flanking regions of 5' and 3' boundaries of a 
+given set of genomic features and computes the per-base coverage of query 
 regions across these boundaries.
 }
 \examples{
@@ -39,6 +42,7 @@ transcriptEndCoverage <- getFeatureBoundaryCoverage (
                                      queryRegions = queryRegions,
                                     featureCoords = transcriptCoords,
                                     flankSize = 100,
+                                    boundaryType = 'threeprime'
                                     sampleN = 1000)
 }
 
