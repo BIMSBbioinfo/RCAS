@@ -55,6 +55,7 @@ Imports:
     BiocGenerics,
     S4Vectors,
     stats,
+    plotrix
 RoxygenNote: 5.0.1
 Suggests: BSgenome.Mmusculus.UCSC.mm9,
     BSgenome.Celegans.UCSC.ce10,
