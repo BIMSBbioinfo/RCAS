@@ -42,7 +42,7 @@ transcriptEndCoverage <- getFeatureBoundaryCoverage (
                                      queryRegions = queryRegions,
                                     featureCoords = transcriptCoords,
                                     flankSize = 100,
-                                    boundaryType = 'threeprime'
+                                    boundaryType = 'threeprime',
                                     sampleN = 1000)
 }
 

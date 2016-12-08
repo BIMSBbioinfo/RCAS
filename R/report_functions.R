@@ -438,7 +438,7 @@ queryGff <- function(queryRegions, gffData) {
 #'                                      queryRegions = queryRegions,
 #'                                     featureCoords = transcriptCoords,
 #'                                     flankSize = 100,
-#'                                     boundaryType = 'threeprime'
+#'                                     boundaryType = 'threeprime',
 #'                                     sampleN = 1000)
 #' @import GenomicRanges
 #' @importFrom genomation ScoreMatrix
