@@ -129,7 +129,7 @@ cat('# Annotation Summary for Query Regions \n')
 ```{r summarizeQueryRegionsFigureCaption, results='asis', eval=annotationSummary}
 cat('## Distribution of query regions across gene features\n')
 
-cat("**Figure",figureCount,":** The number of query regions that overlap different kinds of gene features are counted. The 'y' axis denotes the types of gene features included in the analysis and the 'x' axis denotes the percentage of query regions (out of total number of query regions denoted with 'n') that overlap at least one genomic interval that host the corresponding feature. Notice that the sum of the percentage values for different features don't add up to 100%, because some query regions may overlap multiple kinds of features \n")
+cat("**Figure",figureCount,":** The number of query regions that overlap different kinds of gene features is counted. The 'y' axis denotes the types of gene features included in the analysis and the 'x' axis denotes the percentage of query regions (out of total number of query regions denoted with 'n') that overlap at least one genomic interval that hosts the corresponding feature. Notice that the percentage values for different features don't add up to 100%, because some query regions may overlap multiple kinds of features \n")
 ```
 
 
