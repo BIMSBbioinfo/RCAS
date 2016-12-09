@@ -551,21 +551,20 @@ getFeatureBoundaryCoverageBin <- function (queryRegions,
 
 
 #' calculateCoverageProfile
-#'
-#' This function checks overlaps between input query regions and annotation
+#' 
+#' This function checks overlaps between input query regions and annotation 
 #' features, and then calculates coverage profile along target regions.
-#'
-#' @param queryRegions GRanges object imported from a BED file using
+#' 
+#' @param queryRegions GRanges object imported from a BED file using 
 #'   \code{importBed} function
-#' @param targetRegions GRanges object containing genomic coordinates of a
+#' @param targetRegions GRanges object containing genomic coordinates of a 
 #'   target feature (e.g. exons)
-#' @param sampleN If set to a positive integer, \code{targetRegions} will be
+#' @param sampleN If set to a positive integer, \code{targetRegions} will be 
 #'   downsampled to \code{sampleN} regions
-#'
-#' @return A data.frame object consisting of two columns: 1. coverage level 2.
-#'   bins. Target regions are divided into 100 equal sized bins and coverage
-#'   level is summarized in a strand-specific manner using the
-#'   \code{genomation::ScoreMatrixBin} function.
+#'   
+#' @return A ScoreMatrix object returned by \code{genomation::ScoreMatrixBin} 
+#'   function. Target regions are divided into 100 equal sized bins and coverage
+#'   level is calculated in a strand-specific manner.
 #' @examples
 #' data(gff)
 #' data(queryRegions)
@@ -599,22 +598,24 @@ calculateCoverageProfile = function (queryRegions, targetRegions, sampleN = 0){
 }
 
 #' calculateCoverageProfileList
-#'
-#' This function checks overlaps between input query regions and a target list
-#' of annotation features, and then calculates the coverage profile along the
+#' 
+#' This function checks overlaps between input query regions and a target list 
+#' of annotation features, and then calculates the coverage profile along the 
 #' target regions.
-#'
-#' @param queryRegions GRanges object imported from a BED file using
+#' 
+#' @param queryRegions GRanges object imported from a BED file using 
 #'   \code{importBed} function
-#' @param targetRegionsList A list of GRanges objects containing genomic
+#' @param targetRegionsList A list of GRanges objects containing genomic 
 #'   coordinates of target features (e.g. transcripts, exons, introns)
-#' @param sampleN If set to a positive integer, \code{targetRegions} will be
+#' @param sampleN If set to a positive integer, \code{targetRegions} will be 
 #'   downsampled to \code{sampleN} regions
-#'
-#' @return A list of data.frame objects consisting of two columns: 1. coverage
-#'   level 2. bins. Target regions are divided into 100 equal sized bins and
-#'   coverage level is summarized in a strand-specific manner using the
-#'   \code{genomation::ScoreMatrixBin} function.
+#'   
+#' @return A data.frame consisting of four columns: 1. bins level 2.
+#'   meanCoverage 3. standardError 4. feature Target regions are divided into
+#'   100 equal sized bins and coverage level is summarized in a strand-specific
+#'   manner using the \code{genomation::ScoreMatrixBin} function. For each bin,
+#'   mean coverage score and the standard error of the mean coverage score is
+#'   calculated (\code{plotrix::std.error})
 #' @importFrom plotrix std.error
 #' @examples
 #' data(gff)

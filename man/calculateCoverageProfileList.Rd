@@ -17,10 +17,13 @@ coordinates of target features (e.g. transcripts, exons, introns)}
 downsampled to \code{sampleN} regions}
 }
 \value{
-A list of data.frame objects consisting of two columns: 1. coverage
-  level 2. bins. Target regions are divided into 100 equal sized bins and
+A data.frame consisting of four columns: 1. bins
+  level 2. meanCoverage 3. standardError 4. feature 
+  Target regions are divided into 100 equal sized bins and
   coverage level is summarized in a strand-specific manner using the
-  \code{genomation::ScoreMatrixBin} function.
+  \code{genomation::ScoreMatrixBin} function. For each bin, mean 
+  coverage score and the standard error of the mean coverage score
+  is calculated (\code{plotrix::std.error})
 }
 \description{
 This function checks overlaps between input query regions and a target list
