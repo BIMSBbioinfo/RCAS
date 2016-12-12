@@ -152,7 +152,8 @@ layout(p = p,
                                   "n =", length(queryRegions)
                                   )
                     ), 
-       margin = list(b = 150, r = 50)
+       margin = list(b = 150, r = 50),
+       font = list(size = 14)
        )
 
 if(params$printProcessedTables == TRUE) {
@@ -206,7 +207,8 @@ layout(p = p,
        margin = list(l=100, r=100, b=150), 
        xaxis = list(showticklabels = TRUE,  tickangle = 90), 
        yaxis = list(title = paste("percentage of query regions,", 
-                                  "n =", length(queryRegions))))
+                                  "n =", length(queryRegions))),
+       font = list(size = 14))
 if(params$printProcessedTables == TRUE) {
   write.table(x = df, file=paste0('Figure',figureCount,'.query_gene_types.data.tsv'), quote = FALSE, sep = '\t', row.names = TRUE)
 } 
@@ -222,7 +224,7 @@ cat("**Figure",figureCount,":** The depth of coverage of query regions at and ar
 cvgF <- getFeatureBoundaryCoverage(queryRegions = queryRegions, featureCoords = txdbFeatures$transcripts, flankSize = 1000, boundaryType = 'fiveprime', sampleN = 10000)
 cvgT <- getFeatureBoundaryCoverage(queryRegions = queryRegions, featureCoords = txdbFeatures$transcripts, flankSize = 1000, boundaryType = 'threeprime', sampleN = 10000)
 
-plotFeatureBoundaryCoverage(cvgF = cvgF, cvgT = cvgT, featureName = 'Transcript')
+plotFeatureBoundaryCoverage(cvgF = cvgF, cvgT = cvgT, featureName = 'transcripts')
 
 if(params$printProcessedTables == TRUE) {
   write.table(x = cvgF, file=paste0('Figure',figureCount,'.transcriptBoundaryCoverage.fiveprime.data.tsv'), quote = FALSE, sep = '\t', row.names = TRUE)
@@ -250,7 +252,7 @@ internalExons <- internalExons[internalExons$exon_rank > 1,]
 cvgF <- getFeatureBoundaryCoverage(queryRegions = queryRegions, featureCoords = internalExons, boundaryType = 'fiveprime', flankSize = 1000, sampleN = 10000)
 cvgT <- getFeatureBoundaryCoverage(queryRegions = queryRegions, featureCoords = internalExons, boundaryType = 'threeprime', flankSize = 1000, sampleN = 10000)
 
-plotFeatureBoundaryCoverage(cvgF = cvgF, cvgT = cvgT, featureName = 'Internal Exon')
+plotFeatureBoundaryCoverage(cvgF = cvgF, cvgT = cvgT, featureName = 'Internal Exons')
 
 if(params$printProcessedTables == TRUE) {
   write.table(x = cvgF, file=paste0('Figure',figureCount,'.exonIntronBoundaryCoverage.fiveprime.data.tsv'), quote = FALSE, sep = '\t', row.names = TRUE)
@@ -281,7 +283,7 @@ for (f in unique(cvgList$feature)){
                    name = f, color = f
                    )
 }
-layout(p)
+layout(p, font = list(size = 14))
 
 if(params$printProcessedTables == TRUE) {
   write.table(x = cvgList, file=paste0('Figure',figureCount,'.coverageprofilelist.data.tsv'), quote = FALSE, sep = '\t', row.names = TRUE)
@@ -402,11 +404,11 @@ if (!is.null(goCC)) { goSummaryCC <- TRUE }
 
 ```{r goBP_tabcap, results='asis', eval=goSummaryBP}
 cat("## Biological Processes\n")
-cat("**Table",tableCount,":** Significant Biological Process GO terms (bonferroni < 0.1) enriched for genes that overlap query regions\n")  
+cat("**Table",tableCount,":** Significant Biological Process GO terms (FDR < 0.1) enriched for genes that overlap query regions\n")  
 goBP <- goBP[order(goBP$foldEnrichment, decreasing = TRUE),]
 rownames(goBP) <- goBP$GO.ID
 goBP <- subset(goBP, select = -c(Annotated,classicFisher, GO.ID))
-DT::datatable(goBP[goBP$bonferroni < 0.1,], 
+DT::datatable(goBP[goBP$bh < 0.1,], 
           extensions = c('Buttons', 'FixedColumns'), 
           options = list(fixedColumns = TRUE, 
                          scrollX = TRUE,
@@ -424,12 +426,12 @@ tableCount <- tableCount + 1
 
 ```{r goMF_tabcap, results='asis', eval=goSummaryMF}
 cat("## Molecular Functions\n")
-cat("**Table",tableCount,":** Significant Molecular Function GO terms (bonferroni < 0.1) enriched for genes that overlap query regions\n")  
+cat("**Table",tableCount,":** Significant Molecular Function GO terms (FDR < 0.1) enriched for genes that overlap query regions\n")  
 goMF <- goMF[order(goMF$foldEnrichment, decreasing = TRUE),]
 rownames(goMF) <- goMF$GO.ID
 goMF <- subset(goMF, select = -c(Annotated,classicFisher, GO.ID))
 
-DT::datatable(goMF[goMF$bonferroni < 0.1,], 
+DT::datatable(goMF[goMF$bh < 0.1,], 
           extensions = c('Buttons', 'FixedColumns'), 
           options = list(fixedColumns = TRUE, 
                          scrollX = TRUE,
@@ -447,12 +449,12 @@ tableCount <- tableCount + 1
 
 ```{r goCC_tabcap, results='asis', eval=goSummaryCC}
 cat("## Cellular Compartments\n")
-cat("**Table",tableCount,":** Significant Cellular Compartment GO terms (bonferroni < 0.1) enriched for genes that overlap query regions\n")  
+cat("**Table",tableCount,":** Significant Cellular Compartment GO terms (FDR < 0.1) enriched for genes that overlap query regions\n")  
 goCC <- goCC[order(goCC$foldEnrichment, decreasing = TRUE),]
 rownames(goCC) <- goCC$GO.ID
 goCC <- subset(goCC, select = -c(Annotated,classicFisher, GO.ID))
 
-DT::datatable(goCC[goCC$bonferroni < 0.1,], 
+DT::datatable(goCC[goCC$bh < 0.1,], 
           extensions = c('Buttons', 'FixedColumns'), 
           options = list(fixedColumns = TRUE, 
                          scrollX = TRUE,
@@ -469,7 +471,7 @@ tableCount <- tableCount + 1
 
 ```{r GSEA_tabcap, results='asis', eval=msigdbAnalysis}
 cat("# Gene Set Enrichment Analysis Results\n")
-cat("**Table",tableCount,":** Significant MSigDB Gene Sets (bonferroni < 0.1) enriched for genes that overlap query regions\n")
+cat("**Table",tableCount,":** Significant MSigDB Gene Sets (FDR < 0.1) enriched for genes that overlap query regions\n")
 ```
 
 ```{r GSEA, eval=msigdbAnalysis}
@@ -492,7 +494,7 @@ resultsGSEA <- runGSEA(geneSetList = geneSets,
 rownames(resultsGSEA) = gsub(pattern = '_', replacement = ' ', x = rownames(resultsGSEA))
 resultsGSEA <- subset(resultsGSEA, select = -c(treatmentSize, fisherPVal))
 
-DT::datatable(resultsGSEA[resultsGSEA$bonferroni < 0.1,], 
+DT::datatable(resultsGSEA[resultsGSEA$BH < 0.1,], 
           extensions = c('Buttons', 'FixedColumns'), 
           options = list(fixedColumns = TRUE, 
                          scrollX = TRUE,
