@@ -56,8 +56,8 @@ plotFeatureBoundaryCoverage <- function (cvgF, cvgT, featureName) {
     layout (xaxis = list(title = "Distance (bp) to 5' boundary"), 
             xaxis2 = list(title = "Distance (bp) to 3' boundary"),
             yaxis = list(title = "Mean Coverage Score"),
-            legend = list(x = 50, y = 100, orientation = 'h'), 
-            font = list(size = 14),
+            legend = list(x = 0, y = 100, orientation = 'h'),
+            font = list(size = 14), 
             margin = list(l = 100, b = 100))
   return(p)
 }
