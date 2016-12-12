@@ -405,7 +405,7 @@ cat("## Biological Processes\n")
 cat("**Table",tableCount,":** Significant Biological Process GO terms (bonferroni < 0.1) enriched for genes that overlap query regions\n")  
 goBP <- goBP[order(goBP$foldEnrichment, decreasing = TRUE),]
 rownames(goBP) <- goBP$GO.ID
-goBP <- subset(goBP, select = -c(Annotated,classicFisher, bh, GO.ID))
+goBP <- subset(goBP, select = -c(Annotated,classicFisher, GO.ID))
 DT::datatable(goBP[goBP$bonferroni < 0.1,], 
           extensions = c('Buttons', 'FixedColumns'), 
           options = list(fixedColumns = TRUE, 
@@ -427,7 +427,7 @@ cat("## Molecular Functions\n")
 cat("**Table",tableCount,":** Significant Molecular Function GO terms (bonferroni < 0.1) enriched for genes that overlap query regions\n")  
 goMF <- goMF[order(goMF$foldEnrichment, decreasing = TRUE),]
 rownames(goMF) <- goMF$GO.ID
-goMF <- subset(goMF, select = -c(Annotated,classicFisher, bh, GO.ID))
+goMF <- subset(goMF, select = -c(Annotated,classicFisher, GO.ID))
 
 DT::datatable(goMF[goMF$bonferroni < 0.1,], 
           extensions = c('Buttons', 'FixedColumns'), 
@@ -450,7 +450,7 @@ cat("## Cellular Compartments\n")
 cat("**Table",tableCount,":** Significant Cellular Compartment GO terms (bonferroni < 0.1) enriched for genes that overlap query regions\n")  
 goCC <- goCC[order(goCC$foldEnrichment, decreasing = TRUE),]
 rownames(goCC) <- goCC$GO.ID
-goCC <- subset(goCC, select = -c(Annotated,classicFisher, bh, GO.ID))
+goCC <- subset(goCC, select = -c(Annotated,classicFisher, GO.ID))
 
 DT::datatable(goCC[goCC$bonferroni < 0.1,], 
           extensions = c('Buttons', 'FixedColumns'), 
@@ -490,7 +490,7 @@ resultsGSEA <- runGSEA(geneSetList = geneSets,
                        targetedGenes = targetedGenes)
 
 rownames(resultsGSEA) = gsub(pattern = '_', replacement = ' ', x = rownames(resultsGSEA))
-resultsGSEA <- subset(resultsGSEA, select = -c(BH, treatmentSize, fisherPVal))
+resultsGSEA <- subset(resultsGSEA, select = -c(treatmentSize, fisherPVal))
 
 DT::datatable(resultsGSEA[resultsGSEA$bonferroni < 0.1,], 
           extensions = c('Buttons', 'FixedColumns'), 
