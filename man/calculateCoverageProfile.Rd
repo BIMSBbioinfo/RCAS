@@ -7,23 +7,22 @@
 calculateCoverageProfile(queryRegions, targetRegions, sampleN = 0)
 }
 \arguments{
-\item{queryRegions}{GRanges object imported from a BED file using
+\item{queryRegions}{GRanges object imported from a BED file using 
 \code{importBed} function}
 
-\item{targetRegions}{GRanges object containing genomic coordinates of a
+\item{targetRegions}{GRanges object containing genomic coordinates of a 
 target feature (e.g. exons)}
 
-\item{sampleN}{If set to a positive integer, \code{targetRegions} will be
+\item{sampleN}{If set to a positive integer, \code{targetRegions} will be 
 downsampled to \code{sampleN} regions}
 }
 \value{
-A data.frame object consisting of two columns: 1. coverage level 2.
-  bins. Target regions are divided into 100 equal sized bins and coverage
-  level is summarized in a strand-specific manner using the
-  \code{genomation::ScoreMatrixBin} function.
+A ScoreMatrix object returned by \code{genomation::ScoreMatrixBin} 
+  function. Target regions are divided into 100 equal sized bins and coverage
+  level is calculated in a strand-specific manner.
 }
 \description{
-This function checks overlaps between input query regions and annotation
+This function checks overlaps between input query regions and annotation 
 features, and then calculates coverage profile along target regions.
 }
 \examples{
