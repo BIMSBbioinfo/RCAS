@@ -1,3 +1,8 @@
+#' plotFeatureBoundaryCoverage
+#' 
+#' This function is used to create interactive plots displaying 5' and 3'
+#' end coverage profiles of given transcript features. 
+#' 
 #' @param cvgF data.frame object containing 'fiveprime' coverage data returned 
 #'   by getFeatureBoundaryCoverage function
 #' @param cvgT data.fram object containing 'threeprime' coverage data returned 
