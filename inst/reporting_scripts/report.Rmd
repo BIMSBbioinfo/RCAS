@@ -222,23 +222,7 @@ cat("**Figure",figureCount,":** The depth of coverage of query regions at and ar
 cvgF <- getFeatureBoundaryCoverage(queryRegions = queryRegions, featureCoords = txdbFeatures$transcripts, flankSize = 1000, boundaryType = 'fiveprime', sampleN = 10000)
 cvgT <- getFeatureBoundaryCoverage(queryRegions = queryRegions, featureCoords = txdbFeatures$transcripts, flankSize = 1000, boundaryType = 'threeprime', sampleN = 10000)
 
-p1 <- plotly::plot_ly(data = cvgF, x = ~bases, y = ~meanCoverage, type = 'scatter', mode = 'lines', name = "TSS coverage") %>% 
-  add_ribbons(x = ~bases, ymin = cvgF$meanCoverage - cvgF$standardError*1.96, ymax = cvgF$meanCoverage + cvgF$standardError*1.96,
-              line = list(color = 'rgba(182, 7, 127, 0.05)'),
-              fillcolor = 'rgba(182, 7, 127, 0.22)',
-              name = "TSS standard error (95% conf. int.)") 
-
-p2 <- plotly::plot_ly(data = cvgT, x = ~bases, y = ~meanCoverage, type = 'scatter', mode = 'lines', name = "TES coverage") %>% 
-  add_ribbons(x = ~bases, ymin = cvgT$meanCoverage - cvgT$standardError*1.96, ymax = cvgT$meanCoverage + cvgT$standardError*1.96, 
-              line = list(color = 'rgba(7, 164, 181, 0.05)'),
-              fillcolor = 'rgba(7, 164, 181, 0.2)',
-              name = "TES standard error (95% conf. int.)"
-              )
-
-plotly::subplot(p1, p2, shareY = TRUE) %>% 
-  layout (xaxis = list(title = 'Distance (bp) to TSS'), 
-          xaxis2 = list(title = 'Distance (bp) to TES'),
-          legend = list(orientation = 'h'))
+plotFeatureBoundaryCoverage(cvgF = cvgF, cvgT = cvgT, featureName = 'Transcript')
 
 if(params$printProcessedTables == TRUE) {
   write.table(x = cvgF, file=paste0('Figure',figureCount,'.transcriptBoundaryCoverage.fiveprime.data.tsv'), quote = FALSE, sep = '\t', row.names = TRUE)
@@ -263,26 +247,10 @@ exonCounts <- BiocGenerics::lengths(rtracklayer::split(exons, names(exons)))
 internalExons <- exons[exonCounts[names(exons)] != exons$exon_rank,]
 internalExons <- internalExons[internalExons$exon_rank > 1,]
 
-cvgF <- getFeatureBoundaryCoverage(queryRegions = queryRegions, featureCoords = internalExons, boundaryType = 'fiveprime', sampleN = 10000)
-cvgT <- getFeatureBoundaryCoverage(queryRegions = queryRegions, featureCoords = internalExons, boundaryType = 'threeprime', sampleN = 10000)
+cvgF <- getFeatureBoundaryCoverage(queryRegions = queryRegions, featureCoords = internalExons, boundaryType = 'fiveprime', flankSize = 1000, sampleN = 10000)
+cvgT <- getFeatureBoundaryCoverage(queryRegions = queryRegions, featureCoords = internalExons, boundaryType = 'threeprime', flankSize = 1000, sampleN = 10000)
 
-p1 <- plotly::plot_ly(data = cvgF, x = ~bases, y = ~meanCoverage, type = 'scatter', mode = 'lines', name = "5' exon-intron coverage") %>% 
-  add_ribbons(x = ~bases, ymin = cvgF$meanCoverage - cvgF$standardError*1.96, ymax = cvgF$meanCoverage + cvgF$standardError*1.96,
-              line = list(color = 'rgba(182, 7, 127, 0.05)'),
-              fillcolor = 'rgba(182, 7, 127, 0.22)',
-              name = "5' standard error (95% conf. int.)") 
-
-p2 <- plotly::plot_ly(data = cvgT, x = ~bases, y = ~meanCoverage, type = 'scatter', mode = 'lines', name = "3' exon-intron coverage") %>% 
-  add_ribbons(x = ~bases, ymin = cvgT$meanCoverage - cvgT$standardError*1.96, ymax = cvgT$meanCoverage + cvgT$standardError*1.96, 
-              line = list(color = 'rgba(7, 164, 181, 0.05)'),
-              fillcolor = 'rgba(7, 164, 181, 0.2)',
-              name = "3' standard error (95% conf. int.)"
-              )
-
-plotly::subplot(p1, p2, shareY = TRUE) %>% 
-  layout (xaxis = list(title = "5' end of exon-intron junction"), 
-          xaxis2 = list(title = "3' end of exon-intron junction"),
-          legend = list(orientation = 'h'))
+plotFeatureBoundaryCoverage(cvgF = cvgF, cvgT = cvgT, featureName = 'Internal Exon')
 
 if(params$printProcessedTables == TRUE) {
   write.table(x = cvgF, file=paste0('Figure',figureCount,'.exonIntronBoundaryCoverage.fiveprime.data.tsv'), quote = FALSE, sep = '\t', row.names = TRUE)
