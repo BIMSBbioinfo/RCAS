@@ -300,7 +300,10 @@ cat('# motifRG analysis results \n')
 #as we don't need the complete set of intervals for motif discovery
 #and the motif discovery part is a bottleneck for run time.
 queryRegionsExt <- queryRegions
-queryRegionsExt <- queryRegionsExt[sample(x = 1:length(queryRegionsExt), size = 10000)]
+
+if(length(queryRegionsExt) > 10000) {
+  queryRegionsExt <- queryRegionsExt[sample(x = 1:length(queryRegionsExt), size = 10000)]
+}
 
 #extend the queryRegions if shorter than 15 bp otherwise, motif analysis is not possible for such short segments
 queryRegionsExt[width(queryRegionsExt) < 15] <- GenomicRanges::resize(x = queryRegionsExt[width(queryRegionsExt) < 15], 
