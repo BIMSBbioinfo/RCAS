@@ -18,7 +18,10 @@ var RCAS = (function () {
             while (draglayers.length > 0) {
                 draglayers[0].parentNode.removeChild(draglayers[0]);
             }
-            data = data + svgs[i].innerHTML;
+            // Some plots may contain non UTF-8 characters that cause
+            // btoa to fail in Firefox, so we remove them with a call
+            // to "replace".
+            data = data + svgs[i].innerHTML.replace(/[\u0100-\uFFFF]/g,'');
         }
         data = prefix + btoa('<?xml version="1.0" standalone="yes"?>'+
                              '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="' + width +'" ' +
