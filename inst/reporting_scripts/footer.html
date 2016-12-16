@@ -6,15 +6,17 @@ var RCAS = (function () {
             width  = container.offsetWidth,
             svgs = container.querySelectorAll('svg.main-svg'),
             prefix = 'data:image/svg+xml;base64,',
-            data = '';
+            data = '',
+            draglayers = [];
 
         for (var i = 0; i < svgs.length; i++) {
             // Remove drag layer because it looks like a black box
             // when rendered in Inkscape.  This won't remove the
             // element from the DOM because we use querySelectorAll,
             // which returns a static node list.
-            for (var item of svgs[i].getElementsByClassName('draglayer')) {
-                item.remove();
+            draglayers = svgs[i].getElementsByClassName('draglayer');
+            while (draglayers.length > 0) {
+                draglayers[0].parentNode.removeChild(draglayers[0]);
             }
             data = data + svgs[i].innerHTML;
         }
