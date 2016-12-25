@@ -27,8 +27,10 @@
 #'                                     sampleN = 1000)
 #' p <- plotFeatureBoundaryCoverage(cvgF = cvgF, 
 #'                                  cvgT = cvgT, 
-#'                           featureName = 'transcript')                                   
+#'                           featureName = 'transcript')   
+#'                                                           
 #' @return a plotly htmlwidget is returned
+#' @export 
 plotFeatureBoundaryCoverage <- function (cvgF, cvgT, featureName) {
 
   p1 <- plotly::plot_ly(data = cvgF, x = ~bases, y = ~meanCoverage, 
