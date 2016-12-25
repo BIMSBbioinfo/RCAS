@@ -410,21 +410,23 @@ queryGff <- function(queryRegions, gffData) {
 
 
 #' getFeatureBoundaryCoverage
-#'
-#' This function extracts the flanking regions of 5' and 3' boundaries of a
-#' given set of genomic features and computes the per-base coverage of query
+#' 
+#' This function extracts the flanking regions of 5' and 3' boundaries of a 
+#' given set of genomic features and computes the per-base coverage of query 
 #' regions across these boundaries.
-#'
-#' @param queryRegions GRanges object imported from a BED file using
+#' 
+#' @param queryRegions GRanges object imported from a BED file using 
 #'   \code{importBed} function
 #' @param featureCoords GRanges object containing the target feature coordinates
 #' @param flankSize Positive integer that determines the number of base pairs to
 #'   extract around a given genomic feature boundary
+#' @param boundaryType (Options: fiveprime or threeprime). Denotes which side of
+#'   the feature's boundary is to be profiled.
 #' @param sampleN A positive integer value less than the total number of featuer
-#'   coordinates that determines whether the target feature coordinates should
+#'   coordinates that determines whether the target feature coordinates should 
 #'   be randomly downsampled. If set to 0, no downsampling will happen. If
-#' @return a data frame containin three columns. 1. fivePrime: Coverage at 5'
-#'   end of features 2. threePrime: Coverage at 3' end of features; 3. bases:
+#' @return a data frame containin three columns. 1. fivePrime: Coverage at 5' 
+#'   end of features 2. threePrime: Coverage at 3' end of features; 3. bases: 
 #'   distance (in bp) to the boundary
 #'
 #' @examples
@@ -436,46 +438,45 @@ queryGff <- function(queryRegions, gffData) {
 #'                                      queryRegions = queryRegions,
 #'                                     featureCoords = transcriptCoords,
 #'                                     flankSize = 100,
+#'                                     boundaryType = 'threeprime',
 #'                                     sampleN = 1000)
 #' @import GenomicRanges
 #' @importFrom genomation ScoreMatrix
 #' @export
 getFeatureBoundaryCoverage <- function (queryRegions,
-                                        featureCoords,
-                                        flankSize = 500,
-                                        sampleN = 0) {
-
+                                         featureCoords,
+                                         flankSize = 500,
+                                         boundaryType, 
+                                         sampleN = 0) {
+  
   if (sampleN > 0 && sampleN < length(featureCoords)) {
     featureCoords <- sort(featureCoords[sample(length(featureCoords), sampleN)])
   }
-
-  #flanking regions at/around 5' site of the features
-  fivePrimeFlanks <- GenomicRanges::flank(x = featureCoords,
-                                          width = flankSize,
-                                          start = TRUE,
-                                          both = TRUE
+  
+  if (boundaryType == 'fiveprime') {
+    flanks <- GenomicRanges::flank(x = featureCoords,
+                                   width = flankSize,
+                                   start = TRUE,
+                                   both = TRUE)
+  } else if (boundaryType == 'threeprime') { 
+    flanks <- GenomicRanges::flank(x = featureCoords,
+                                   width = flankSize,
+                                   start = FALSE,
+                                   both = TRUE)
+  } else {
+    stop ("please indicate either threeprime or fiveprime for boundary type\n")
+  }
+  
+  sm <- genomation::ScoreMatrix(target = queryRegions,
+                                windows = flanks,
+                                strand.aware = TRUE)
+  
+  return (data.frame('bases' = c(-flankSize:(flankSize-1)), 
+                     'meanCoverage' = colMeans(sm), 
+                     'standardError' = apply(sm, 2, plotrix::std.error))
   )
-  #flanking regions at/around 3' site of the features
-  threePrimeFlanks <- GenomicRanges::flank(x = featureCoords,
-                                           width = flankSize,
-                                           start = FALSE,
-                                           both = TRUE)
-
-  cvgFivePrime <- genomation::ScoreMatrix(target = queryRegions,
-                                          windows = fivePrimeFlanks,
-                                          strand.aware = TRUE)
-
-  cvgThreePrime <- genomation::ScoreMatrix(target = queryRegions,
-                                           windows = threePrimeFlanks,
-                                           strand.aware = TRUE)
-
-  mdata <- data.frame('fivePrime' = colSums(cvgFivePrime),
-                      'threePrime' = colSums(cvgThreePrime),
-                      'bases' =  c(-flankSize:(flankSize-1)))
-
-  return(mdata)
 }
-
+  
 
 #' getFeatureBoundaryCoverageBin
 #'
@@ -550,21 +551,20 @@ getFeatureBoundaryCoverageBin <- function (queryRegions,
 
 
 #' calculateCoverageProfile
-#'
-#' This function checks overlaps between input query regions and annotation
+#' 
+#' This function checks overlaps between input query regions and annotation 
 #' features, and then calculates coverage profile along target regions.
-#'
-#' @param queryRegions GRanges object imported from a BED file using
+#' 
+#' @param queryRegions GRanges object imported from a BED file using 
 #'   \code{importBed} function
-#' @param targetRegions GRanges object containing genomic coordinates of a
+#' @param targetRegions GRanges object containing genomic coordinates of a 
 #'   target feature (e.g. exons)
-#' @param sampleN If set to a positive integer, \code{targetRegions} will be
+#' @param sampleN If set to a positive integer, \code{targetRegions} will be 
 #'   downsampled to \code{sampleN} regions
-#'
-#' @return A data.frame object consisting of two columns: 1. coverage level 2.
-#'   bins. Target regions are divided into 100 equal sized bins and coverage
-#'   level is summarized in a strand-specific manner using the
-#'   \code{genomation::ScoreMatrixBin} function.
+#'   
+#' @return A ScoreMatrix object returned by \code{genomation::ScoreMatrixBin} 
+#'   function. Target regions are divided into 100 equal sized bins and coverage
+#'   level is calculated in a strand-specific manner.
 #' @examples
 #' data(gff)
 #' data(queryRegions)
@@ -590,10 +590,7 @@ calculateCoverageProfile = function (queryRegions, targetRegions, sampleN = 0){
                                      bin.num = 100,
                                      bin.op = 'max',
                                      strand.aware = TRUE)
-    mdata <- as.data.frame(colSums(sm))
-    mdata$bins <- c(1:100)
-    colnames(mdata) <- c('coverage', 'bins')
-    return(mdata)
+    return(sm)
     } else {
     stop("Cannot compute coverage profile for target regions.\n
          There are no target regions longer than 100 bp\n")
@@ -601,22 +598,25 @@ calculateCoverageProfile = function (queryRegions, targetRegions, sampleN = 0){
 }
 
 #' calculateCoverageProfileList
-#'
-#' This function checks overlaps between input query regions and a target list
-#' of annotation features, and then calculates the coverage profile along the
+#' 
+#' This function checks overlaps between input query regions and a target list 
+#' of annotation features, and then calculates the coverage profile along the 
 #' target regions.
-#'
-#' @param queryRegions GRanges object imported from a BED file using
+#' 
+#' @param queryRegions GRanges object imported from a BED file using 
 #'   \code{importBed} function
-#' @param targetRegionsList A list of GRanges objects containing genomic
+#' @param targetRegionsList A list of GRanges objects containing genomic 
 #'   coordinates of target features (e.g. transcripts, exons, introns)
-#' @param sampleN If set to a positive integer, \code{targetRegions} will be
+#' @param sampleN If set to a positive integer, \code{targetRegions} will be 
 #'   downsampled to \code{sampleN} regions
-#'
-#' @return A list of data.frame objects consisting of two columns: 1. coverage
-#'   level 2. bins. Target regions are divided into 100 equal sized bins and
-#'   coverage level is summarized in a strand-specific manner using the
-#'   \code{genomation::ScoreMatrixBin} function.
+#'   
+#' @return A data.frame consisting of four columns: 1. bins level 2.
+#'   meanCoverage 3. standardError 4. feature Target regions are divided into
+#'   100 equal sized bins and coverage level is summarized in a strand-specific
+#'   manner using the \code{genomation::ScoreMatrixBin} function. For each bin,
+#'   mean coverage score and the standard error of the mean coverage score is
+#'   calculated (\code{plotrix::std.error})
+#' @importFrom plotrix std.error
 #' @examples
 #' data(gff)
 #' data(queryRegions)
@@ -626,12 +626,19 @@ calculateCoverageProfile = function (queryRegions, targetRegions, sampleN = 0){
 #'                                     sampleN = 1000)
 #' @export
 calculateCoverageProfileList <- function (queryRegions,
-                                          targetRegionsList,
-                                          sampleN = 0) {
-  lapply(X = targetRegionsList,
-       FUN = function(x) { calculateCoverageProfile(queryRegions = queryRegions,
-                                                    targetRegions = x,
-                                                    sampleN = sampleN) })
+                                             targetRegionsList,
+                                             sampleN = 0) {
+  results <- lapply(X = names(targetRegionsList),
+                    FUN = function(x) { 
+                      sm <- calculateCoverageProfile(queryRegions = queryRegions,
+                                                        targetRegions = targetRegionsList[[x]],
+                                                        sampleN = sampleN)
+                      mdata <- data.frame('bins' = c(1:100), 
+                                          'meanCoverage' = colMeans(sm), 
+                                          'standardError' = apply(sm, 2, plotrix::std.error),
+                                          'feature' = x)
+                    })
+  return(do.call(rbind, results))
 }
 
 #' calculateCoverageProfileListFromTxdb
@@ -898,6 +905,8 @@ runReport <- function(queryFilePath = 'testdata',
 
   reportFile <- system.file("reporting_scripts", "report.Rmd", package='RCAS')
   headerFile <- system.file("reporting_scripts", "header.html", package='RCAS')
+  footerFile <- system.file("reporting_scripts", "footer.html", package='RCAS')
+  
   outFile <- paste0(basename(queryFilePath), '.RCAS.report.html')
 
   rmarkdown::render(
@@ -910,7 +919,8 @@ runReport <- function(queryFilePath = 'testdata',
       toc_float = TRUE,
       theme = 'simplex',
       number_sections = TRUE,
-      includes = rmarkdown::includes(in_header = headerFile), 
+      includes = rmarkdown::includes(in_header = headerFile, 
+                                     after_body = footerFile), 
       self_contained = selfContained
       ),
     params = list(query = queryFilePath,

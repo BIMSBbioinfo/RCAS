@@ -1,5 +1,5 @@
 library(RCAS)
-context("Functions to get txdbFeatures")
+context("Functions to get txdbFeatures and calculating coverage profiles")
 
 data(gff)
 txdb <- GenomicFeatures::makeTxDbFromGRanges(gff)
@@ -47,8 +47,8 @@ profile <- calculateCoverageProfile(queryRegions = queryRegions,
                                    sampleN = 1000)
 test_that("Getting coverage profile of query regions
           over a single gene feature from txdbFeatures", {
-  expect_is(profile, 'data.frame')
-  expect_equal(colnames(profile), c('coverage', 'bins'))
+  expect_is(profile, 'ScoreMatrix')
+  expect_equal(ncol(profile), 100)
 })
 
 profileList <- calculateCoverageProfileList(queryRegions = queryRegions,
@@ -56,8 +56,9 @@ profileList <- calculateCoverageProfileList(queryRegions = queryRegions,
                                             sampleN = 1000)
 test_that("Getting a list of coverage profiles
           over all gene features from txdbFeatures", {
-  expect_is(profileList, 'list')
-  expect_equal(length(names(profileList)), length(features))
+  expect_is(profileList, 'data.frame')
+  expect_equal(colnames(profileList), c('bins', 'meanCoverage', 'standardError', 'feature'))
+  expect_equal(dim(profileList), c(700, 4))
 })
 
 profile <- calculateCoverageProfileFromTxdb(queryRegions = queryRegions,
@@ -67,8 +68,8 @@ profile <- calculateCoverageProfileFromTxdb(queryRegions = queryRegions,
 
 test_that("Getting coverage profile of query regions
           over a single gene feature from a TxDb object", {
-            expect_is(profile, 'data.frame')
-            expect_equal(colnames(profile), c('coverage', 'bins'))
+            expect_is(profile, 'ScoreMatrix')
+            expect_equal(ncol(profile), 100)
           })
 
 profileList <- calculateCoverageProfileListFromTxdb(queryRegions = queryRegions,
@@ -83,14 +84,15 @@ test_that("Getting a list of coverage profiles
 transcriptEndCoverage <- getFeatureBoundaryCoverage(
                                 queryRegions = queryRegions,
                                 featureCoords = features$transcripts[1:1000],
-                                flankSize = 100,
+                                flankSize = 100, 
+                                boundaryType = 'threeprime',
                                 sampleN = 0
                                 )
 
-test_that("Calculating per base coverage profile at TSS and TES boundaries", {
-  expect_equal(colnames(transcriptEndCoverage), c("fivePrime","threePrime","bases"))
+test_that("Calculating per base coverage profile at TES boundary", {
+  expect_equal(colnames(transcriptEndCoverage), c("bases","meanCoverage","standardError"))
   expect_is(transcriptEndCoverage, 'data.frame')
-  expect_equal(as.vector(colSums(transcriptEndCoverage)), c(28, 463, -100))
+  expect_equal(sum(transcriptEndCoverage$bases), -100)
 })
 
 transcriptEndCoverageBin <- getFeatureBoundaryCoverageBin(

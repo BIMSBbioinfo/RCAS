@@ -167,19 +167,19 @@ DT::datatable(dt[1:100],
 
 ### Profiling the coverage of query regions across gene features 
 
-#### Coverage profile of query regions for 3' UTRs
-Coverage profiles can be obtained for a single type of gene feature or a list of
-gene features. Here we demonstrate how to get coverage profile of query regions
-across 3'UTRs. It might be a good idea to use sampleN parameter to randomly
-downsample the target regions to speed up the calculations.
+#### Coverage profile of query regions at feature boundaries 
 
-```{r coverageprofile}
-cov <- calculateCoverageProfile(queryRegions = queryRegions, 
-                               targetRegions = txdbFeatures$threeUTRs, 
-                               sampleN = 10000)
+It may be useful to look at the distribution of query regions at the boundaries of transcript features.
+For instance, it may be important to see the relative signal at transcript ends (transcription start sites
+versus transcription end sites). Or, it may be important to see how the signal is distributed at exon boundaries, which may give an idea about the regulation of the transcript. Here we demonstrate how to
+get such signal distributions at transcription start/end sites. The same approach can be done for any other
+collection of transcript features (exons, introns, promoters, UTRs etc.)
 
-plot_ly(data = cov, x = ~bins, y = ~coverage, 
-            type = 'scatter', mode = 'lines')
+```{r transcriptBoundaryCoverage}
+cvgF <- getFeatureBoundaryCoverage(queryRegions = queryRegions, featureCoords = txdbFeatures$transcripts, flankSize = 1000, boundaryType = 'fiveprime', sampleN = 10000)
+cvgT <- getFeatureBoundaryCoverage(queryRegions = queryRegions, featureCoords = txdbFeatures$transcripts, flankSize = 1000, boundaryType = 'threeprime', sampleN = 10000)
+
+plotFeatureBoundaryCoverage(cvgF = cvgF, cvgT = cvgT, featureName = 'transcripts')
 
 ```
 
@@ -191,19 +191,23 @@ parameter to randomly downsample the target regions to speed up the
 calculations.
 
 ```{r coverageprofilelist}
-covList <- calculateCoverageProfileList(queryRegions = queryRegions, 
+cvgList <- calculateCoverageProfileList(queryRegions = queryRegions, 
                                        targetRegionsList = txdbFeatures, 
                                        sampleN = 10000)
 
-df <- do.call('cbind', covList)
-df <- df[,!grepl(colnames(df), pattern = '*.bins')]
-df$bins <- c(1:100)
-colnames(df) <- gsub(pattern = ".coverage", replacement = "", x = colnames(df))
-mdf <- reshape2::melt(df, id.vars = c('bins'))
-colnames(mdf) <- c('bins', 'feature', 'coverage')
-p = plot_ly(data = mdf, x = ~bins, y = ~coverage, 
-            type = 'scatter', mode = 'lines', color = ~feature)
-layout(p)
+p <- plotly::plot_ly(data = cvgList, type = 'scatter', mode = 'lines')
+for (f in unique(cvgList$feature)){
+  data <- cvgList[cvgList$feature == f,]
+  p <- add_trace(p = p, data = data, x = ~bins, y = ~meanCoverage, 
+                 legendgroup = f, showlegend = FALSE, opacity = 1, color = f)
+  p <- add_ribbons(p = p, data = data, x = ~bins, 
+                   ymin = data$meanCoverage - data$standardError*1.96,
+                   ymax = data$meanCoverage + data$standardError*1.96, 
+                   legendgroup = f, 
+                   name = f, color = f
+                   )
+}
+layout(p, font = list(size = 14))
 ```
 
 
@@ -215,27 +219,6 @@ exon-intron boundaries, and so on. Below, we demonstrate how to get the signal d
 at the flanking regions of the transcription start/end sites. The signal can be either binned by
 a window of certain number of base-pairs (using **getFeatureBoundaryCoverageBin** function) or the signal can be computed for each base-pair around the boundary region including a certain length of flanking bases (using the **getFeatureBoundaryCoverage** function). Plotting the coverage profiles of 
 TSS and TES regions side-by-side, we can quickly observe that for this particular dataset, the signal concentrates around the 3' end of the transcript. 
-
-```{r transcriptBoundaryCoverage}
-cvg <- getFeatureBoundaryCoverage(queryRegions = queryRegions,
-                                  featureCoords = txdbFeatures$transcripts,
-                                  flankSize = 1000, 
-                                  sampleN = 10000)
-
-yLimit <- (as.integer(max(c(cvg$fivePrime, cvg$threePrime))/10)+1)*10
-
-p <- subplot(
-  plot_ly(data = cvg, x = ~bases, y = ~fivePrime, type = 'scatter', mode = 'lines'),
-  plot_ly(data = cvg, x = ~bases, y = ~threePrime, type = 'scatter', mode = 'lines'),
-  margin = 0.05
-) %>% layout (xaxis = list(title = 'Distance (bp) to TSS'), 
-              xaxis2 = list(title = 'Distance (bp) to TES'), 
-              yaxis = list(title = 'coverage', range = c(0, yLimit)),
-              yaxis2 = list(title = 'coverage', range = c(0, yLimit)),
-                           showlegend = FALSE) 
-layout(p) 
-```
-
 
 # Motif Analysis using motifRG
 
@@ -348,8 +331,9 @@ orthGeneSets <- createOrthologousGeneSetList(referenceGeneSetList = refGeneSets,
 
 # Generating a full report 
 
-The users can use the runReport() function to generate full custom reports
-including all the analysis modules described above. There are four main parts of the analysis report.
+The users can use the runReport() function to generate full custom reports 
+including all the analysis modules described above. There are four main parts of
+the analysis report.
 
 - Annotation summaries via overlap operations 
 - GO term analysis 
@@ -396,6 +380,15 @@ runReport( queryFilePath = 'input.mm9.BED',
 ## To turn off verbose output and progress bars
 ```
 runReport(quiet = TRUE)
+```
+
+## Printing raw data generated by the runReport function
+One may be interested in printing the raw data used to make the plots and tables
+in the HTML report output of runReport function. Such tables could be used for
+meta-analysis of multiple analysis results. In order to activate this function,
+printProcessedTables argument must be set to TRUE.
+```
+runReport(printProcessedTables = TRUE)
 ```
 
 # Acknowledgements
