@@ -18,6 +18,11 @@ discovery. RCAS is available in the Bioconductor repository, packaged in multipl
 environments including Conda, Galaxy, and Guix, and as a webservice
 at http://rcas.mdc-berlin.de/.
 
+Currently supported genome builds are hg19 (human), mm9 (mouse), dm3 (fly), and ce10 (worm). 
+Modules for annotation summaries and motif analysis are supported for each of these genome  builds. 
+GO term and gene-set enrichment analyses are supported for hg19, mm9, and dm3 (ce10 is currently not supported 
+for GO/GSEA modules). 
+
 ## installation:
 
 ### Installing from [Bioconductor](http://bioconductor.org/packages/3.4/bioc/html/RCAS.html)
