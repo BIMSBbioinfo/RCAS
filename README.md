@@ -86,23 +86,23 @@ See the [package vignette](http://bioconductor.org/packages/3.4/bioc/vignettes/R
     - [c2.all.v5.1.entrez.gmt](http://software.broadinstitute.org/gsea/msigdb/download_file.jsp?filePath=/resources/msigdb/5.1/c2.all.v5.1.entrez.gmt)
 
 
-- [RCAS report](https://bimsbstatic.mdc-berlin.de/akalin/buyar/RCAS/1.0.0/PARCLIP_PUM2_Hafner2010b_hg19.bed.RCAS.report.html) for [PUM2](http://www.uniprot.org/uniprot/Q8TB72) RNA-binding sites detected by **PAR-CLIP** technique ([Hafner et al, 2010](https://www.ncbi.nlm.nih.gov/pubmed/20371350))
+- [RCAS report](https://bimsbstatic.mdc-berlin.de/akalin/buyar/RCAS/1.1.1/PARCLIP_PUM2_Hafner2010b_hg19.bed.RCAS.report.html) for [PUM2](http://www.uniprot.org/uniprot/Q8TB72) RNA-binding sites detected by **PAR-CLIP** technique ([Hafner et al, 2010](https://www.ncbi.nlm.nih.gov/pubmed/20371350))
   - input:  [PARCLIP_PUM2_Hafner2010b_hg19](http://dorina.mdc-berlin.de/api/v1.0/download/regulator/hg19/PARCLIP_PUM2_Hafner2010b_hg19)
 
 
-- [RCAS report](https://bimsbstatic.mdc-berlin.de/akalin/buyar/RCAS/1.0.0/PARCLIP_QKI_Hafner2010c_hg19.bed.RCAS.report.html) for [QKI](http://www.uniprot.org/uniprot/Q96PU8) RNA-binding sites detected by **PAR-CLIP** technique ([Hafner et al, 2010](https://www.ncbi.nlm.nih.gov/pubmed/20371350))
+- [RCAS report](https://bimsbstatic.mdc-berlin.de/akalin/buyar/RCAS/1.1.1/PARCLIP_QKI_Hafner2010c_hg19.bed.RCAS.report.html) for [QKI](http://www.uniprot.org/uniprot/Q96PU8) RNA-binding sites detected by **PAR-CLIP** technique ([Hafner et al, 2010](https://www.ncbi.nlm.nih.gov/pubmed/20371350))
   - input: [PARCLIP_QKI_Hafner2010c_hg19](http://dorina.mdc-berlin.de/api/v1.0/download/regulator/hg19/PARCLIP_QKI_Hafner2010c_hg19 )
 
 
-- [RCAS report](https://bimsbstatic.mdc-berlin.de/akalin/buyar/RCAS/1.0.0/PARCLIP_IGF2BP123_Hafner2010d_hg19.bed.RCAS.report.html) for IGF2BP[1](http://www.uniprot.org/uniprot/Q9NZI8)[2](http://www.uniprot.org/uniprot/Q9Y6M1)[3](http://www.uniprot.org/uniprot/O00425) RNA-binding sites detected by **PAR-CLIP** technique ([Hafner et al, 2010](https://www.ncbi.nlm.nih.gov/pubmed/20371350))
+- [RCAS report](https://bimsbstatic.mdc-berlin.de/akalin/buyar/RCAS/1.1.1/PARCLIP_IGF2BP123_Hafner2010d_hg19.bed.RCAS.report.html) for IGF2BP[1](http://www.uniprot.org/uniprot/Q9NZI8)[2](http://www.uniprot.org/uniprot/Q9Y6M1)[3](http://www.uniprot.org/uniprot/O00425) RNA-binding sites detected by **PAR-CLIP** technique ([Hafner et al, 2010](https://www.ncbi.nlm.nih.gov/pubmed/20371350))
   - input:  [PARCLIP_IGF2BP123_Hafner2010d_hg19](http://dorina.mdc-berlin.de/api/v1.0/download/regulator/hg19/PARCLIP_IGF2BP123_Hafner2010d_hg19)
 
 
-- [RCAS report](https://bimsbstatic.mdc-berlin.de/akalin/buyar/RCAS/1.0.0/human_FANTOM4_tiRNAs-hg19.bed.RCAS.report.html) for tiny RNA (tiRNA) loci detected by **deepCAGE** analysis ([Taft et al. 2009](https://www.ncbi.nlm.nih.gov/pubmed/19377478))
+- [RCAS report](https://bimsbstatic.mdc-berlin.de/akalin/buyar/RCAS/1.1.1/human_FANTOM4_tiRNAs-hg19.bed.RCAS.report.html) for tiny RNA (tiRNA) loci detected by **deepCAGE** analysis ([Taft et al. 2009](https://www.ncbi.nlm.nih.gov/pubmed/19377478))
     - input: [human_FANTOM4_tiRNAs.bed](http://fantom.gsc.riken.jp/4/download/Supplemental_Materials/Taft_et_al_2009/human_FANTOM4_tiRNAs.bed)
 
 
-- [RCAS report](https://bimsbstatic.mdc-berlin.de/akalin/buyar/RCAS/1.0.0/m1Asites.dominissini.2016.resized.bed.RCAS.report.html) for m<sup>1</sup>A **methylation sites** ([Dominissini et al, 2016](https://www.ncbi.nlm.nih.gov/pubmed/26863196))
+- [RCAS report](https://bimsbstatic.mdc-berlin.de/akalin/buyar/RCAS/1.1.1/m1Asites.dominissini.2016.resized.bed.RCAS.report.html) for m<sup>1</sup>A **methylation sites** ([Dominissini et al, 2016](https://www.ncbi.nlm.nih.gov/pubmed/26863196))
     - input: [GSE70485_human_peaks.txt.gz](http://www.ncbi.nlm.nih.gov/geo/download/?acc=GSE70485&format=file&file=GSE70485%5Fhuman%5Fpeaks%2Etxt%2Egz)
 
 ## Acknowledgements
