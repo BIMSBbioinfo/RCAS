@@ -111,6 +111,8 @@ In order to cite RCAS, please use:
 Bora Uyar, Dilmurat Yusuf, Ricardo Wurmus, Nikolaus Rajewsky, Uwe Ohler, Altuna Akalin; RCAS: an RNA centric annotation
   system for transcriptome-wide regions of interest. Nucleic Acids Res 2017 gkx120. doi: 10.1093/nar/gkx120
 
+See our publication [here](https://academic.oup.com/nar/article/3038237/RCAS-an-RNA-centric-annotation-system-for). 
+
 ## Acknowledgements
 
 RCAS is developed in the group of
