@@ -105,6 +105,12 @@ See the [package vignette](http://bioconductor.org/packages/3.4/bioc/vignettes/R
 - [RCAS report](https://bimsbstatic.mdc-berlin.de/akalin/buyar/RCAS/1.1.1/m1Asites.dominissini.2016.resized.bed.RCAS.report.html) for m<sup>1</sup>A **methylation sites** ([Dominissini et al, 2016](https://www.ncbi.nlm.nih.gov/pubmed/26863196))
     - input: [GSE70485_human_peaks.txt.gz](http://www.ncbi.nlm.nih.gov/geo/download/?acc=GSE70485&format=file&file=GSE70485%5Fhuman%5Fpeaks%2Etxt%2Egz)
 
+## Citation
+In order to cite RCAS, please use: 
+
+Bora Uyar, Dilmurat Yusuf, Ricardo Wurmus, Nikolaus Rajewsky, Uwe Ohler, Altuna Akalin; RCAS: an RNA centric annotation
+  system for transcriptome-wide regions of interest. Nucleic Acids Res 2017 gkx120. doi: 10.1093/nar/gkx120
+
 ## Acknowledgements
 
 RCAS is developed in the group of
