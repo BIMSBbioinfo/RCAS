@@ -1,0 +1,19 @@
+citHeader("To cite RCAS in publications use:")
+
+citEntry(entry = "Article",
+  title        = "RCAS: an RNA centric annotation system for transcriptome-wide regions of interest",
+  author       = personList(as.person("Bora Uyar"),
+                   as.person("Dilmurat Yusuf"), 
+                   as.person("Ricardo Wurmus"), 
+                   as.person("Nikolaus Rajewsky"),
+                   as.person("Uwe Ohler"),
+                   as.person("Altuna Akalin")),
+  journal      = "Nucleic Acids Research",
+  year         = "2017",
+  doi          = "doi:10.1093/nar/gkx120",
+
+  textVersion  =
+  paste("Bora Uyar, Dilmurat Yusuf, Ricardo Wurmus, Nikolaus Rajewsky, Uwe Ohler, Altuna Akalin;",
+        "RCAS: an RNA centric annotation system for transcriptome-wide regions of interest.",
+        "Nucleic Acids Res 2017 gkx120. doi: 10.1093/nar/gkx120")
+)
