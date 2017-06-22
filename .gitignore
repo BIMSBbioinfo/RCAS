@@ -11,3 +11,4 @@ src/run.rcas.R.in
 src/base/header.html
 autom4te.cache/
 *~
+.Rproj.user
