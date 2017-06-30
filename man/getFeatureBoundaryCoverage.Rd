@@ -45,4 +45,3 @@ transcriptEndCoverage <- getFeatureBoundaryCoverage (
                                     boundaryType = 'threeprime',
                                     sampleN = 1000)
 }
-

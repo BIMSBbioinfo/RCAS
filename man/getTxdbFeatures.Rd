@@ -24,4 +24,3 @@ txdb <- GenomicFeatures::makeTxDbFromGRanges(gff)
 txdbFeatures <- getTxdbFeatures(txdb)
 
 }
-

@@ -41,6 +41,6 @@ cvgT <- getFeatureBoundaryCoverage (queryRegions = queryRegions,
                                     sampleN = 1000)
 p <- plotFeatureBoundaryCoverage(cvgF = cvgF, 
                                  cvgT = cvgT, 
-                          featureName = 'transcript')                                   
+                          featureName = 'transcript')   
+                                                          
 }
-

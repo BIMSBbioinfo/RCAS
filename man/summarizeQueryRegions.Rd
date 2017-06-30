@@ -29,4 +29,3 @@ summary <- summarizeQueryRegions(queryRegions = queryRegions,
                                  txdbFeatures = txdbFeatures)
 
 }
-

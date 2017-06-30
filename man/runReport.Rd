@@ -37,7 +37,7 @@ should run gene set enrichment analysis}
 should run motif analysis}
 
 \item{genomeVersion}{A character string to denote for which genome version 
-the analysis is being done. Available options are hg19 (human), mm9 
+the analysis is being done. Available options are hg19/hg38 (human), mm9/mm10 
 (mouse), ce10 (worm) and dm3 (fly).}
 
 \item{outDir}{Path to the output directory. (default: current working 
@@ -107,4 +107,3 @@ runReport( queryFilePath = 'input.mm9.BED',
            genomeVersion = 'mm9' )
            }
 }
-

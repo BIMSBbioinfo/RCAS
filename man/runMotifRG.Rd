@@ -34,4 +34,3 @@ motifResults <- runMotifRG(queryRegions = queryRegions,
                            motifN = 1,
                            nCores = 2)
 }
-

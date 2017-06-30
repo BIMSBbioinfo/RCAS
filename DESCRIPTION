@@ -56,7 +56,7 @@ Imports:
     S4Vectors,
     stats,
     plotrix
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1
 Suggests: BSgenome.Hsapiens.UCSC.hg38, 
     BSgenome.Mmusculus.UCSC.mm10, 
     BSgenome.Mmusculus.UCSC.mm9,

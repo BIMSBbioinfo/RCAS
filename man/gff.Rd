@@ -21,4 +21,3 @@ Homo sapiens downloaded from Ensembl. The GFF file is imported via the
 features found on 'chr1'.
 }
 \keyword{datasets}
-

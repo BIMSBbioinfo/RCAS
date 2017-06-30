@@ -36,4 +36,3 @@ df <- calculateCoverageProfileListFromTxdb(queryRegions = queryRegions,
                                                 sampleN = 1000)
 
 }
-

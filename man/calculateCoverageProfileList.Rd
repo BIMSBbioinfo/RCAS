@@ -37,4 +37,3 @@ dfList <- calculateCoverageProfileList(queryRegions = queryRegions,
                               targetRegionsList = txdbFeatures,
                                     sampleN = 1000)
 }
-

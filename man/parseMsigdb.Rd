@@ -26,4 +26,3 @@ input <- system.file('extdata', 'msigdb_test.gmt', package='RCAS')
 msigDB <- parseMsigdb (filePath = input)
 
 }
-

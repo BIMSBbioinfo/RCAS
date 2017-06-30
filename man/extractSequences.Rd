@@ -28,4 +28,3 @@ data(queryRegions)
 sequences <- extractSequences(queryRegions = queryRegions,
                              genomeVersion = 'hg19')
 }
-
