@@ -3,6 +3,12 @@
 [![Build Status](https://travis-ci.org/BIMSBbioinfo/RCAS.svg?branch=master)](https://travis-ci.org/BIMSBbioinfo/RCAS)
 ![codecov.io](https://codecov.io/github/BIMSBbioinfo/RCAS/coverage.svg?branch=master)
 
+## NEWS for version 1.3.1
+
+- Genome builds for H.sapiens (hg38) and M.musculus (mm10) are now supported!
+
+## Introduction
+
 RCAS is an R/Bioconductor package designed as a generic reporting tool
 for the functional analysis of transcriptome-wide regions of interest detected
 by high-throughput experiments. Such transcriptomic regions could be,
