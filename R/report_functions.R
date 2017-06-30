@@ -58,7 +58,7 @@ importGtf <- function (filePath,  saveObjectAsRds = TRUE, readFromRds = TRUE,
     if (keepStandardChr == TRUE) {
       cat('Keeping standard chromosomes only\n')
       GenomeInfoDb::seqlevelsStyle(gff) = 'UCSC'
-      gff = GenomeInfoDb::keepStandardChromosomes(gff)
+      gff = GenomeInfoDb::keepStandardChromosomes(gff, pruning.mode = 'coarse')
     }
 
     if (saveObjectAsRds == TRUE) {
@@ -778,7 +778,7 @@ findLongLines <- function (myfile, lineLimit = 80) {
 #' @param motifAnalysis TRUE/FALSE (default: TRUE) A switch to decide if RCAS 
 #'   should run motif analysis
 #' @param genomeVersion  A character string to denote for which genome version 
-#'   the analysis is being done. Available options are hg19 (human), mm9 
+#'   the analysis is being done. Available options are hg19/hg38 (human), mm9/mm10 
 #'   (mouse), ce10 (worm) and dm3 (fly).
 #' @param outDir Path to the output directory. (default: current working 
 #'   directory)
@@ -850,9 +850,9 @@ runReport <- function(queryFilePath = 'testdata',
                       quiet = FALSE,
                       selfContained = TRUE) {
 
-  if (genomeVersion == 'hg19') {
+  if (genomeVersion %in% c('hg19', 'hg38')) {
     species <- 'human'
-  } else if (genomeVersion == 'mm9') {
+  } else if (genomeVersion %in% c('mm9', 'mm10')) {
     species <- 'mouse'
   } else if (genomeVersion == 'ce10') {
     species <- 'worm'
@@ -883,6 +883,7 @@ runReport <- function(queryFilePath = 'testdata',
       stop('Test-data only works for human.
            Please provide a gffFilePath to input in GTF format \n')
     }
+    
     if (msigdbFilePath == 'testdata' && msigdbAnalysis == TRUE) {
       stop('Test-data only works for human.
          Please provide a gene set dataset with ENTREZ gene ids
