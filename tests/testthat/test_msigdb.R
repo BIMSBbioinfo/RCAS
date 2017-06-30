@@ -19,11 +19,13 @@ test_that("Gene set enrichment analysis using random gene sets", {
 })
 
 test_that("Creating biomart connections for different genome versions",{
+  expect_is(getBioMartConnection(genomeVersion = 'hg38'), 'Mart')
   expect_is(getBioMartConnection(genomeVersion = 'hg19'), 'Mart')
+  expect_is(getBioMartConnection(genomeVersion = 'mm10'), 'Mart')
+  expect_is(getBioMartConnection(genomeVersion = 'mm9'), 'Mart')
   expect_is(getBioMartConnection(genomeVersion = 'dm3'), 'Mart')
   expect_is(getBioMartConnection(genomeVersion = 'ce10'), 'Mart')
-  expect_is(getBioMartConnection(genomeVersion = 'mm9'), 'Mart')
-  expect_error(getBioMartConnection(genomeVersion = 'mm10'))
+  expect_error(getBioMartConnection(genomeVersion = 'ce6'))
   expect_error(getBioMartConnection(genomeVersion = 'bar'))
   expect_error(getBioMartConnection(genomeVersion = 'foo'))
 })
