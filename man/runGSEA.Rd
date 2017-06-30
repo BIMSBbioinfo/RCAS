@@ -46,4 +46,3 @@ resultsGSEA <- runGSEA(geneSetList = geneSets,
           backgroundGenes = backgroundGenes,
           targetedGenes = targetedGenes)
 }
-

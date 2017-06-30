@@ -29,4 +29,3 @@ data(gff)
 overlaps <- queryGff(queryRegions = queryRegions, gffData = gff)
 
 }
-

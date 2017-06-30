@@ -41,4 +41,3 @@ featuresTable <- getTargetedGenesTable(queryRegions = queryRegions,
                                        txdbFeatures = txdbFeatures)
                                        }
 }
-

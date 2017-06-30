@@ -32,4 +32,3 @@ input <- system.file("extdata", "testfile.bed", package='RCAS')
 importBed(filePath = input, keepStandardChr = TRUE)
 
 }
-

@@ -36,4 +36,3 @@ orthologs <- retrieveOrthologs( mart1 = mart1_hg19,
                                 mart2 = mart2_mm9,
                                 geneSet = genes)
 }
-

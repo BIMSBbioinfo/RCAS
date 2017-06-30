@@ -34,4 +34,3 @@ df <- calculateCoverageProfile(queryRegions = queryRegions,
                                     sampleN = 1000)
 
 }
-

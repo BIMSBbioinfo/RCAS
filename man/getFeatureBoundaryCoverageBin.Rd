@@ -41,4 +41,3 @@ transcriptEndCoverageBin <- getFeatureBoundaryCoverageBin (
                                     flankSize = 100,
                                     sampleN = 1000)
 }
-

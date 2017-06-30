@@ -40,4 +40,3 @@ orthGeneSets <- createOrthologousGeneSetList(
                              )
 
 }
-

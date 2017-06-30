@@ -28,4 +28,3 @@ data(geneSets)
 printMsigdbDataset(geneSets, 'output.gmt')
 
 }
-

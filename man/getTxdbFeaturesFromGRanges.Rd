@@ -24,4 +24,3 @@ data(gff)
 txdbFeatures <- getTxdbFeaturesFromGRanges(gffData = gff)
 
 }
-

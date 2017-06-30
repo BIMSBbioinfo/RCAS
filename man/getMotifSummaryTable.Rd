@@ -26,4 +26,3 @@ motifResults <- runMotifRG(queryRegions = queryRegions,
 motifSummary <- getMotifSummaryTable(motifResults)
 
 }
-

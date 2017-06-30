@@ -24,4 +24,3 @@ data(queryRegions)
 controlRegions <- createControlRegions(queryRegions = queryRegions)
 
 }
-

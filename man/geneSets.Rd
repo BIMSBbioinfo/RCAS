@@ -21,4 +21,3 @@ using the \code{parseMsigdb} function.
 Actual curated datasets must be downloaded from the MSIGDB database
 }
 \keyword{datasets}
-

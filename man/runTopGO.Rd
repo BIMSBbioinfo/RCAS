@@ -47,4 +47,3 @@ goResults = runTopGO( ontology = 'BP',
                       targetedGenes = targetedGenes)
                       }
 }
-
