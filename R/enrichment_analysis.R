@@ -213,7 +213,7 @@ getBioMartConnection <- function (genomeVersion) {
                               dataset = "celegans_gene_ensembl") 
   } else {
     stop ("Cannot create a BioMart connection for genome versions except:
-          hg19, ce10, dm3, and mm9\n")
+          hg38, hg19, mm9, mm10, ce10, and dm3\n")
   }
   return (mart)
 }
