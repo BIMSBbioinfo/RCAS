@@ -194,10 +194,18 @@ retrieveOrthologs <- function(mart1, mart2, geneSet){
 
 #' @importFrom biomaRt useMart
 getBioMartConnection <- function (genomeVersion) {
-  if (genomeVersion == 'hg19') {
+   if (genomeVersion == 'hg38') {
+    mart <- biomaRt::useMart( biomart = 'ENSEMBL_MART_ENSEMBL',
+                              host = 'mar2017.archive.ensembl.org',
+                              dataset = "hsapiens_gene_ensembl")
+  } else if (genomeVersion == 'hg19') {
     mart <- biomaRt::useMart( biomart = 'ENSEMBL_MART_ENSEMBL',
                               host = 'feb2014.archive.ensembl.org',
                               dataset = "hsapiens_gene_ensembl")
+  } else if (genomeVersion == 'mm10') {
+    mart <- biomaRt::useMart( biomart = 'ENSEMBL_MART_ENSEMBL',
+                              host = 'mar2017.archive.ensembl.org',
+                              dataset = "mmusculus_gene_ensembl")
   } else if (genomeVersion == 'mm9') {
     mart <- biomaRt::useMart( biomart = 'ENSEMBL_MART_ENSEMBL',
                               host = 'may2012.archive.ensembl.org',
