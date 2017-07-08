@@ -9,7 +9,7 @@ getOverlapSimilarityMatrix(queryRegionsList, ...)
 \arguments{
 \item{queryRegionsList}{A GRangesList object}
 
-\item{...}{Other arguments passed to GenomicRanges::countOverlaps function}
+\item{...}{Other arguments passed to IRanges::overlapsAny function}
 }
 \value{
 A matrix with equal number of rows and columns where the size is 
