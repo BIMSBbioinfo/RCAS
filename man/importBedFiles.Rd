@@ -22,6 +22,6 @@ import BED files as a GRangesList object
 \examples{
 input1 <- system.file("extdata", "testfile.bed", package='RCAS')
 input2 <- system.file("extdata", "testfile2.bed", package='RCAS')
-importBed(filePaths = c(input1, input2), keepStandardChr = TRUE)
+importBedFiles(filePaths = c(input1, input2), keepStandardChr = TRUE)
 
 }
