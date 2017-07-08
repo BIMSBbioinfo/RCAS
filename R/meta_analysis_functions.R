@@ -58,3 +58,37 @@ summarizeQueryRegionsMulti <- function(queryRegionsList, txdbFeatures) {
   rownames(summaryRaw) <- names(txdbFeatures)
   return(t(summaryRaw))
 }
+
+#' getOverlapSimilarityMatrix
+#' 
+#' This function takes as input a GRangesList objects and finds pairwise
+#' overlapping intervals in all list elements. Then, it creates a similarity
+#' matrix based on the percentage of intervals in each GRanges object to overlap
+#' any intervals in every other GRanges object in the list.
+#' 
+#' @param queryRegionsList A GRangesList object
+#' @param ... Other arguments passed to GenomicRanges::countOverlaps function
+#' @return A matrix with equal number of rows and columns where the size is 
+#'   determined by the number of list elements in the input object. Matrix
+#'   values are between 0 and 1, where 0 means no similarity (no overlap) and 1
+#'   means all elements of object A overlap have at least one overlap with some
+#'   element in B (but not necessarily vice versa).
+#' @examples 
+#' data(queryRegions)
+#' queryRegionsList <- GRangesList(queryRegions, queryRegions, 
+#'                                 queryRegions, queryRegions)
+#' getOverlapSimilarityMatrix(queryRegionsList, type = 'any')                                
+#' @importFrom GenomicRanges countOverlaps
+#' @export
+getOverlapSimilarityMatrix <- function(queryRegionsList, ...) {
+  sapply(queryRegionsList, function(gr1) {
+    sapply(queryRegionsList, function(gr2) {
+      round(sum(GenomicRanges::countOverlaps(gr1, gr2, ...) > 0) /
+              length(gr1), 2)
+    })
+  })
+}
+
+
+
+
