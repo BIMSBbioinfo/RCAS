@@ -97,7 +97,7 @@ importGtf <- function (filePath,  saveObjectAsRds = TRUE, readFromRds = TRUE,
 #'   \code{keepStandardChromosomes} function to only keep data from the standard
 #'   chromosomes
 #' @param quiet TRUE/FALSE (default:FALSE). Set to TRUE to turn off messages
-#'
+#' @param ... Other arguments passed to rtracklayer::import.bed function
 #' @return A \code{GRanges} object containing the coordinates of the intervals
 #'   from an input BED file
 #'
@@ -109,10 +109,10 @@ importGtf <- function (filePath,  saveObjectAsRds = TRUE, readFromRds = TRUE,
 #' @importFrom GenomeInfoDb seqlevelsStyle
 #' @importFrom GenomeInfoDb keepStandardChromosomes
 #' @export
-importBed <- function (filePath, sampleN = 0, keepStandardChr = TRUE, quiet = FALSE) {
+importBed <- function (filePath, sampleN = 0, keepStandardChr = TRUE, quiet = FALSE, ...) {
 
   if (file.exists(filePath)) {
-    data = rtracklayer::import.bed(filePath)
+    data = rtracklayer::import.bed(filePath, ...)
     if(quiet == FALSE) {
       cat('Processing',filePath,'\n')
     }

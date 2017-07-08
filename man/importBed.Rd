@@ -4,7 +4,8 @@
 \alias{importBed}
 \title{importBed}
 \usage{
-importBed(filePath, sampleN = 0, keepStandardChr = TRUE, quiet = FALSE)
+importBed(filePath, sampleN = 0, keepStandardChr = TRUE, quiet = FALSE,
+  ...)
 }
 \arguments{
 \item{filePath}{Path to a BED file}
@@ -20,6 +21,8 @@ convert the \code{seqlevelsStyle} to 'UCSC' and apply
 chromosomes}
 
 \item{quiet}{TRUE/FALSE (default:FALSE). Set to TRUE to turn off messages}
+
+\item{...}{Other arguments passed to rtracklayer::import.bed function}
 }
 \value{
 A \code{GRanges} object containing the coordinates of the intervals
