@@ -9,14 +9,15 @@ importBedFiles(filePaths, ...)
 \arguments{
 \item{filePaths}{A vector of paths to one or more BED files}
 
-\item{...}{Parameters passed to RCAS::importBed function}
+\item{...}{Other parameters passed to RCAS::importBed and
+rtracklayer::import.bed function}
 }
 \value{
-A \code{GRangesList} object containing the coordinates of the
+A \code{GRangesList} object containing the coordinates of the 
   intervals from multiple input BED files
 }
 \description{
-This function is a wrapper that uses \code{RCAS::importBed()} function to
+This function is a wrapper that uses \code{RCAS::importBed()} function to 
 import BED files as a GRangesList object
 }
 \examples{

@@ -1,11 +1,12 @@
 #' importBedFiles
 #'
-#' This function is a wrapper that uses \code{RCAS::importBed()} function to
+#' This function is a wrapper that uses \code{RCAS::importBed()} function to 
 #' import BED files as a GRangesList object
 #' 
 #' @param filePaths A vector of paths to one or more BED files
-#' @param ... Parameters passed to RCAS::importBed function
-#' @return A \code{GRangesList} object containing the coordinates of the
+#' @param ... Other parameters passed to RCAS::importBed and
+#'   rtracklayer::import.bed function
+#' @return A \code{GRangesList} object containing the coordinates of the 
 #'   intervals from multiple input BED files
 #'   
 #' @examples
