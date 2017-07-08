@@ -369,15 +369,11 @@ getTargetedGenesTable <- function (queryRegions, txdbFeatures) {
 #' @importFrom S4Vectors queryHits
 #' @export
 summarizeQueryRegions <- function(queryRegions, txdbFeatures) {
-  summarize <- function (x) {
-    myOverlaps <- GenomicRanges::findOverlaps(queryRegions, x)
-    tmp <- S4Vectors::queryHits(myOverlaps)
-    return(length(unique(tmp)))
-  }
-  results = lapply(X = txdbFeatures, FUN = summarize)
-  df <- t(data.frame(results))
-  colnames(df) <- c('count')
-  return(df)
+  results = data.frame(sapply(X = txdbFeatures, function(x) {
+    sum(GenomicRanges::countOverlaps(queryRegions, x) > 0)
+  }))
+  colnames(results) <- c('counts')
+  return(results)
 }
 
 #' queryGff
