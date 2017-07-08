@@ -4,7 +4,7 @@
 \alias{importBed}
 \title{importBed}
 \usage{
-importBed(filePath, sampleN = 0, keepStandardChr = TRUE)
+importBed(filePath, sampleN = 0, keepStandardChr = TRUE, quiet = FALSE)
 }
 \arguments{
 \item{filePath}{Path to a GTF file}
@@ -18,6 +18,8 @@ than zero and less than the total number of input intervals.}
 convert the \code{seqlevelsStyle} to 'UCSC' and apply
 \code{keepStandardChromosomes} function to only keep data from the standard
 chromosomes}
+
+\item{quiet}{TRUE/FALSE (default:FALSE). Set to TRUE to turn off messages}
 }
 \value{
 A \code{GRanges} object containing the coordinates of the intervals

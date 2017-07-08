@@ -87,7 +87,7 @@ importGtf <- function (filePath,  saveObjectAsRds = TRUE, readFromRds = TRUE,
 #' This function uses \code{rtracklayer::import.bed()} function to import BED
 #' files
 #'
-#' @param filePath Path to a GTF file
+#' @param filePath Path to a BED file
 #' @param sampleN A positive integer value. The number of intervals in the input
 #'   BED file are randomly downsampled to include intervals as many as
 #'   \code{sampleN}. The input will be downsampled only if this value is larger
@@ -96,6 +96,7 @@ importGtf <- function (filePath,  saveObjectAsRds = TRUE, readFromRds = TRUE,
 #'   convert the \code{seqlevelsStyle} to 'UCSC' and apply
 #'   \code{keepStandardChromosomes} function to only keep data from the standard
 #'   chromosomes
+#' @param quiet TRUE/FALSE (default:FALSE). Set to TRUE to turn off messages
 #'
 #' @return A \code{GRanges} object containing the coordinates of the intervals
 #'   from an input BED file
@@ -108,18 +109,25 @@ importGtf <- function (filePath,  saveObjectAsRds = TRUE, readFromRds = TRUE,
 #' @importFrom GenomeInfoDb seqlevelsStyle
 #' @importFrom GenomeInfoDb keepStandardChromosomes
 #' @export
-importBed <- function (filePath, sampleN = 0, keepStandardChr = TRUE) {
+importBed <- function (filePath, sampleN = 0, keepStandardChr = TRUE, quiet = FALSE) {
 
   if (file.exists(filePath)) {
     data = rtracklayer::import.bed(filePath)
+    if(quiet == FALSE) {
+      cat('Processing',filePath,'\n')
+    }
     if (keepStandardChr == TRUE) {
       GenomeInfoDb::seqlevelsStyle(data) <- 'UCSC'
-      cat('Keeping standard chromosomes only\n')
+      if(quiet == FALSE) {
+        cat('Keeping standard chromosomes only\n')
+      }
       data <- GenomeInfoDb::keepStandardChromosomes(data, pruning.mode = 'coarse')
     }
 
     if (sampleN > 0 && sampleN < length(data)) {
-      cat ('Downsampling intervals to size:',sampleN,'\n')
+      if(quiet == FALSE) {
+        cat ('Downsampling intervals to size:',sampleN,'\n')
+      }
       data <- data[sample(x = 1:length(data), size = sampleN)]
     }
     return(data)
