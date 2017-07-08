@@ -115,7 +115,7 @@ importBed <- function (filePath, sampleN = 0, keepStandardChr = TRUE) {
     if (keepStandardChr == TRUE) {
       GenomeInfoDb::seqlevelsStyle(data) <- 'UCSC'
       cat('Keeping standard chromosomes only\n')
-      data <- GenomeInfoDb::keepStandardChromosomes(data)
+      data <- GenomeInfoDb::keepStandardChromosomes(data, pruning.mode = 'coarse')
     }
 
     if (sampleN > 0 && sampleN < length(data)) {
