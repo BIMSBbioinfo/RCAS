@@ -19,7 +19,7 @@
 #'   \code{seqlevelsStyle} will be converted to 'UCSC' and
 #'   \code{keepStandardChromosomes} function  will be applied to only keep data
 #'   from the standard chromosomes.
-#'
+#' @param ... Other arguments passed to rtracklayer::import.gff function
 #' @return A \code{GRanges} object containing the coordinates of the annotated
 #'   genomic features in an input GTF file
 #'
@@ -42,7 +42,7 @@
 #' @importFrom GenomeInfoDb keepStandardChromosomes
 #' @export
 importGtf <- function (filePath,  saveObjectAsRds = TRUE, readFromRds = TRUE,
-                       overwriteObjectAsRds = FALSE, keepStandardChr = TRUE) {
+                       overwriteObjectAsRds = FALSE, keepStandardChr = TRUE, ...) {
 
   rdsFilePath <- paste0(filePath, ".granges.rds")
 
@@ -51,7 +51,7 @@ importGtf <- function (filePath,  saveObjectAsRds = TRUE, readFromRds = TRUE,
     gff <- readRDS(rdsFilePath)
   } else {
     cat('importing gtf file from', filePath,'\n')
-    gff <- rtracklayer::import.gff(filePath)
+    gff <- rtracklayer::import.gff(filePath, ...)
   }
 
   if (!is.null(gff)) {

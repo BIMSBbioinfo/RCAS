@@ -5,7 +5,7 @@
 \title{importGtf}
 \usage{
 importGtf(filePath, saveObjectAsRds = TRUE, readFromRds = TRUE,
-  overwriteObjectAsRds = FALSE, keepStandardChr = TRUE)
+  overwriteObjectAsRds = FALSE, keepStandardChr = TRUE, ...)
 }
 \arguments{
 \item{filePath}{Path to a GTF file}
@@ -26,6 +26,8 @@ existing .rds file (<filePath>.granges.rds) will overwritten.}
 \code{seqlevelsStyle} will be converted to 'UCSC' and
 \code{keepStandardChromosomes} function  will be applied to only keep data
 from the standard chromosomes.}
+
+\item{...}{Other arguments passed to rtracklayer::import.gff function}
 }
 \value{
 A \code{GRanges} object containing the coordinates of the annotated
