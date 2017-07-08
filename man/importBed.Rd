@@ -7,7 +7,7 @@
 importBed(filePath, sampleN = 0, keepStandardChr = TRUE, quiet = FALSE)
 }
 \arguments{
-\item{filePath}{Path to a GTF file}
+\item{filePath}{Path to a BED file}
 
 \item{sampleN}{A positive integer value. The number of intervals in the input
 BED file are randomly downsampled to include intervals as many as
