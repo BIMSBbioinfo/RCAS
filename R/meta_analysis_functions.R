@@ -78,24 +78,13 @@ summarizeQueryRegionsMulti <- function(queryRegionsList, txdbFeatures) {
 #' queryRegionsList <- GRangesList(queryRegions, queryRegions, 
 #'                                 queryRegions, queryRegions)
 #' getOverlapSimilarityMatrix(queryRegionsList, type = 'any')                                
-#' @importFrom IRanges overlapsAny
 #' @export
 getOverlapSimilarityMatrix <- function(queryRegionsList, ...) {
   sapply(queryRegionsList, function(gr1) {
     sapply(queryRegionsList, function(gr2) {
-      round(sum(IRanges::overlapsAny(gr1, gr2, ...)) /
+      round(sum(overlapsAny(gr1, gr2, ...)) /
               length(gr1), 2)
     })
   })
 }
-
-getOverlapSimilarityMatrix2 <- function(queryRegionsList, ...) {
-  sapply(queryRegionsList, function(gr1) {
-    sapply(queryRegionsList, function(gr2) {
-      round(sum(IRanges::overlapsAny(gr1, gr2, ...)) /
-              length(gr1), 2)
-    })
-  })
-}
-
 
