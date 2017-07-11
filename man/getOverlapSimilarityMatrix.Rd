@@ -4,18 +4,20 @@
 \alias{getOverlapSimilarityMatrix}
 \title{getOverlapSimilarityMatrix}
 \usage{
-getOverlapSimilarityMatrix(queryRegionsList, ...)
+getOverlapSimilarityMatrix(queryRegionsList, nodeN = 2, ...)
 }
 \arguments{
 \item{queryRegionsList}{A GRangesList object}
+
+\item{nodeN}{(default: 2) Number of nodes to use to parallellize the process}
 
 \item{...}{Other arguments passed to IRanges::overlapsAny function}
 }
 \value{
 A matrix with equal number of rows and columns where the size is 
-  determined by the number of list elements in the input object. Matrix
-  values are between 0 and 1, where 0 means no similarity (no overlap) and 1
-  means all elements of object A overlap have at least one overlap with some
+  determined by the number of list elements in the input object. Matrix 
+  values are between 0 and 1, where 0 means no similarity (no overlap) and 1 
+  means all elements of object A overlap have at least one overlap with some 
   element in B (but not necessarily vice versa).
 }
 \description{
@@ -28,5 +30,5 @@ any intervals in every other GRanges object in the list.
 data(queryRegions)
 queryRegionsList <- GRangesList(queryRegions, queryRegions, 
                                 queryRegions, queryRegions)
-getOverlapSimilarityMatrix(queryRegionsList, type = 'any')                                
+getOverlapSimilarityMatrix(queryRegionsList, type = 'any')  
 }

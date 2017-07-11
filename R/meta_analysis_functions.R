@@ -67,24 +67,32 @@ summarizeQueryRegionsMulti <- function(queryRegionsList, txdbFeatures) {
 #' any intervals in every other GRanges object in the list.
 #' 
 #' @param queryRegionsList A GRangesList object
+#' @param nodeN (default: 2) Number of nodes to use to parallellize the process
 #' @param ... Other arguments passed to IRanges::overlapsAny function
 #' @return A matrix with equal number of rows and columns where the size is 
-#'   determined by the number of list elements in the input object. Matrix
-#'   values are between 0 and 1, where 0 means no similarity (no overlap) and 1
-#'   means all elements of object A overlap have at least one overlap with some
+#'   determined by the number of list elements in the input object. Matrix 
+#'   values are between 0 and 1, where 0 means no similarity (no overlap) and 1 
+#'   means all elements of object A overlap have at least one overlap with some 
 #'   element in B (but not necessarily vice versa).
 #' @examples 
 #' data(queryRegions)
 #' queryRegionsList <- GRangesList(queryRegions, queryRegions, 
 #'                                 queryRegions, queryRegions)
-#' getOverlapSimilarityMatrix(queryRegionsList, type = 'any')                                
+#' getOverlapSimilarityMatrix(queryRegionsList, type = 'any')  
+#' @importFrom parallel makeCluster
+#' @importFrom parallel stopCluster
+#' @importFrom parallel clusterCall
 #' @export
-getOverlapSimilarityMatrix <- function(queryRegionsList, ...) {
-  sapply(queryRegionsList, function(gr1) {
-    sapply(queryRegionsList, function(gr2) {
-      round(sum(overlapsAny(gr1, gr2, ...)) /
-              length(gr1), 2)
-    })
+getOverlapSimilarityMatrix <- function(queryRegionsList, nodeN = 2, ...) {
+  cl <- parallel::makeCluster(nodeN)
+  parallel::clusterCall(cl, function() library(IRanges))
+  M <- parSapply(cl = cl, X = queryRegionsList, FUN = function(gr1) {
+    sapply(X = queryRegionsList, 
+           FUN = function(gr2) {
+             round(sum(overlapsAny(gr1, gr2, ...)) / length(gr1), 2)
+           })
   })
+  parallel::stopCluster(cl)
+  return(M)
 }
 
