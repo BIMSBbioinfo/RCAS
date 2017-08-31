@@ -21,7 +21,7 @@ A matrix with equal number of rows and columns where the size is
   element in B (but not necessarily vice versa).
 }
 \description{
-This function takes as input a GRangesList objects and finds pairwise
+This function takes as input a GRangesList object and finds pairwise
 overlapping intervals in all list elements. Then, it creates a similarity
 matrix based on the percentage of intervals in each GRanges object to overlap
 any intervals in every other GRanges object in the list.
