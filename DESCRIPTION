@@ -55,7 +55,8 @@ Imports:
     BiocGenerics,
     S4Vectors,
     stats,
-    plotrix
+    plotrix,
+    pbapply
 RoxygenNote: 6.0.1
 Suggests: BSgenome.Hsapiens.UCSC.hg38, 
     BSgenome.Mmusculus.UCSC.mm10, 

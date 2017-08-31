@@ -10,15 +10,22 @@
 #'   intervals from multiple input BED files
 #'   
 #' @examples
-#' input1 <- system.file("extdata", "testfile.bed", package='RCAS')
-#' input2 <- system.file("extdata", "testfile2.bed", package='RCAS')
-#' importBedFiles(filePaths = c(input1, input2), keepStandardChr = TRUE)
+#' input1 <- system.file("extdata", "testfile.bed", package='RCAS') 
+#' input2 <- system.file("extdata", "testfile2.bed", package='RCAS') 
+#' bedData <- importBedFiles(filePaths = c(input1, input2), 
+#' keepStandardChr = TRUE) 
+#' # when importing multiple bed files with different column names, it 
+#' # is required to pass the common column names to be parsed from the 
+#' # bed files
+#' bedData <- importBedFiles(filePaths = c(input1, input2), quiet = TRUE,
+#'                 colnames = c('chrom', 'start', 'end', 'strand'))
 #' 
 #' @importFrom GenomicRanges GRangesList
+#' @importFrom pbapply pbsapply
 #' @export
 importBedFiles <- function(filePaths, ...) {
-  bedData <- GenomicRanges::GRangesList(sapply(filePaths, function(f) {
-    RCAS::importBed(filePath = f, ...)
+  bedData <- GenomicRanges::GRangesList(pbapply::pbsapply(filePaths, function(f) {
+    RCAS::importBed(filePath = f, quiet = TRUE, ...)
   }, USE.NAMES = TRUE))
   names(bedData) <- gsub(pattern = '.bed$', 
                          replacement = '', 
@@ -61,7 +68,7 @@ summarizeQueryRegionsMulti <- function(queryRegionsList, txdbFeatures) {
 
 #' getOverlapSimilarityMatrix
 #' 
-#' This function takes as input a GRangesList objects and finds pairwise
+#' This function takes as input a GRangesList object and finds pairwise
 #' overlapping intervals in all list elements. Then, it creates a similarity
 #' matrix based on the percentage of intervals in each GRanges object to overlap
 #' any intervals in every other GRanges object in the list.
@@ -95,4 +102,7 @@ getOverlapSimilarityMatrix <- function(queryRegionsList, nodeN = 2, ...) {
   parallel::stopCluster(cl)
   return(M)
 }
+
+
+
 

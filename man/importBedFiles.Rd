@@ -21,8 +21,14 @@ This function is a wrapper that uses \code{RCAS::importBed()} function to
 import BED files as a GRangesList object
 }
 \examples{
-input1 <- system.file("extdata", "testfile.bed", package='RCAS')
-input2 <- system.file("extdata", "testfile2.bed", package='RCAS')
-importBedFiles(filePaths = c(input1, input2), keepStandardChr = TRUE)
+input1 <- system.file("extdata", "testfile.bed", package='RCAS') 
+input2 <- system.file("extdata", "testfile2.bed", package='RCAS') 
+bedData <- importBedFiles(filePaths = c(input1, input2), 
+keepStandardChr = TRUE) 
+# when importing multiple bed files with different column names, it 
+# is required to pass the common column names to be parsed from the 
+# bed files
+bedData <- importBedFiles(filePaths = c(input1, input2), quiet = TRUE,
+                colnames = c('chrom', 'start', 'end', 'strand'))
 
 }
