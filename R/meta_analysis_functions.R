@@ -57,8 +57,6 @@ importBedFiles <- function(filePaths, ...) {
 #' summaryMatrix <- summarizeQueryRegionsMulti(queryRegionsList = queryRegionsList,
 #'                                  txdbFeatures = txdbFeatures)
 #'
-#' @import GenomicRanges
-#' @importFrom S4Vectors queryHits
 #' @export
 summarizeQueryRegionsMulti <- function(queryRegionsList, txdbFeatures) {
   summaryRaw <- sapply(queryRegionsList, function(x) summarizeQueryRegions(x, txdbFeatures))
