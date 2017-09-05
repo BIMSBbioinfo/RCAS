@@ -57,12 +57,25 @@ importBedFiles <- function(filePaths, ...) {
 #' summaryMatrix <- summarizeQueryRegionsMulti(queryRegionsList = queryRegionsList,
 #'                                  txdbFeatures = txdbFeatures)
 #'
+#' @importFrom parallel makeCluster
+#' @importFrom parallel clusterExport
+#' @importFrom parallel clusterEvalQ
+#' @importFrom pbapply pbsapply 
 #' @export
-summarizeQueryRegionsMulti <- function(queryRegionsList, txdbFeatures) {
-  summaryRaw <- sapply(queryRegionsList, function(x) summarizeQueryRegions(x, txdbFeatures))
-  rownames(summaryRaw) <- names(txdbFeatures)
+summarizeQueryRegionsMulti <- function(queryRegionsList, txdbFeatures, nodeN = 1) {
+  cl <- parallel::makeCluster(nodeN)
+  parallel::clusterExport(cl = cl, 
+                          varlist = c('txdbFeatures', 'summarizeQueryRegions'), 
+                          envir = environment())
+  summaryRaw <- pbapply::pbsapply(queryRegionsList, 
+                                  function(x) {
+                                    summarizeQueryRegions(x, txdbFeatures)
+                                    }, cl = cl)
+  rownames(summaryRaw) <- c(names(txdbFeatures), 'NoFeatures')
+  stopCluster(cl)
   return(t(summaryRaw))
 }
+
 
 #' getOverlapSimilarityMatrix
 #' 

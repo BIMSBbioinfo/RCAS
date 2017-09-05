@@ -4,7 +4,7 @@
 \alias{summarizeQueryRegionsMulti}
 \title{summarizeQueryRegionsMulti}
 \usage{
-summarizeQueryRegionsMulti(queryRegionsList, txdbFeatures)
+summarizeQueryRegionsMulti(queryRegionsList, txdbFeatures, nodeN = 1)
 }
 \arguments{
 \item{queryRegionsList}{GRangesList object imported from multiple BED files
