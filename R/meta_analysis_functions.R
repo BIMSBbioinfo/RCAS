@@ -61,7 +61,7 @@ importBedFiles <- function(filePaths, ...) {
 #'
 #' @importFrom parallel makeCluster
 #' @importFrom parallel clusterExport
-#' @importFrom parallel clusterEvalQ
+#' @importFrom parallel stopCluster
 #' @importFrom pbapply pbsapply 
 #' @export
 summarizeQueryRegionsMulti <- function(queryRegionsList, txdbFeatures, nodeN = 1) {
@@ -74,7 +74,7 @@ summarizeQueryRegionsMulti <- function(queryRegionsList, txdbFeatures, nodeN = 1
                                     summarizeQueryRegions(x, txdbFeatures)
                                     }, cl = cl)
   rownames(summaryRaw) <- c(names(txdbFeatures), 'NoFeatures')
-  stopCluster(cl)
+  parallel::stopCluster(cl)
   return(t(summaryRaw))
 }
 
