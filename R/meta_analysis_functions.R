@@ -138,4 +138,148 @@ getIntervalOverlapMatrix <- function(queryRegionsList, targetRegions, targetRegi
   return(M)
 }
 
+#' createDB
+#' 
+#' Creates and sqlite database consisting of various tables of data obtained
+#' from processed BED files
+#' 
+#' @param dbPath Path to the sqlite database file (could be an existing file or
+#'   a new file path to be created at the given path)
+#' @param projDataFile A file consisting of meta-data about the input samples.
+#'   Must minimally consist of two columns: 1. sampleName (name of the sample)
+#'   2. bedFilePath (full path to the location of the BED file containing data
+#'   for the sample)
+#' @param gtfFilePath Path to the GTF file (preferably downloaded from the
+#'   Ensembl database) that contains genome annotations
+#' @param updateDB TRUE/FALSE (default:FALSE). Whether an existing database
+#'   should be updated with datasets provided in the projDataFile if there are
+#'   new datasets that don't already exist in the database.
+#' @param nodeN Number of cpus to use for parallel processing (default: 1)
+#' @return An SQLiteConnection object created by RSQLite package
+#' @importFrom RSQLite dbConnect
+#' @importFrom RSQLite dbWriteTable
+#' @importFrom RSQLite dbDisconnect
+#' @importFrom RSQLite SQLite
+#' @importFrom data.table as.data.table
+#' @export 
+createDB <- function(dbPath = file.path(getwd(), 'rcasDB.sqlite'), 
+                     projDataFile,
+                     gtfFilePath,
+                     nodeN = 1
+                     ) {
+  if(file.exists(dbPath)) {
+    stop("A database already exists at ",dbPath,"\n",
+         "Either provide a different path or use updateDB() 
+         function to update an existing database")
+  }
+  
+  if(!file.exists(gtfFilePath)) {
+    stop("A GTF file doesn't exist at the given location ",
+         gtfFilePath,"\n")
+  }
+  
+  if(!file.exists(projDataFile)) {
+    stop("A project data file doesnt't exist at the given location ",
+         projDataFile,"\n")
+  }
+  
+  #create connection to sqlite 
+  mydb <- RSQLite::dbConnect(RSQLite::SQLite(), dbPath)
+  
+  cat("Reading project data\n")
+  #read projDataFile
+  projData <- read.table(file = projDataFile, 
+                         header = TRUE, 
+                         sep = '\t', 
+                         stringsAsFactors = FALSE)
+  
+  #check 1
+  ambigousSamples <- projData[table(projData$sampleName) > 1,]$sampleName
+  if(length(ambigousSamples) > 0) {
+    stop("Some sample names are ambigously assigned to multiple files in:\n",projDataFile,"\n",
+         "See sample names:",paste0(ambigousSamples, collapse = ', '),"\n")
+  }
+  #check 2
+  ambigousFiles <- projData[table(projData$bedFilePath) > 1,]$bedFilePath
+  if(length(ambigousFiles) > 0) {
+    stop("Some bed files are ambigously assigned to multiple sample names",projDataFile,"\n",
+         "See:",paste0(ambigousFiles, collapse = ', '),"\n")
+  }
+  
+  #check 3
+  unaccessibleFiles <- projData$bedFilePath[!sapply(projData$bedFilePath, 
+                                                    file.exists)]
+  if(length(unaccessibleFiles) > 0) {
+    stop("Following files are not accessible or do not exist at the provided location:\n",
+         "See:",paste0(unaccessibleFiles, collapse = ', '),"\n")
+  }
+  
+  cat("Reading bed files\n")
+  bedData <- importBedFiles(filePaths = projData$bedFilePath,
+                            colnames = c('chrom', 'start', 
+                                         'end', 'strand'))
+  names(bedData) <- projData$sampleName
+  
+  cat("Saving interval datasets in 'bedData' table\n")
+  RSQLite::dbWriteTable(conn = mydb, name = 'bedData', 
+               value = as.data.table(bedData), 
+               append = TRUE)
+  
+  #read gtf data 
+  cat("Importing GTF annotations\n")
+  gffData <- importGtf(filePath = gtfFilePath)
+  
+  cat("Parsing transcript features\n")
+  #get transcript feature coordinates
+  txdbFeatures <- getTxdbFeaturesFromGRanges(gffData)
+  
+  cat("Calculating annotation summaries\n")
+  #get feature overlap table
+  annotationSummaries <- summarizeQueryRegionsMulti(queryRegionsList = bedData,
+                                                    txdbFeatures = txdbFeatures, 
+                                                    nodeN = nodeN)
+  
+  cat("Saving annotation summaries in 'annotationSummaries' table\n")
+  RSQLite::dbWriteTable(conn = mydb, name = 'annotationSummaries', 
+               value = as.data.frame(annotationSummaries), 
+               append = TRUE)
+  
+  cat("Running function: getIntervalOverlapMatrix for all intervals\n")
+  M1 <- getIntervalOverlapMatrix(queryRegionsList = bedData, 
+                                targetRegions = unique(unlist(bedData)), 
+                                nodeN = nodeN)
+  
+  distanceByAllIntervals <- as.matrix(proxy::dist(x = M1, 
+                                          by_rows = FALSE, 
+                                          method = 'Jaccard'))
+  
+  cat("Saving distance matrix based on all intervals, in table 'distanceByAllIntervals'\n")
+  RSQLite::dbWriteTable(conn = mydb, name = 'distanceByAllIntervals', 
+               value = as.data.frame(distanceByAllIntervals), 
+               append = TRUE)
+  
+  cat("Running function: getIntervalOverlapMatrix for gene intervals\n")
+  M2 <- getIntervalOverlapMatrix(queryRegionsList = bedData, 
+                                 targetRegions = gffData[gffData$type == 'gene',],
+                                 targetRegionNames = gffData[gffData$type == 'gene',]$gene_name,
+                                 nodeN = nodeN)
+  distanceByGeneIntervals <- as.matrix(proxy::dist(x = M2, 
+                                                  by_rows = FALSE, 
+                                                  method = 'Jaccard'))
+  cat("Saving overlap matrix of genes versus samples in table 'geneOverlaps'\n")
+  RSQLite::dbWriteTable(conn = mydb, name = 'geneOverlaps', 
+                        value = data.table::as.data.table(M2, keep.rownames = TRUE), 
+                        append = TRUE)
+  
+  cat("Saving distance matrix based on gene intervals, in table 'distanceByGeneIntervals'\n")
+  RSQLite::dbWriteTable(conn = mydb, name = 'distanceByGeneIntervals', 
+               value = as.data.frame(distanceByGeneIntervals), 
+               append = TRUE)
+  
+  RSQLite::dbDisconnect(mydb)
+  
+  cat("Finished preparing the database and disconnected.\n",
+      "Type",paste0("RSQLite::dbConnect(RSQLite::SQLite(), \'",dbPath,"\')"),"to reconnect\n")
+  return(dbPath)
+} 
 
