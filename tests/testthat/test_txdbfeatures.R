@@ -18,7 +18,7 @@ test_that("Parsing features from txdb", {
 features <- getTxdbFeaturesFromGRanges(gffData = gff)
 test_that("Parsing features from GFF", {
   expect_is(features, 'list')
-  expect_equal(length(names(features)), 7)
+  expect_equal(length(names(features)), 8)
   expect_match(names(features)[1], "transcripts")
   expect_match(names(features)[7], "threeUTRs")
 })
@@ -39,7 +39,7 @@ summary <- summarizeQueryRegions(queryRegions = queryRegions,
 test_that("Summarizing query regions with txdbFeatures", {
   expect_is(summary, 'matrix')
   expect_match(colnames(summary), 'count')
-  expect_equal(nrow(summary), length(names(features)))
+  expect_equal(nrow(summary), length(names(features)) + 1)
 })
 
 profile <- calculateCoverageProfile(queryRegions = queryRegions,
