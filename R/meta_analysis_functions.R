@@ -45,6 +45,8 @@ importBedFiles <- function(filePaths, ...) {
 #'   using \code{importBedFiles} function
 #' @param txdbFeatures List of GRanges objects - outputs of 
 #'   \code{getTxdbFeaturesFromGRanges} and \code{getTxdbFeatures} functions
+#' @param nodeN Positive integer value that denotes the number of cpus to use
+#'   for parallel processing (default: 1)
 #' @return A list consisting of two data.frame objects: one for raw overlap 
 #'   counts and one for percentage of overlap counts (raw overlap counts divided
 #'   by the number of query regions in the corresponding BED file)

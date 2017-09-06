@@ -12,6 +12,9 @@ using \code{importBedFiles} function}
 
 \item{txdbFeatures}{List of GRanges objects - outputs of 
 \code{getTxdbFeaturesFromGRanges} and \code{getTxdbFeatures} functions}
+
+\item{nodeN}{Positive integer value that denotes the number of cpus to use
+for parallel processing (default: 1)}
 }
 \value{
 A list consisting of two data.frame objects: one for raw overlap 
