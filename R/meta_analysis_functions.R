@@ -140,29 +140,26 @@ getIntervalOverlapMatrix <- function(queryRegionsList, targetRegions, targetRegi
 
 #' createDB
 #' 
-#' Creates and sqlite database consisting of various tables of data obtained
+#' Creates and sqlite database consisting of various tables of data obtained 
 #' from processed BED files
 #' 
-#' @param dbPath Path to the sqlite database file (could be an existing file or
+#' @param dbPath Path to the sqlite database file (could be an existing file or 
 #'   a new file path to be created at the given path)
-#' @param projDataFile A file consisting of meta-data about the input samples.
-#'   Must minimally consist of two columns: 1. sampleName (name of the sample)
-#'   2. bedFilePath (full path to the location of the BED file containing data
+#' @param projDataFile A file consisting of meta-data about the input samples. 
+#'   Must minimally consist of two columns: 1. sampleName (name of the sample) 
+#'   2. bedFilePath (full path to the location of the BED file containing data 
 #'   for the sample)
-#' @param gtfFilePath Path to the GTF file (preferably downloaded from the
+#' @param gtfFilePath Path to the GTF file (preferably downloaded from the 
 #'   Ensembl database) that contains genome annotations
-#' @param updateDB TRUE/FALSE (default:FALSE). Whether an existing database
-#'   should be updated with datasets provided in the projDataFile if there are
-#'   new datasets that don't already exist in the database.
 #' @param nodeN Number of cpus to use for parallel processing (default: 1)
-#' @return An SQLiteConnection object created by RSQLite package
+#' @return Path to an SQLiteConnection object created by RSQLite package
 #' @importFrom RSQLite dbConnect
 #' @importFrom RSQLite dbWriteTable
 #' @importFrom RSQLite dbDisconnect
 #' @importFrom RSQLite SQLite
 #' @importFrom data.table as.data.table
 #' @importFrom proxy dist
-#' @export 
+#' @export
 createDB <- function(dbPath = file.path(getwd(), 'rcasDB.sqlite'), 
                      projDataFile,
                      gtfFilePath,
