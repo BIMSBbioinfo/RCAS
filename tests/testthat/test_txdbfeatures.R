@@ -18,7 +18,7 @@ test_that("Parsing features from txdb", {
 features <- getTxdbFeaturesFromGRanges(gffData = gff)
 test_that("Parsing features from GFF", {
   expect_is(features, 'list')
-  expect_equal(length(names(features)), 8)
+  expect_equal(length(names(features)), 7)
   expect_match(names(features)[1], "transcripts")
   expect_match(names(features)[7], "threeUTRs")
 })
