@@ -115,5 +115,63 @@ getOverlapSimilarityMatrix <- function(queryRegionsList, nodeN = 2, ...) {
 }
 
 
+#' getIntervalOverlapMatrix
+#' 
+#' This function is used to obtain a binary matrix of overlaps between a list of
+#' GRanges objects (GRangesList object) and a target GRanges object. The
+#' resulting matrix has N rows where N is the number of intervals in the target
+#' GRanges object and M columns where M is the number GRanges objects in the
+#' query GRangesList object.
+#' 
+#' @param queryRegionsList A GRangesList object
+#' @param targetRegions A GRanges object
+#' @param targetRegionNames Optional vector of names to be used as rownames in
+#'   the resulting matrix. The vector indices must correspond to the intervals
+#'   in targetRegions object.
+#' @param nodeN Positive integer value to use one or more cpus for parallel
+#'   computation (default: 1)
+#' @return A binary matrix object consisting of number of rows equal to the
+#'   number of intervals in targetRegions object, and number of columns equal to
+#'   the number of GRanges objects available in the queryRegionsList object.
+#' @examples 
+#' data(gff)
+#' input1 <- system.file("extdata", "testfile.bed", package='RCAS') 
+#' input2 <- system.file("extdata", "testfile2.bed", package='RCAS') 
+#' bedData <- RCAS::importBedFiles(filePaths = c(input1, input2)) 
+#' M <- RCAS::getIntervalOverlapMatrix(
+#' queryRegionsList = bedData, 
+#' targetRegions = gff[gff$type == 'gene',][1:100], 
+#' targetRegionNames = gff[gff$type == 'gene',][1:100]$gene_name)
+#' @export
+getIntervalOverlapMatrix <- function(queryRegionsList, targetRegions, targetRegionNames = NULL, nodeN = 1) {
+  
+  if(!is.null(targetRegionNames) & length(targetRegions) != length(targetRegionNames)) {
+    stop("The sizes of targetRegions and targetRegionNames must be equal\n")
+  }
+  cl <- parallel::makeCluster(nodeN)
+  parallel::clusterExport(cl = cl, 
+                          varlist = c('targetRegions'), 
+                          envir = environment())
+  summaryRaw <- pbapply::pbsapply(queryRegionsList, 
+                                  function(x) {
+                                    myOverlaps <- GenomicRanges::findOverlaps(targetRegions, x)
+                                    unique(S4Vectors::queryHits(myOverlaps))
+                                  }, cl = cl)
+  parallel::stopCluster(cl)
+  
+  rowN <- length(targetRegions)
+  colN <- length(queryRegionsList)
+  
+  M <- sapply(X = summaryRaw, 
+              FUN = function(x) {
+                v <- rep(0, rowN) 
+                v[x] <- 1
+                return(v)
+              })
+  if(!is.null(targetRegionNames)) {
+    rownames(M) <- targetRegionNames
+  }
+  return(M)
+}
 
 
