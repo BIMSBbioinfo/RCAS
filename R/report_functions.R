@@ -96,7 +96,7 @@ importGtf <- function (filePath,  saveObjectAsRds = TRUE, readFromRds = TRUE,
 #'   convert the \code{seqlevelsStyle} to 'UCSC' and apply
 #'   \code{keepStandardChromosomes} function to only keep data from the standard
 #'   chromosomes
-#' @param quiet TRUE/FALSE (default:FALSE). Set to TRUE to turn off messages
+#' @param debug TRUE/FALSE (default:TRUE). Set to FALSE to turn off messages
 #' @param ... Other arguments passed to rtracklayer::import.bed function
 #' @return A \code{GRanges} object containing the coordinates of the intervals
 #'   from an input BED file
@@ -109,23 +109,23 @@ importGtf <- function (filePath,  saveObjectAsRds = TRUE, readFromRds = TRUE,
 #' @importFrom GenomeInfoDb seqlevelsStyle
 #' @importFrom GenomeInfoDb keepStandardChromosomes
 #' @export
-importBed <- function (filePath, sampleN = 0, keepStandardChr = TRUE, quiet = FALSE, ...) {
+importBed <- function (filePath, sampleN = 0, keepStandardChr = TRUE, debug = TRUE, ...) {
 
   if (file.exists(filePath)) {
     data = rtracklayer::import.bed(filePath, ...)
-    if(quiet == FALSE) {
+    if(debug == TRUE) {
       cat('Processing',filePath,'\n')
     }
     if (keepStandardChr == TRUE) {
       GenomeInfoDb::seqlevelsStyle(data) <- 'UCSC'
-      if(quiet == FALSE) {
+      if(debug == TRUE) {
         cat('Keeping standard chromosomes only\n')
       }
       data <- GenomeInfoDb::keepStandardChromosomes(data, pruning.mode = 'coarse')
     }
 
     if (sampleN > 0 && sampleN < length(data)) {
-      if(quiet == FALSE) {
+      if(debug == TRUE) {
         cat ('Downsampling intervals to size:',sampleN,'\n')
       }
       data <- data[sample(x = 1:length(data), size = sampleN)]

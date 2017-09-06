@@ -4,7 +4,7 @@
 \alias{importBed}
 \title{importBed}
 \usage{
-importBed(filePath, sampleN = 0, keepStandardChr = TRUE, quiet = FALSE,
+importBed(filePath, sampleN = 0, keepStandardChr = TRUE, debug = TRUE,
   ...)
 }
 \arguments{
@@ -20,7 +20,7 @@ convert the \code{seqlevelsStyle} to 'UCSC' and apply
 \code{keepStandardChromosomes} function to only keep data from the standard
 chromosomes}
 
-\item{quiet}{TRUE/FALSE (default:FALSE). Set to TRUE to turn off messages}
+\item{debug}{TRUE/FALSE (default:TRUE). Set to FALSE to turn off messages}
 
 \item{...}{Other arguments passed to rtracklayer::import.bed function}
 }

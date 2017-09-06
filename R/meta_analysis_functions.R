@@ -17,15 +17,15 @@
 #' # when importing multiple bed files with different column names, it 
 #' # is required to pass the common column names to be parsed from the 
 #' # bed files
-#' bedData <- importBedFiles(filePaths = c(input1, input2), quiet = TRUE,
-#'                 colnames = c('chrom', 'start', 'end', 'strand'))
+#' bedData <- importBedFiles(filePaths = c(input1, input2),
+#'                  colnames = c('chrom', 'start', 'end', 'strand'))
 #' 
 #' @importFrom GenomicRanges GRangesList
 #' @importFrom pbapply pbsapply
 #' @export
 importBedFiles <- function(filePaths, ...) {
   bedData <- GenomicRanges::GRangesList(pbapply::pbsapply(filePaths, function(f) {
-    RCAS::importBed(filePath = f, quiet = TRUE, ...)
+    RCAS::importBed(filePath = f, debug = FALSE, ...)
   }, USE.NAMES = TRUE))
   names(bedData) <- gsub(pattern = '.bed$', 
                          replacement = '', 

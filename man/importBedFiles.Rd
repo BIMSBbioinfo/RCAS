@@ -28,7 +28,7 @@ keepStandardChr = TRUE)
 # when importing multiple bed files with different column names, it 
 # is required to pass the common column names to be parsed from the 
 # bed files
-bedData <- importBedFiles(filePaths = c(input1, input2), quiet = TRUE,
-                colnames = c('chrom', 'start', 'end', 'strand'))
+bedData <- importBedFiles(filePaths = c(input1, input2),
+                 colnames = c('chrom', 'start', 'end', 'strand'))
 
 }
