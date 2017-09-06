@@ -161,6 +161,7 @@ getIntervalOverlapMatrix <- function(queryRegionsList, targetRegions, targetRegi
 #' @importFrom RSQLite dbDisconnect
 #' @importFrom RSQLite SQLite
 #' @importFrom data.table as.data.table
+#' @importFrom proxy dist
 #' @export 
 createDB <- function(dbPath = file.path(getwd(), 'rcasDB.sqlite'), 
                      projDataFile,
