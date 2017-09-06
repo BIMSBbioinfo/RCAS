@@ -3,10 +3,6 @@
 [![Build Status](https://travis-ci.org/BIMSBbioinfo/RCAS.svg?branch=master)](https://travis-ci.org/BIMSBbioinfo/RCAS)
 ![codecov.io](https://codecov.io/github/BIMSBbioinfo/RCAS/coverage.svg?branch=master)
 
-## NEWS for version 1.3.1
-
-- Genome builds for H.sapiens (hg38) and M.musculus (mm10) are now supported!
-
 ## Introduction
 
 RCAS is an R/Bioconductor package designed as a generic reporting tool
@@ -24,10 +20,9 @@ discovery. RCAS is available in the Bioconductor repository, packaged in multipl
 environments including Conda, Galaxy, and Guix, and as a webservice
 at http://rcas.mdc-berlin.de/.
 
-Currently supported genome builds are hg19 (human), mm9 (mouse), dm3 (fly), and ce10 (worm). 
+Currently supported genome builds are hg19 and hg38 (human), mm9 and mm10 (mouse), dm3 (fly), and ce10 (worm). 
 Modules for annotation summaries and motif analysis are supported for each of these genome  builds. 
-GO term and gene-set enrichment analyses are supported for hg19, mm9, and dm3 (ce10 is currently not supported 
-for GO/GSEA modules). 
+GO term and gene-set enrichment analyses are supported for hg19, hg38, mm9, mm10, and dm3. ce10 is currently not supportedfor GO/GSEA modules. 
 
 ## installation:
 
