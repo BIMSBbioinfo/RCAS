@@ -44,7 +44,7 @@ Imports:
     AnnotationDbi,
     GenomicRanges,
     BSgenome.Hsapiens.UCSC.hg19,
-    GenomeInfoDb,
+    GenomeInfoDb (>= 1.12.0),
     Biostrings,
     rtracklayer,
     org.Hs.eg.db,
