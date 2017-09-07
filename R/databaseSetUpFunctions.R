@@ -1,8 +1,11 @@
 ## functions to create, update and manipulate the sqlite database for meta-analysis 
-validateProjDataFile <- function(projDataFile) {
+validateProjDataFile <- function(projDataFile, conn) {
   projData <- read.table(file = projDataFile, header = TRUE, 
                          sep = '\t', stringsAsFactors = FALSE)
-  
+  if(sum(grepl(pattern = '-', x = projData$sampleName)) > 0){
+    warning("Converting dashes (-) in sample names to underscore (_)\n")
+    projData$sampleName <- gsub(pattern = '-', '_', x = projData$sampleName)
+  }
   #check 1
   ambigousSamples <- projData[table(projData$sampleName) > 1,]$sampleName
   if(length(ambigousSamples) > 0) {
@@ -23,55 +26,133 @@ validateProjDataFile <- function(projDataFile) {
     stop("Following files are not accessible or do not exist at the provided location:\n",
          "See:",paste0(unaccessibleFiles, collapse = ', '),"\n")
   }
+  
+  #check 4 (when an existing database is updated, samples in projData object that clash with the
+  #existing sample names will be ignored)
+  if(RSQLite::dbExistsTable(conn, 'processedSamples')) {
+    ps <- RSQLite::dbReadTable(conn, 'processedSamples')
+    existingSamples <- intersect(ps$sampleName, projData$sampleName)
+    if(length(existingSamples) > 0) {
+      warning("The following samples already exists in the database. 
+              These samples will be ignored during the database update:",
+              paste0(existingSamples, collapse = ','))
+    }
+    projData <- rbind(ps, projData[!projData$sampleName %in% existingSamples,])
+  }
   return(projData)
 }
 
 insertTableGtfData <- function(conn, name, gtfFilePath) {
-  cat("Importing GTF annotations\n")
-  gtfData <- importGtf(filePath = gtfFilePath, 
-                       readFromRds = FALSE, 
-                       colnames = c('source', 'type', 'score', 
-                                    'gene_id', 'gene_name', 
-                                    'transcript_id', 'exon_id', 
-                                    'exon_number'))
-  RSQLite::dbWriteTable(conn = conn, name = name, 
-                        value = data.table::as.data.table(gtfData))
-  return(gtfData)
+  if(RSQLite::dbExistsTable(conn, name)) {
+    cat("Reading GTF data from the database")
+    gtfData <- GenomicRanges::makeGRangesFromDataFrame(
+      df = RSQLite::dbReadTable(conn, name), keep.extra.columns = TRUE)
+  } else {
+    cat("Importing GTF annotations\n")
+    gtfData <- importGtf(filePath = gtfFilePath, 
+                         readFromRds = FALSE, 
+                         colnames = c('source', 'type', 'score', 
+                                      'gene_id', 'gene_name', 
+                                      'transcript_id', 'exon_id', 
+                                      'exon_number'))
+    RSQLite::dbWriteTable(conn = conn, name = name, 
+                          value = data.table::as.data.table(gtfData))
+    return(gtfData)
+  }
 }
 
-insertTableBedData <- function(conn, sampleNames, ...) {
-  cat("Reading bed files\n")
-  bedData <- importBedFiles(...)
-  names(bedData) <- sampleNames
+insertTableBedData <- function(conn, projData) {
+  if(RSQLite::dbExistsTable(conn = conn, name = 'bedData')) {
+    cat("Reading existing BED data from database\n")
+    bedData <- GenomicRanges::makeGRangesListFromDataFrame(
+      df = RSQLite::dbReadTable(conn, 'bedData'), 
+      split.field = 'group_name')
+    
+    #find which samples in projData don't have any data yet
+    newSamples <- setdiff(projData$sampleName, names(bedData))
+    if(length(newSamples) > 0) {
+      cat("Reading BED files for new samples\n")
+      newBedData <- importBedFiles(
+        filePaths = projData[projData$sampleName %in% newSamples,]$bedFilePath,
+        colnames = c('chrom', 'start', 'end', 'strand'))
+      names(newBedData) <- newSamples
+      
+      cat("Appending new interval datasets in 'bedData' table\n")
+      RSQLite::dbWriteTable(conn = conn, name = 'bedData', 
+                            value = as.data.table(newBedData), 
+                            append = TRUE)
+      bedData <- c(bedData, newBedData)
+    } 
+    return(bedData)
+    } else {
+    bedData <- importBedFiles(
+      filePaths = projData$bedFilePath,
+      colnames = c('chrom', 'start', 'end', 'strand'))
+    names(bedData) <- projData$sampleName
+    cat("Saving interval datasets in 'bedData' table\n")
+    RSQLite::dbWriteTable(conn = conn, name = 'bedData', 
+                          value = as.data.table(bedData), 
+                          append = TRUE)
+    return(bedData)
+  } 
+}
+
+insertTableAnnotationSummaries <- function(conn, bedData, ...) {
   
-  cat("Saving interval datasets in 'bedData' table\n")
-  RSQLite::dbWriteTable(conn = conn, name = 'bedData', 
-                        value = as.data.table(bedData), 
-                        append = TRUE)
-  return(bedData)
+  if(RSQLite::dbExistsTable(conn, 'annotationSummaries')) {
+    annotationSummaries <- RSQLite::dbReadTable(conn, 'annotationSummaries')
+    
+    newSamples <- setdiff(names(bedData), annotationSummaries$sampleName)
+    if(length(newSamples) > 0) {
+      cat("Calculating annotation summaries for new samples\n")
+      newAnnot <- summarizeQueryRegionsMulti(queryRegionsList = bedData[newSamples], 
+                                             ...)
+      newAnnot <- data.table::as.data.table(newAnnot, keep.rownames = TRUE)
+      colnames(newAnnot)[1] <- 'sampleName'
+      
+      cat("Appending new annotation summaries in 'annotationSummaries' table\n")
+      RSQLite::dbWriteTable(conn = conn, name = 'annotationSummaries', 
+                            value = newAnnot, 
+                            append = TRUE)
+    } 
+  } else {
+    cat("Calculating annotation summaries\n")
+    #get feature overlap table
+    annotationSummaries <- summarizeQueryRegionsMulti(queryRegionsList = bedData, 
+                                                      ...)
+    annotationSummaries <- data.table::as.data.table(x = annotationSummaries, 
+                                                     keep.rownames = TRUE)
+    colnames(annotationSummaries)[1] <- 'sampleName'
+    cat("Saving annotation summaries in 'annotationSummaries' table\n")
+    RSQLite::dbWriteTable(conn = conn, name = 'annotationSummaries', 
+                          value = annotationSummaries, 
+                          append = TRUE)
+    
+  }
 }
 
-insertTableAnnotationSummaries <- function(conn, ...) {
-  cat("Calculating annotation summaries\n")
-  #get feature overlap table
-  annotationSummaries <- summarizeQueryRegionsMulti(...)
-  
-  cat("Saving annotation summaries in 'annotationSummaries' table\n")
-  RSQLite::dbWriteTable(conn = conn, name = 'annotationSummaries', 
-                        value = as.data.frame(annotationSummaries), 
-                        append = TRUE)
+insertTableOverlapMatrix <- function(conn, name, bedData, ...) {
+  if(RSQLite::dbExistsTable(conn, name)) {
+    M <- RSQLite::dbReadTable(conn, name)
+    
+    newSamples <- setdiff(names(bedData), colnames(M))
+    if(length(newSamples) > 0) {
+      newM <- getIntervalOverlapMatrix(queryRegionsList = bedData[newSamples], ...)
+      M <- cbind(data.table::as.data.table(M), 
+                 data.table::as.data.table(newM))
+    }
+    RSQLite::dbWriteTable(conn = conn, name = name, 
+                          value = M, 
+                          overwrite = TRUE)
+  } else {
+      cat("Running function: getIntervalOverlapMatrix for table",name,"\n")
+      M <- getIntervalOverlapMatrix(queryRegionsList = bedData, ...)
+      RSQLite::dbWriteTable(conn = conn, name = name, 
+                            value = data.table::as.data.table(M, 
+                                                              keep.rownames = TRUE), 
+                            overwrite = TRUE)
+  }
 }
-
-insertTableOverlapMatrix <- function(conn, name, ...) {
-  cat("Running function: getIntervalOverlapMatrix for table",name,"\n")
-  M <- getIntervalOverlapMatrix(...)
-  
-  RSQLite::dbWriteTable(conn = conn, name = name, 
-                        value = data.table::as.data.table(M, 
-                                                          keep.rownames = TRUE), 
-                        append = TRUE)
-}
-
 
 #' createDB
 #' 
@@ -86,6 +167,8 @@ insertTableOverlapMatrix <- function(conn, name, ...) {
 #'   for the sample)
 #' @param gtfFilePath Path to the GTF file (preferably downloaded from the 
 #'   Ensembl database) that contains genome annotations
+#' @param update TRUE/FALSE (default: FALSE) whether an existing database 
+#'   should be updated 
 #' @param nodeN Number of cpus to use for parallel processing (default: 1)
 #' @return Path to an SQLiteConnection object created by RSQLite package
 #' @importFrom RSQLite dbConnect
@@ -96,11 +179,11 @@ insertTableOverlapMatrix <- function(conn, name, ...) {
 #' @importFrom proxy dist
 #' @export
 createDB <- function(dbPath = file.path(getwd(), 'rcasDB.sqlite'), 
-                     projDataFile, gtfFilePath, nodeN = 1) {
-  if(file.exists(dbPath)) {
+                     projDataFile, gtfFilePath, update = FALSE, nodeN = 1) {
+  if(file.exists(dbPath) & update == FALSE) {
     stop("A database already exists at ",dbPath,"\n",
-         "Either provide a different path or use updateDB() 
-         function to update an existing database")
+         "Either provide a different path or set argument 'update' to TRUE  
+         in order to update this database")
   } else if(!file.exists(gtfFilePath)) {
     stop("A GTF file doesn't exist at:\n",gtfFilePath,"\n")
   } else if(!file.exists(projDataFile)) {
@@ -108,22 +191,20 @@ createDB <- function(dbPath = file.path(getwd(), 'rcasDB.sqlite'),
   }
   #create connection to sqlite 
   mydb <- RSQLite::dbConnect(RSQLite::SQLite(), dbPath)
-  #read and validate project data file
-  projData <- validateProjDataFile(projDataFile)
+  #read and validate project data file 
+  projData <- validateProjDataFile(projDataFile, mydb) 
   #import and save genome annotations
-  gtfData <- insertTableGtfData(conn = mydb, name = 'gtfData', 
+  gtfData <- insertTableGtfData(conn = mydb, name = 'gtfData',
                                 gtfFilePath = gtfFilePath)
   cat("Parsing transcript features\n")
   txdbFeatures <- getTxdbFeaturesFromGRanges(gtfData)
   
-  bedData <- insertTableBedData(conn = mydb, 
-                                sampleNames = projData$sampleName,
-                                filePaths = projData$bedFilePath,
-                                colnames = c('chrom', 'start', 'end', 'strand'))
-  insertTableAnnotationSummaries(conn = mydb, queryRegionsList = bedData,
+  bedData <- insertTableBedData(conn = mydb,projData = projData) 
+
+  insertTableAnnotationSummaries(conn = mydb, bedData = bedData, 
                                  txdbFeatures = txdbFeatures, nodeN = nodeN)
   insertTableOverlapMatrix(conn = mydb, name = 'geneOverlaps',
-                           queryRegionsList = bedData, 
+                           bedData = bedData, 
                            targetRegions = gtfData[gtfData$type == 'gene',],
                            targetRegionNames = gtfData[gtfData$type == 'gene',]$gene_name,
                            nodeN = nodeN)

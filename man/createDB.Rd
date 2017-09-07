@@ -5,7 +5,7 @@
 \title{createDB}
 \usage{
 createDB(dbPath = file.path(getwd(), "rcasDB.sqlite"), projDataFile,
-  gtfFilePath, nodeN = 1)
+  gtfFilePath, update = FALSE, nodeN = 1)
 }
 \arguments{
 \item{dbPath}{Path to the sqlite database file (could be an existing file or 
@@ -18,6 +18,9 @@ for the sample)}
 
 \item{gtfFilePath}{Path to the GTF file (preferably downloaded from the 
 Ensembl database) that contains genome annotations}
+
+\item{update}{TRUE/FALSE (default: FALSE) whether an existing database 
+should be updated}
 
 \item{nodeN}{Number of cpus to use for parallel processing (default: 1)}
 }
