@@ -137,14 +137,3 @@ getIntervalOverlapMatrix <- function(queryRegionsList, targetRegions, targetRegi
   }
   return(M)
 }
-
-
-
-
-
-
-
-
-
-
-

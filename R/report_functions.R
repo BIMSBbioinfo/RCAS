@@ -47,27 +47,27 @@ importGtf <- function (filePath,  saveObjectAsRds = TRUE, readFromRds = TRUE,
   rdsFilePath <- paste0(filePath, ".granges.rds")
 
   if (readFromRds == TRUE && file.exists(rdsFilePath)){
-    cat('Reading existing granges.rds object from',rdsFilePath,'\n')
+    message('Reading existing granges.rds object from',rdsFilePath,'\n')
     gff <- readRDS(rdsFilePath)
   } else {
-    cat('importing gtf file from', filePath,'\n')
+    message('importing gtf file from', filePath,'\n')
     gff <- rtracklayer::import.gff(filePath, ...)
   }
 
   if (!is.null(gff)) {
     if (keepStandardChr == TRUE) {
-      cat('Keeping standard chromosomes only\n')
+      message('Keeping standard chromosomes only\n')
       GenomeInfoDb::seqlevelsStyle(gff) = 'UCSC'
       gff = GenomeInfoDb::keepStandardChromosomes(gff, pruning.mode = 'coarse')
     }
 
     if (saveObjectAsRds == TRUE) {
       if (!file.exists(rdsFilePath)){
-        cat('Saving gff object in RDS file at',rdsFilePath,'\n')
+        message('Saving gff object in RDS file at',rdsFilePath,'\n')
         saveRDS(gff, file=rdsFilePath)
       } else {
         if (overwriteObjectAsRds == TRUE) {
-          cat('Overwriting gff object in RDS file at',rdsFilePath,'\n')
+          message('Overwriting gff object in RDS file at',rdsFilePath,'\n')
           saveRDS(gff, file=rdsFilePath)
         } else {
           message('File ',rdsFilePath,' already exists.\n
@@ -114,12 +114,12 @@ importBed <- function (filePath, sampleN = 0, keepStandardChr = TRUE, debug = TR
   if (file.exists(filePath)) {
     data = rtracklayer::import.bed(filePath, ...)
     if(debug == TRUE) {
-      cat('Processing',filePath,'\n')
+      message('Processing',filePath,'\n')
     }
     if (keepStandardChr == TRUE) {
       GenomeInfoDb::seqlevelsStyle(data) <- 'UCSC'
       if(debug == TRUE) {
-        cat('Keeping standard chromosomes only\n')
+        message('Keeping standard chromosomes only\n')
       }
       data <- GenomeInfoDb::keepStandardChromosomes(data, pruning.mode = 'coarse')
     }

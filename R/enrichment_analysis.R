@@ -151,7 +151,7 @@ printMsigdbDataset = function(dataset, outputFilename){
   for (i in 1:length(dataset)){
     geneSetName = names(dataset)[i]
     geneSet = paste(unique(paste(unlist(dataset[i]))), collapse = '\t')
-    cat(geneSetName, 'no_http', geneSet, sep='\t', "\n")
+    message(geneSetName, 'no_http', geneSet, sep='\t', "\n")
   }
   sink()
 }
@@ -267,12 +267,12 @@ createOrthologousGeneSetList <- function(referenceGeneSetList,
   # biomaRt to get ortholog data from Ensembl
   refMart <- getBioMartConnection (genomeVersion = refGenomeVersion)
   targetMart <- getBioMartConnection (genomeVersion = targetGenomeVersion)
-  cat('Created the database connections to biomart for',
+  message('Created the database connections to biomart for',
       refGenomeVersion, 'and', targetGenomeVersion,'\n')
 
   #retrieve orthologs lists for all human genes found in the MSIGDB gene sets
   orthologs <- retrieveOrthologs(mart1 = refMart, mart2 = targetMart, refGenes)
-  cat('Retrieved', nrow(orthologs),
+  message('Retrieved', nrow(orthologs),
       'orthologous relations between',
       length(unique(orthologs[,1])),
       "genes from", refGenomeVersion,

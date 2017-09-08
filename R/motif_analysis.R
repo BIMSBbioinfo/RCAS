@@ -128,13 +128,13 @@ runMotifRG <- function (queryRegions, genomeVersion, motifN = 5, nCores = 4) {
 
   controlRegions <- createControlRegions(queryRegions)
 
-  cat('extracting peak sequences from fasta..\n')
+  message('extracting peak sequences from fasta..\n')
   querySeqs <- extractSequences(queryRegions, genomeVersion)
 
-  cat('extracting background sequences from fasta..\n')
+  message('extracting background sequences from fasta..\n')
   controlSeqs <- extractSequences(controlRegions, genomeVersion)
 
-  cat('running motifRG...\n')
+  message('running motifRG...\n')
   motifResults <- motifRG::findMotifFgBg(fg.seq = querySeqs,
                                          bg.seq = controlSeqs,
                                          enriched.only = TRUE,
