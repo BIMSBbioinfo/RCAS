@@ -44,11 +44,11 @@ validateProjDataFile <- function(projDataFile, conn) {
 
 insertTableGtfData <- function(conn, name, gtfFilePath) {
   if(RSQLite::dbExistsTable(conn, name)) {
-    message("Reading GTF data from the database\n")
+    message("Reading GTF data from the database")
     gtfData <- GenomicRanges::makeGRangesFromDataFrame(
       df = RSQLite::dbReadTable(conn, name), keep.extra.columns = TRUE)
   } else {
-    message("Importing GTF annotations\n")
+    message("Importing GTF annotations")
     gtfData <- importGtf(filePath = gtfFilePath, 
                          readFromRds = FALSE, 
                          colnames = c('source', 'type', 'score', 
@@ -63,7 +63,7 @@ insertTableGtfData <- function(conn, name, gtfFilePath) {
 
 insertTableBedData <- function(conn, projData) {
   if(RSQLite::dbExistsTable(conn = conn, name = 'bedData')) {
-    message("Reading existing BED data from database\n")
+    message("Reading existing BED data from database")
     bedData <- GenomicRanges::makeGRangesListFromDataFrame(
       df = RSQLite::dbReadTable(conn, 'bedData'), 
       split.field = 'group_name')
@@ -71,13 +71,13 @@ insertTableBedData <- function(conn, projData) {
     #find which samples in projData don't have any data yet
     newSamples <- setdiff(projData$sampleName, names(bedData))
     if(length(newSamples) > 0) {
-      message("Reading BED files for new samples\n")
+      message("Reading BED files for new samples")
       newBedData <- importBedFiles(
         filePaths = projData[projData$sampleName %in% newSamples,]$bedFilePath,
         colnames = c('chrom', 'start', 'end', 'strand'))
       names(newBedData) <- newSamples
       
-      message("Appending new interval datasets in 'bedData' table\n")
+      message("Appending new interval datasets in 'bedData' table")
       RSQLite::dbWriteTable(conn = conn, name = 'bedData', 
                             value = as.data.table(newBedData), 
                             append = TRUE)
@@ -89,7 +89,7 @@ insertTableBedData <- function(conn, projData) {
       filePaths = projData$bedFilePath,
       colnames = c('chrom', 'start', 'end', 'strand'))
     names(bedData) <- projData$sampleName
-    message("Saving interval datasets in 'bedData' table\n")
+    message("Saving interval datasets in 'bedData' table")
     RSQLite::dbWriteTable(conn = conn, name = 'bedData', 
                           value = as.data.table(bedData), 
                           append = TRUE)
@@ -104,26 +104,26 @@ insertTableAnnotationSummaries <- function(conn, bedData, ...) {
     
     newSamples <- setdiff(names(bedData), annotationSummaries$sampleName)
     if(length(newSamples) > 0) {
-      message("Calculating annotation summaries for new samples\n")
+      message("Calculating annotation summaries for new samples")
       newAnnot <- summarizeQueryRegionsMulti(queryRegionsList = bedData[newSamples], 
                                              ...)
       newAnnot <- data.table::as.data.table(newAnnot, keep.rownames = TRUE)
       colnames(newAnnot)[1] <- 'sampleName'
       
-      message("Appending new annotation summaries in 'annotationSummaries' table\n")
+      message("Appending new annotation summaries in 'annotationSummaries' table")
       RSQLite::dbWriteTable(conn = conn, name = 'annotationSummaries', 
                             value = newAnnot, 
                             append = TRUE)
     } 
   } else {
-    message("Calculating annotation summaries\n")
+    message("Calculating annotation summaries")
     #get feature overlap table
     annotationSummaries <- summarizeQueryRegionsMulti(queryRegionsList = bedData, 
                                                       ...)
     annotationSummaries <- data.table::as.data.table(x = annotationSummaries, 
                                                      keep.rownames = TRUE)
     colnames(annotationSummaries)[1] <- 'sampleName'
-    message("Saving annotation summaries in 'annotationSummaries' table\n")
+    message("Saving annotation summaries in 'annotationSummaries' table")
     RSQLite::dbWriteTable(conn = conn, name = 'annotationSummaries', 
                           value = annotationSummaries, 
                           append = TRUE)
@@ -145,7 +145,7 @@ insertTableOverlapMatrix <- function(conn, name, bedData, ...) {
                           value = M, 
                           overwrite = TRUE)
   } else {
-      message("Running function: getIntervalOverlapMatrix for table",name,"\n")
+      message("Running function: getIntervalOverlapMatrix for table",name)
       M <- getIntervalOverlapMatrix(queryRegionsList = bedData, ...)
       RSQLite::dbWriteTable(conn = conn, name = name, 
                             value = data.table::as.data.table(M, 
@@ -156,7 +156,7 @@ insertTableOverlapMatrix <- function(conn, name, bedData, ...) {
 
 #' createDB
 #' 
-#' Creates and sqlite database consisting of various tables of data obtained 
+#' Creates an sqlite database consisting of various tables of data obtained 
 #' from processed BED files
 #' 
 #' @param dbPath Path to the sqlite database file (could be an existing file or 
@@ -196,7 +196,7 @@ createDB <- function(dbPath = file.path(getwd(), 'rcasDB.sqlite'),
   #import and save genome annotations
   gtfData <- insertTableGtfData(conn = mydb, name = 'gtfData',
                                 gtfFilePath = gtfFilePath)
-  message("Parsing transcript features\n")
+  message("Parsing transcript features")
   txdbFeatures <- getTxdbFeaturesFromGRanges(gtfData)
   
   bedData <- insertTableBedData(conn = mydb,projData = projData) 
@@ -210,8 +210,8 @@ createDB <- function(dbPath = file.path(getwd(), 'rcasDB.sqlite'),
                            nodeN = nodeN)
   RSQLite::dbWriteTable(mydb, 'processedSamples', projData, overwrite = TRUE)
   RSQLite::dbDisconnect(mydb)
-  message("Finished preparing the database and disconnected.\n",
+  message("Finished preparing the database and disconnected.",
       "Type",paste0("RSQLite::dbConnect(RSQLite::SQLite(), \'",
-                    dbPath,"\')"),"to reconnect\n")
+                    dbPath,"\')"),"to reconnect")
   return(dbPath)
 } 
