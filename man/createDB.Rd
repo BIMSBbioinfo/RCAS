@@ -28,6 +28,6 @@ should be updated}
 Path to an SQLiteConnection object created by RSQLite package
 }
 \description{
-Creates and sqlite database consisting of various tables of data obtained 
+Creates an sqlite database consisting of various tables of data obtained 
 from processed BED files
 }
