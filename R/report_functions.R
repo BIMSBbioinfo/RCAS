@@ -152,7 +152,7 @@ importBed <- function (filePath, sampleN = 0, keepStandardChr = TRUE, debug = TR
 #' txdb <- GenomicFeatures::makeTxDbFromGRanges(gff)
 #' txdbFeatures <- getTxdbFeatures(txdb)
 #'
-#' @return A list of GRanges objects
+#' @return A list of GRanges objects 
 #'
 #' @import GenomicFeatures
 #' @import GenomicRanges
@@ -586,10 +586,15 @@ getFeatureBoundaryCoverageBin <- function (queryRegions,
 #' @importFrom genomation ScoreMatrixBin
 #' @import GenomicRanges
 #' @export
-calculateCoverageProfile = function (queryRegions, targetRegions, sampleN = 0){
-  #remove windows shorter than 100 bp
-  #because the windows have to be separated into at least 100 bins
-  windows <- targetRegions[GenomicRanges::width(targetRegions) >= 100]
+calculateCoverageProfile = function (queryRegions, 
+                                     targetRegions, 
+                                     sampleN = 0, 
+                                     bin.num = 100, 
+                                     bin.op = 'mean', 
+                                     strand.aware = TRUE){
+  #remove windows shorter than bin.num
+  #because the windows have to be separated into at least 'bin.num' bins
+  windows <- targetRegions[GenomicRanges::width(targetRegions) >= bin.num]
 
   if (length(windows) > 0) {
     if (sampleN > 0 && sampleN < length(windows)) {
@@ -597,13 +602,13 @@ calculateCoverageProfile = function (queryRegions, targetRegions, sampleN = 0){
     }
     sm <- genomation::ScoreMatrixBin(target = queryRegions,
                                      windows = windows,
-                                     bin.num = 100,
-                                     bin.op = 'max',
-                                     strand.aware = TRUE)
+                                     bin.num = bin.num,
+                                     bin.op = bin.op,
+                                     strand.aware = strand.aware)
     return(sm)
     } else {
     stop("Cannot compute coverage profile for target regions.\n
-         There are no target regions longer than 100 bp\n")
+         There are no target regions longer than",bin.num,"\n")
   }
 }
 
@@ -636,14 +641,20 @@ calculateCoverageProfile = function (queryRegions, targetRegions, sampleN = 0){
 #'                                     sampleN = 1000)
 #' @export
 calculateCoverageProfileList <- function (queryRegions,
-                                             targetRegionsList,
-                                             sampleN = 0) {
+                                          targetRegionsList,
+                                          sampleN = 0, 
+                                          bin.num = 100,
+                                          bin.op = 'mean',
+                                          strand.aware = TRUE) {
   results <- lapply(X = names(targetRegionsList),
                     FUN = function(x) { 
                       sm <- calculateCoverageProfile(queryRegions = queryRegions,
-                                                        targetRegions = targetRegionsList[[x]],
-                                                        sampleN = sampleN)
-                      mdata <- data.frame('bins' = c(1:100), 
+                                                     targetRegions = targetRegionsList[[x]],
+                                                     sampleN = sampleN, 
+                                                     bin.num = bin.num, 
+                                                     bin.op = bin.op, 
+                                                     strand.aware = strand.aware)
+                      mdata <- data.frame('bins' = c(1:bin.num), 
                                           'meanCoverage' = colMeans(sm), 
                                           'standardError' = apply(sm, 2, plotrix::std.error),
                                           'feature' = x)
