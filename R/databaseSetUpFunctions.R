@@ -131,6 +131,36 @@ insertTableAnnotationSummaries <- function(conn, bedData, ...) {
   }
 }
 
+insertTableFeatureBoundaryCoverageProfiles <- function(conn, bedData, ...) {
+  
+  if(RSQLite::dbExistsTable(conn, 'featureBoundaryCoverageProfiles')) {
+    cvg <- RSQLite::dbReadTable(conn, 'featureBoundaryCoverageProfiles')
+    
+    newSamples <- setdiff(names(bedData), cvg$sample)
+    if(length(newSamples) > 0) {
+      message("Calculating feature boundary coverage profiles for new samples")
+      newCvg <- getFeatureBoundaryCoverageMulti(bedData[newSamples], ...)
+
+      message("Appending new coverage profiles in 
+              'featureBoundaryCoverageProfiles' table")
+      RSQLite::dbWriteTable(conn = conn, 
+                            name = 'featureBoundaryCoverageProfiles', 
+                            value = newCvg, 
+                            append = TRUE)
+    } 
+  } else {
+    message("Calculating feature boundary coverage profiles")
+    cvg <- getFeatureBoundaryCoverageMulti(bedData, ...)
+    message("Saving coverage profiles in 
+              'featureBoundaryCoverageProfiles' table")
+    RSQLite::dbWriteTable(conn = conn, 
+                          name = 'featureBoundaryCoverageProfiles', 
+                          value = cvg, 
+                          append = TRUE)
+    
+  }
+}
+
 insertTableOverlapMatrix <- function(conn, name, bedData, ...) {
   if(RSQLite::dbExistsTable(conn, name)) {
     M <- RSQLite::dbReadTable(conn, name)
@@ -203,6 +233,11 @@ createDB <- function(dbPath = file.path(getwd(), 'rcasDB.sqlite'),
 
   insertTableAnnotationSummaries(conn = mydb, bedData = bedData, 
                                  txdbFeatures = txdbFeatures, nodeN = nodeN)
+  
+  insertTableFeatureBoundaryCoverageProfiles(conn = mydb, bedData = bedData, 
+                                             txdbFeatures = txdbFeatures, 
+                                             sampleN = 10000)
+  
   insertTableOverlapMatrix(conn = mydb, name = 'geneOverlaps',
                            bedData = bedData, 
                            targetRegions = gtfData[gtfData$type == 'gene',],
