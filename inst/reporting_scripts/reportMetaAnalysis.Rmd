@@ -1,0 +1,72 @@
+---
+title: "The RNA Centric Analysis System Report"
+author: "Bora Uyar, Dilmurat Yusuf, Ricardo Wurmus, Altuna Akalin"
+date: "`r Sys.time()`"
+params: 
+  dbPath: 'RCAS.sqlite'
+  workdir: '.'
+---
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, fig.height = 4.5, fig.width = 8)
+knitr::opts_knit$set(progress = FALSE, root.dir = params$workdir)
+```
+
+```{r setup}
+library(RCAS)
+library(DBI)
+library(ggplot2)
+library(pheatmap)
+mydb <- RSQLite::dbConnect(RSQLite::SQLite(), params$dbPath)
+```
+# How similar are these samples based on the gene overlap matrix?
+
+```{r gene_overlaps}
+geneOverlaps <- dbReadTable(mydb, 'geneOverlaps')
+
+SM <- as.matrix(proxy::dist(x = as.matrix(geneOverlaps[,c(-1)]), method = 'Jaccard', by_rows = FALSE, diag = TRUE, upper = TRUE))
+pheatmap(SM, display_numbers = FALSE)
+```
+
+
+# how similar are these samples based on their distribution at different transcript features? 
+```{r annotation_summaries}
+AS <- dbReadTable(mydb, 'annotationSummaries')
+annotationSummaries <- as.matrix(AS[,c(-1)])
+rownames(annotationSummaries) <- AS$sampleName
+pheatmap(annotationSummaries, scale = 'row')
+```
+
+
+```{r coverage_profiles}
+cvg <- dbReadTable(mydb, 'featureBoundaryCoverageProfiles')
+cvg$sampleGroup <- stringi::stri_extract(cvg$sample, regex = '^.{4}')
+p <- ggplot(cvg, aes(x = bases, y = meanCoverage)) + geom_line(aes(colour = sampleGroup), fill = FALSE) + facet_grid(feature ~ boundary) + geom_vline(xintercept = 0)
+plotly::ggplotly(p)
+```
+
+# Acknowledgements
+
+RCAS is developed in the group of 
+[Altuna Akalin](http://bioinformatics.mdc-berlin.de/team.html#altuna-akalin-phd)
+(head of the Scientific Bioinformatics Platform) by
+[Bora Uyar](http://bioinformatics.mdc-berlin.de/team.html#bora-uyar-phd)
+(Bioinformatics Scientist),
+[Dilmurat Yusuf](http://bioinformatics.mdc-berlin.de/team.html#dilmurat-yusuf-phd)
+(Bioinformatics Scientist) and 
+[Ricardo Wurmus](http://bioinformatics.mdc-berlin.de/team.html#ricardo-wurmus)
+(System Administrator) at the Berlin Institute of Medical Systems Biology
+([BIMSB](https://www.mdc-berlin.de/13800178/en/bimsb))
+at the Max-Delbrueck-Center for Molecular Medicine
+([MDC](https://www.mdc-berlin.de)) in Berlin.
+
+RCAS is developed as a bioinformatics service as part of
+the [RNA Bioinformatics Center](http://www.denbi.de/index.php/rbc),
+which is one of the eight centers of
+the German Network for Bioinformatics Infrastructure
+([de.NBI](http://www.denbi.de/)).  
+
+# Session Information
+```{r sessionInfo}
+sessionInfo()
+```

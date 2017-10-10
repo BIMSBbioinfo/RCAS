@@ -199,3 +199,36 @@ getIntervalOverlapMatrix <- function(queryRegionsList, targetRegions, targetRegi
   }
   return(M)
 }
+
+#' @export
+runReportMetaAnalysis <- function(reportFile, 
+                                  dbPath = 'RCAS.sqlite',
+                                  outDir = getwd(),
+                                  quiet = FALSE,
+                                  selfContained = TRUE) {
+  
+  #reportFile <- system.file("reporting_scripts", "reportMetaAnalysis.Rmd", package='RCAS')
+  headerFile <- system.file("reporting_scripts", "header.html", package='RCAS')
+  footerFile <- system.file("reporting_scripts", "footer.html", package='RCAS')
+  
+  outFile <- paste0(basename(dbPath), '.RCAS.metaAnalysisReport.html')
+  
+  rmarkdown::render(
+    input = reportFile, 
+    output_dir = outDir,
+    intermediates_dir = outDir,
+    output_file = outFile,
+    output_format = rmarkdown::html_document(
+      toc = TRUE,
+      toc_float = TRUE,
+      theme = 'simplex',
+      number_sections = TRUE,
+      includes = rmarkdown::includes(in_header = headerFile, 
+                                     after_body = footerFile), 
+      self_contained = selfContained
+    ),
+    params = list(dbPath = dbPath,
+                  workdir = outDir),
+    quiet = quiet
+  )
+}
