@@ -78,6 +78,68 @@ summarizeQueryRegionsMulti <- function(queryRegionsList, txdbFeatures, nodeN = 1
   return(t(summaryRaw))
 }
 
+#' getFeatureBoundaryCoverageMulti
+#' 
+#' This function is a wrapper function to run RCAS::getFeatureBoundaryCoverage 
+#' multiple times, which is useful to get coverage signals across different 
+#' kinds of transcript features for a given list of bed files imported as a 
+#' GRangesList object.
+#' 
+#' @param queryRegionsList GRangesList object imported from multiple BED files 
+#'   using \code{importBedFiles} function
+#' @param txdbFeatures List of GRanges objects - outputs of 
+#'   \code{getTxdbFeaturesFromGRanges} and \code{getTxdbFeatures} functions
+#' @param sampleN (default=10000) Positive integer value that is used to 
+#'   randomly down-sample the target feature coordinates to improve the runtime.
+#'   Set to 0 to avoid downsampling.
+#'   
+#' @return A data.frame object with coverage data at three prime and five prime
+#'   boundaries of a list of transcript features
+#' @examples
+#' data(gff)
+#' data(queryRegions)
+#' queryRegionsList <- GRangesList(queryRegions, queryRegions)
+#' names(queryRegionsList) <- c('q1', 'q2')
+#' txdbFeatures <- getTxdbFeaturesFromGRanges(gffData = gff)
+#' getFeatureBoundaryCoverageMulti(queryRegionsList, txdbFeatures, sampleN = 500)
+#' 
+#' @importFrom pbapply pblapply
+#' @export
+getFeatureBoundaryCoverageMulti <- function(bedData, 
+                                            txdbFeatures, 
+                                            sampleN = 10000) {
+  results <- pblapply(X = names(bedData),
+    FUN = function(sampleName) {
+      queryCoords <- bedData[[sampleName]]
+      cvg <- lapply(names(txdbFeatures),
+                    function(featureType) {
+                      featureCoords <- txdbFeatures[[featureType]]
+                      cvgF <- getFeatureBoundaryCoverage(
+                        queryRegions = queryCoords,
+                        featureCoords = featureCoords,
+                        sampleN = sampleN,
+                        boundaryType = 'fiveprime')
+                      
+                      cvgT <- getFeatureBoundaryCoverage(
+                        queryRegions = queryCoords,
+                        featureCoords = featureCoords,
+                        sampleN = sampleN,
+                        boundaryType = 'threeprime')
+                      
+                      cvgF$boundary <- 'fiveprime'
+                      cvgT$boundary <- 'threeprime'
+                      
+                      df <- rbind(cvgF, cvgT)
+                      df$feature <- featureType
+                      return(df)
+                      })
+      cvg <- do.call(rbind, cvg)
+      cvg$sample <- sampleName
+      return(cvg)
+      })
+  return(do.call(rbind, results))
+}
+
 
 #' getIntervalOverlapMatrix
 #' 
