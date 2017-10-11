@@ -148,7 +148,7 @@ p <- plot_ly( data = df,
               )
 layout(p = p, 
        xaxis = list(title = 'features'),
-       yaxis = list(title = paste("percentage of query regions,", 
+       yaxis = list(title = paste("% query,", 
                                   "n =", length(queryRegions)
                                   )
                     ), 
