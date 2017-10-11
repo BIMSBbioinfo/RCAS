@@ -66,7 +66,7 @@ insertTableBedData <- function(conn, projData) {
     message("Reading existing BED data from database")
     bedData <- GenomicRanges::makeGRangesListFromDataFrame(
       df = RSQLite::dbReadTable(conn, 'bedData'), 
-      split.field = 'group_name')
+      split.field = 'sampleName')
     
     #find which samples in projData don't have any data yet
     newSamples <- setdiff(projData$sampleName, names(bedData))
@@ -78,8 +78,10 @@ insertTableBedData <- function(conn, projData) {
       names(newBedData) <- newSamples
       
       message("Appending new interval datasets in 'bedData' table")
+      dt <- as.data.table(newBedData)
+      colnames(dt)[2] <- 'sampleName'
       RSQLite::dbWriteTable(conn = conn, name = 'bedData', 
-                            value = as.data.table(newBedData), 
+                            value = dt, 
                             append = TRUE)
       bedData <- c(bedData, newBedData)
     } 
@@ -90,8 +92,10 @@ insertTableBedData <- function(conn, projData) {
       colnames = c('chrom', 'start', 'end', 'strand'))
     names(bedData) <- projData$sampleName
     message("Saving interval datasets in 'bedData' table")
+    dt <- as.data.table(bedData)
+    colnames(dt)[2] <- 'sampleName'
     RSQLite::dbWriteTable(conn = conn, name = 'bedData', 
-                          value = as.data.table(bedData), 
+                          value = dt, 
                           append = TRUE)
     return(bedData)
   } 
@@ -136,7 +140,7 @@ insertTableFeatureBoundaryCoverageProfiles <- function(conn, bedData, ...) {
   if(RSQLite::dbExistsTable(conn, 'featureBoundaryCoverageProfiles')) {
     cvg <- RSQLite::dbReadTable(conn, 'featureBoundaryCoverageProfiles')
     
-    newSamples <- setdiff(names(bedData), cvg$sample)
+    newSamples <- setdiff(names(bedData), cvg$sampleName)
     if(length(newSamples) > 0) {
       message("Calculating feature boundary coverage profiles for new samples")
       newCvg <- getFeatureBoundaryCoverageMulti(bedData[newSamples], ...)
@@ -182,6 +186,52 @@ insertTableOverlapMatrix <- function(conn, name, bedData, ...) {
                                                               keep.rownames = TRUE), 
                             overwrite = TRUE)
   }
+}
+
+#' deleteSampleDataFromDB
+#' 
+#' Given a list of sample names, the function deletes all datasets calculated
+#' for the given samples from the database.
+#' 
+#' @param dbPath Path to the sqlite database
+#' @param sampleNames The names of the samples for which all relevant datasets
+#'   should be deleted from the database. Tip: Use RSQLite::dbReadTable function
+#'   to read the table 'processedSamples' to see which samples are available in
+#'   the database.
+#' @return SQLiteConnection object with updated contents in the dbPath 
+#' @import RSQLite
+#' @export
+deleteSampleDataFromDB <- function(dbPath, sampleNames) {
+  mydb <- RSQLite::dbConnect(RSQLite::SQLite(), dbPath)
+  tables <- RSQLite::dbListTables(mydb)
+  #exclude gtfData because it is independent from sample names
+  tables <- tables[!tables %in% c('gtfData')]
+  
+  for(tbl in tables) {
+    if(tbl == 'geneOverlaps') {
+      df <- RSQLite::dbReadTable(mydb, tbl)
+      df <- df[,!colnames(df) %in% sampleNames]
+      RSQLite::dbRemoveTable(mydb, 'geneOverlaps')
+      RSQLite::dbWriteTable(mydb, 'geneOverlaps', df, append = TRUE)
+      dfNew <- RSQLite::dbReadTable(mydb, 'geneOverlaps')
+      message("Removing columns '",paste0(sampleNames, 
+                                          collapse = ', '),
+              "' from table ",tbl,
+              "... Columns affected: ",ncol(dfNew)-ncol(df))
+    } else {
+      rs <- RSQLite::dbSendStatement(conn = mydb, 
+                                     statement = paste0(
+                                       'DELETE FROM ',tbl,
+                                       ' WHERE "sampleName" = :s'))
+      RSQLite::dbBind(rs, params = list(s = sampleNames))
+      message("Removing rows '",paste0(sampleNames, 
+                                       collapse = ', '),
+              "' from table ",tbl,
+              "... Rows affected: ",RSQLite::dbGetRowsAffected(rs))
+      dbClearResult(rs)
+    }
+  }
+  return(mydb)
 }
 
 #' createDB
@@ -246,7 +296,7 @@ createDB <- function(dbPath = file.path(getwd(), 'rcasDB.sqlite'),
   RSQLite::dbWriteTable(mydb, 'processedSamples', projData, overwrite = TRUE)
   RSQLite::dbDisconnect(mydb)
   message("Finished preparing the database and disconnected.",
-      "Type",paste0("RSQLite::dbConnect(RSQLite::SQLite(), \'",
-                    dbPath,"\')"),"to reconnect")
+      "\nType",paste0("RSQLite::dbConnect(RSQLite::SQLite(), \'",
+                    dbPath,"\')")," to reconnect")
   return(dbPath)
 } 
