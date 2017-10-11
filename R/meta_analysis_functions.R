@@ -109,8 +109,8 @@ getFeatureBoundaryCoverageMulti <- function(bedData,
                                             txdbFeatures, 
                                             sampleN = 10000) {
   results <- pblapply(X = names(bedData),
-    FUN = function(sampleName) {
-      queryCoords <- bedData[[sampleName]]
+    FUN = function(s) {
+      queryCoords <- bedData[[s]]
       cvg <- lapply(names(txdbFeatures),
                     function(featureType) {
                       featureCoords <- txdbFeatures[[featureType]]
@@ -134,7 +134,7 @@ getFeatureBoundaryCoverageMulti <- function(bedData,
                       return(df)
                       })
       cvg <- do.call(rbind, cvg)
-      cvg$sample <- sampleName
+      cvg$sampleName <- s
       return(cvg)
       })
   return(do.call(rbind, results))
