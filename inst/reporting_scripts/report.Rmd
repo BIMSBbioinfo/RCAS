@@ -118,7 +118,7 @@ targetedGenes <- unique(overlaps$gene_id)
 
 ```
 
-```{r getTxdbFeatures, eval=annotationSummary}
+```{r getTxdbFeatures}
 txdbFeatures <- getTxdbFeaturesFromGRanges(gffData = gff)
 ```
 
@@ -206,7 +206,7 @@ p <- plot_ly(data = df,
 layout(p = p, 
        margin = list(l=100, r=100, b=150), 
        xaxis = list(showticklabels = TRUE,  tickangle = 90), 
-       yaxis = list(title = paste("percentage of query regions,", 
+       yaxis = list(title = paste("% query,", 
                                   "n =", length(queryRegions))),
        font = list(size = 14))
 if(params$printProcessedTables == TRUE) {
@@ -309,73 +309,23 @@ if(length(queryRegionsExt) > 10000) {
 queryRegionsExt[width(queryRegionsExt) < 15] <- GenomicRanges::resize(x = queryRegionsExt[width(queryRegionsExt) < 15], 
                                                                       width = 15, 
                                                                       fix = 'center')
+motifLogos <- getFeatureSpecificMotifLogos(queryRegions = queryRegionsExt, 
+                                           txdbFeatures = txdbFeatures, 
+                                           genomeVersion = params$genomeVersion, 
+                                           motifN = 1, nCores = 2)
 
-motifResults <- runMotifRG(queryRegions = queryRegionsExt, 
-                           genomeVersion = params$genomeVersion, 
-                           motifN = 4)
-motifPWMs <- list()
-
-if (length(motifResults$motifs) > 0) {
-  querySeqs <- extractSequences(queryRegions = queryRegionsExt, 
-                                genomeVersion = params$genomeVersion)
-  querySeqs <- querySeqs[width(querySeqs) > 10,]
-  
-  patterns <- c()
-  for (i in 1:length(motifResults$motifs)) {
-    motifPattern <- motifResults$motifs[[i]]@pattern
-    pwm.match <- refinePWMMotif(motifs = motifResults$motifs[[i]]@match$pattern,
-                                seqs = querySeqs)
-    motifPWMs[[length(motifPWMs)+1]] <- pwm.match
-    patterns <- c(patterns, motifPattern)
-  }
-  names(motifPWMs) <- patterns
-
-  provideMotifSummary <- TRUE
-}
 ```
 
 ```{r motif_analysis_plot_figcap, results='asis', eval=motifAnalysis}
 cat('## Top motifs discovered using motifRG \n')
+cat("**Figure",figureCount,":** Top motifs discovered in the sequences of the query regions\n\n")
 ```
 
-```{r motif_analysis_plot, results='asis', eval=motifAnalysis}
-if (length(motifPWMs) > 0) {
-  cat("**Figure",figureCount,":** Top motifs discovered in the sequences of the query regions\n\n")
-  for (i in 1:length(motifResults$motifs)) {
-    motifPattern <- names(motifPWMs)[i]
-    pwm.match <- motifPWMs[[motifPattern]]
-    cat("**Motif",i,":** Consensus:",motifPattern,"\n")
-    seqLogo(pwm.match$model$prob)
-    cat('\n\n')
-  }
-  figureCount <- figureCount + 1
-} else {
-  cat('**Could not detect any motif enrichment in the given query regions**\n')
-}
+```{r motif_analysis_plot, fig.width=10, fig.height=9, eval=motifAnalysis}
+cowplot::plot_grid(plotlist = motifLogos, ncol = 2, scale = 0.9)
+figureCount <- figureCount + 1
 ```
 
-```{r summarize_stats_tablecap, results='asis', eval=provideMotifSummary}
-cat('## motifRG motif discovery statistics \n')
-cat("**Table",tableCount,":** motifRG motif discovery statistics. fg: foreground; bg: background; hits: number of motif hits; seq: number of sequences with motifs; frac: fraction of sequences that contain the motif compared to the all sequences; ratio: ratio of foreground motif fraction versus background motif fraction\n")
-```
-
-```{r motif_analysis_table, eval=provideMotifSummary}
-summary <- getMotifSummaryTable(motifResults)
-DT::datatable(summary, 
-          extensions = c('Buttons', 'FixedColumns'), 
-          options = list(fixedColumns = TRUE, 
-                         scrollX = TRUE,
-                         dom = 'Bfrtip',
-                         buttons = c('copy', 'print', 'csv','excel', 'pdf')),
-          filter = 'bottom'
-          )
-
-if(params$printProcessedTables == TRUE) {
-  write.table(x = summary, file=paste0('Table',tableCount,'.motif_analysis_table.data.tsv'), quote = FALSE, sep = '\t', row.names = TRUE)
-} 
-
-tableCount <- tableCount + 1
-```
 
 ```{r GO_section_header, results='asis', eval=goAnalysis}
 cat("# GO Term Analysis Results\n")
