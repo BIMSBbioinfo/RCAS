@@ -267,17 +267,17 @@ createOrthologousGeneSetList <- function(referenceGeneSetList,
   # biomaRt to get ortholog data from Ensembl
   refMart <- getBioMartConnection (genomeVersion = refGenomeVersion)
   targetMart <- getBioMartConnection (genomeVersion = targetGenomeVersion)
-  message('Created the database connections to biomart for',
-      refGenomeVersion, 'and', targetGenomeVersion,'\n')
+  message('Created the database connections to biomart for ',
+      refGenomeVersion, ' and ', targetGenomeVersion)
 
   #retrieve orthologs lists for all human genes found in the MSIGDB gene sets
   orthologs <- retrieveOrthologs(mart1 = refMart, mart2 = targetMart, refGenes)
   message('Retrieved', nrow(orthologs),
-      'orthologous relations between',
+      ' orthologous relations between ',
       length(unique(orthologs[,1])),
-      "genes from", refGenomeVersion,
-      'and', length(unique(orthologs[,2])),
-      "genes from", targetGenomeVersion,"\n")
+      " genes from ", refGenomeVersion,
+      ' and ', length(unique(orthologs[,2])),
+      " genes from ", targetGenomeVersion)
 
   orthGeneSetList <- list()
   for (i in 1:length(referenceGeneSetList)){
