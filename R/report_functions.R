@@ -47,7 +47,7 @@ importGtf <- function (filePath,  saveObjectAsRds = TRUE, readFromRds = TRUE,
   rdsFilePath <- paste0(filePath, ".granges.rds")
 
   if (readFromRds == TRUE && file.exists(rdsFilePath)){
-    message('Reading existing granges.rds object from',rdsFilePath)
+    message('Reading existing granges.rds object from ',rdsFilePath)
     gff <- readRDS(rdsFilePath)
   } else {
     message('importing gtf file from', filePath)
@@ -114,7 +114,7 @@ importBed <- function (filePath, sampleN = 0, keepStandardChr = TRUE, debug = TR
   if (file.exists(filePath)) {
     data = rtracklayer::import.bed(filePath, ...)
     if(debug == TRUE) {
-      message('Processing',filePath)
+      message('Processing ',filePath)
     }
     if (keepStandardChr == TRUE) {
       GenomeInfoDb::seqlevelsStyle(data) <- 'UCSC'
@@ -126,7 +126,7 @@ importBed <- function (filePath, sampleN = 0, keepStandardChr = TRUE, debug = TR
 
     if (sampleN > 0 && sampleN < length(data)) {
       if(debug == TRUE) {
-        cat ('Downsampling intervals to size:',sampleN,'\n')
+        message ('Downsampling intervals to size:',sampleN)
       }
       data <- data[sample(x = 1:length(data), size = sampleN)]
     }
