@@ -284,3 +284,63 @@ getFeatureSpecificMotifLogos <- function(queryRegions, txdbFeatures, ...) {
   })
   return(logos)
 }
+
+#' discoverFeatureSpecificMotifs
+#' 
+#' This function groups query regions based on their overlap with different
+#' transcript features and generates a table of top enriched motif and matching
+#' patterns for each given transcript feature type along with some other motif 
+#' discovery related statistics.
+#' 
+#' @param queryRegions GRanges object containing coordinates of input query
+#'   regions imported by the \code{\link{importBed}} function
+#' @param txdbFeatures A list of GRanges objects where each GRanges object
+#'   corresponds to the genomic coordinates of gene features such as promoters,
+#'   introns, exons, 5'/3' UTRs and whole transcripts.
+#'   This list of GRanges objects are obtained by the function
+#'   \code{\link{getTxdbFeaturesFromGRanges}} or \code{\link{getTxdbFeatures}}.
+#' @param ... Other arguments passed to \code{\link{runMotifRG}} function.
+#'   Important arguments are 'genomeVersion' and motifN. If motifN is bigger
+#'   than 1, then multiple motifs will be found but only the top motif will be
+#'   plotted.
+#' @examples
+#' \dontrun{
+#' data(gff)
+#' data(queryRegions)
+#' txdbFeatures <- getTxdbFeaturesFromGRanges(gffData = gff)
+#' discoverFeatureSpecificMotifs(queryRegions = queryRegions, 
+#' genomeVersion = 'hg19', txdbFeatures = txdbFeatures, 
+#' motifN = 1, nCores = 1)}
+#' 
+#' @return A data.frame object  
+#' @export 
+discoverFeatureSpecificMotifs <- function(queryRegions, txdbFeatures, ...) {
+  results <- do.call(rbind, lapply(names(txdbFeatures), function(f) {
+    message("Looking for motifs in feature:",f)
+    featureCoords <- txdbFeatures[[f]]
+    #find query regions that overlap the target features
+    q <- queryRegions[unique(queryHits(findOverlaps(queryRegions, featureCoords)))]
+    motifResults <- runMotifRG(queryRegions = q, ...)
+    if(length(motifResults$motifs) > 0) {
+      motifStats <- subset(getMotifSummaryTable(motifResults)[1,], 
+                           select = c('patterns', 'fgSeq', 'fgFrac', 'bgFrac'))
+      motifStats$fgSeqTotal <- length(q)
+      motifStats$matches <- paste0(motifResults$motifs[[1]]@match$pattern, 
+                                   collapse = ';')
+      motifStats$feature <- f
+      return(motifStats)
+    } else {
+      #notice that this must be in line with the select statement
+      #from getMotifSummaryTable function's output
+      motifStats <- data.frame('patterns' = 'None', 
+                               'fgSeq' = 0, 
+                               'fgFrac' = 0,
+                               'bgFrac' = 0,
+                               'fgSeqTotal' = length(q),
+                               'matches' = 'None',
+                               'feature' = f)
+      return(motifStats)
+    }
+  }))
+  return(results)
+}
