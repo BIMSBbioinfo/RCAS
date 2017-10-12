@@ -4,20 +4,29 @@
 \alias{runMotifRG}
 \title{runMotifRG}
 \usage{
-runMotifRG(queryRegions, genomeVersion, motifN = 5, nCores = 4)
+runMotifRG(queryRegions, resizeN = 0, sampleN = 0, genomeVersion,
+  motifN = 5, nCores = 4)
 }
 \arguments{
-\item{queryRegions}{GRanges object containing coordinates of input query
+\item{queryRegions}{GRanges object containing coordinates of input query 
 regions imported by the \code{\link{importBed}} function}
 
-\item{genomeVersion}{A character string to denote the BS genome library
-required to extract sequences. Available options are hg19, mm9, ce10 and
+\item{resizeN}{Integer value (default: 0) to resize query regions if they are
+shorter than the value of \code{resize}. Set to 0 to disable resize.}
+
+\item{sampleN}{A positive integer value. The queryRegions are randomly 
+downsampled to include intervals as many as \code{sampleN}. The input will
+be downsampled only if this value is larger than zero and less than the
+total number of input intervals.}
+
+\item{genomeVersion}{A character string to denote the BS genome library 
+required to extract sequences. Available options are hg19, mm9, ce10 and 
 dm3.}
 
-\item{motifN}{A positive integer (default:5) denoting the maximum number of
+\item{motifN}{A positive integer (default:5) denoting the maximum number of 
 motifs that should be sought by the \code{motifRG::findMotifFgBg} function}
 
-\item{nCores}{A positive integer (default:4) number of cores used for
+\item{nCores}{A positive integer (default:4) number of cores used for 
 parallel execution.}
 }
 \value{
@@ -30,6 +39,7 @@ discovery from input query regions
 \examples{
 data(queryRegions)
 motifResults <- runMotifRG(queryRegions = queryRegions,
+                           resize = 15,
                            genomeVersion = 'hg19',
                            motifN = 1,
                            nCores = 2)

@@ -106,26 +106,51 @@ extractSequences <- function (queryRegions, genomeVersion) {
 #' This function makes use of \code{motifRG} library to carry out de novo motif
 #' discovery from input query regions
 #'
-#' @param queryRegions GRanges object containing coordinates of input query
+#' @param queryRegions GRanges object containing coordinates of input query 
 #'   regions imported by the \code{\link{importBed}} function
-#' @param genomeVersion A character string to denote the BS genome library
-#'   required to extract sequences. Available options are hg19, mm9, ce10 and
+#' @param resizeN Integer value (default: 0) to resize query regions if they are
+#'   shorter than the value of \code{resize}. Set to 0 to disable resize.
+#' @param sampleN A positive integer value. The queryRegions are randomly 
+#'   downsampled to include intervals as many as \code{sampleN}. The input will
+#'   be downsampled only if this value is larger than zero and less than the
+#'   total number of input intervals.
+#' @param genomeVersion A character string to denote the BS genome library 
+#'   required to extract sequences. Available options are hg19, mm9, ce10 and 
 #'   dm3.
-#' @param motifN A positive integer (default:5) denoting the maximum number of
+#' @param motifN A positive integer (default:5) denoting the maximum number of 
 #'   motifs that should be sought by the \code{motifRG::findMotifFgBg} function
-#' @param nCores A positive integer (default:4) number of cores used for
+#' @param nCores A positive integer (default:4) number of cores used for 
 #'   parallel execution.
 #' @return a list of objects returned by the \code{motifRG::findMotif} function
 #' @examples
 #' data(queryRegions)
 #' motifResults <- runMotifRG(queryRegions = queryRegions,
+#'                            resize = 15,
 #'                            genomeVersion = 'hg19',
 #'                            motifN = 1,
 #'                            nCores = 2)
 #' @import motifRG
 #' @export
-runMotifRG <- function (queryRegions, genomeVersion, motifN = 5, nCores = 4) {
+runMotifRG <- function (queryRegions, resizeN = 0, 
+                        sampleN = 0, genomeVersion, 
+                        motifN = 5, nCores = 4) {
 
+  if(sampleN > 0 && length(queryRegions) > sampleN) {
+    message("Randomly sampling query regions for motif analysis. 
+            Downsampling to ",sampleN," regions")
+    queryRegions <- sample(queryRegions, sampleN)
+  } 
+  
+  if(resizeN > 0) {
+    resizeIntervals <- width(queryRegions) < resizeN
+    message("Found ",sum(resizeIntervals)," query regions shorter than ", 
+            resizeN, " bps. Resizing those regions to ",resizeN,' bps')
+    queryRegions[resizeIntervals] <- GenomicRanges::resize(
+      x = queryRegions[resizeIntervals], 
+      width = 15, 
+      fix = 'center')
+  }
+  
   controlRegions <- createControlRegions(queryRegions)
 
   message('extracting peak sequences from fasta..\n')
@@ -214,7 +239,10 @@ getMotifSummaryTable <- function(motifResults){
 #'   introns, exons, 5'/3' UTRs and whole transcripts.
 #'   This list of GRanges objects are obtained by the function
 #'   \code{\link{getTxdbFeaturesFromGRanges}} or \code{\link{getTxdbFeatures}}.
-#' @param ... Other arguments passed to \code{\link{runMotifRG}} function. 
+#' @param ... Other arguments passed to \code{\link{runMotifRG}} function.
+#'   Important arguments are 'genomeVersion' and motifN. If motifN is bigger
+#'   than 1, then multiple motifs will be found but only the top motif will be
+#'   plotted.
 #' @examples
 #' \dontrun{
 #' data(gff)
@@ -222,7 +250,7 @@ getMotifSummaryTable <- function(motifResults){
 #' txdbFeatures <- getTxdbFeaturesFromGRanges(gffData = gff)
 #' getFeatureSpecificMotifLogos(queryRegions = queryRegions, 
 #' genomeVersion = 'hg19', txdbFeatures = txdbFeatures, 
-#' motifN = 1, nCores = 1)
+#' motifN = 1, nCores = 1)}
 #' 
 #' @return A list of ggplot2/ggseqlogo objects 
 #' @import ggplot2
@@ -239,18 +267,17 @@ getFeatureSpecificMotifLogos <- function(queryRegions, txdbFeatures, ...) {
       matches <- motifResults$motifs[[1]]@match$pattern
       uniqueSeqs <- length(unique(motifResults$motifs[[1]]@match$seq.id))
       p <- ggplot2::ggplot() + ggseqlogo::geom_logo(data = matches) + 
+        theme_logo() + 
         labs(x = paste0(f,"\n% of sequences (n=",length(q),") with motif: ",
-                        round(uniqueSeqs/length(q) * 100, 2),"%")) + 
-        theme_logo(base_size = 14) 
+                        round(uniqueSeqs/length(q) * 100, 2),"%")) 
       return(p)
     } else {
       p <- ggplot(data.frame()) + 
         geom_point() +  
-        theme_logo(base_size = 14) + 
+        theme_logo() + 
         annotate(geom = 'text', 
-                 x = 5, y = 5, 
-                 label = 'No Motifs', 
-                 size = 12) + 
+                 x = 1, y = 1, 
+                 label = 'No Motifs Found') + 
         labs(x = paste0(f, "\nn=",length(q)))
       return(p)
     }
