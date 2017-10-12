@@ -16,7 +16,10 @@ introns, exons, 5'/3' UTRs and whole transcripts.
 This list of GRanges objects are obtained by the function
 \code{\link{getTxdbFeaturesFromGRanges}} or \code{\link{getTxdbFeatures}}.}
 
-\item{...}{Other arguments passed to \code{\link{runMotifRG}} function.}
+\item{...}{Other arguments passed to \code{\link{runMotifRG}} function.
+Important arguments are 'genomeVersion' and motifN. If motifN is bigger
+than 1, then multiple motifs will be found but only the top motif will be
+plotted.}
 }
 \value{
 A list of ggplot2/ggseqlogo objects
@@ -24,4 +27,14 @@ A list of ggplot2/ggseqlogo objects
 \description{
 This function groups query regions based on their overlap with different transcript features
 and generates a logo of the top enriched motif for each given transcript feature type.
+}
+\examples{
+\dontrun{
+data(gff)
+data(queryRegions)
+txdbFeatures <- getTxdbFeaturesFromGRanges(gffData = gff)
+getFeatureSpecificMotifLogos(queryRegions = queryRegions, 
+genomeVersion = 'hg19', txdbFeatures = txdbFeatures, 
+motifN = 1, nCores = 1)}
+
 }
