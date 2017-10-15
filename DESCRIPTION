@@ -36,9 +36,13 @@ LazyData: TRUE
 Depends: R (>= 3.3.0),
     plotly (>= 4.5.2),
     DT (>= 0.2),
+    DBI, 
+    pheatmap,
+    cowplot,
+    ggplot2,
     data.table,
     topGO,
-    motifRG,
+    motifRG
 Imports:
     biomaRt,
     AnnotationDbi,
