@@ -1,9 +1,9 @@
 ---
 title: "The RNA Centric Analysis System Report"
 author: "Bora Uyar, Dilmurat Yusuf, Ricardo Wurmus, Altuna Akalin"
-date: "`r Sys.time()`"
-params: 
-  dbPath: 'RCAS.sqlite'
+date: '`r Sys.time()`'
+params:
+  dbPath: './hg19.test.sqlite'
   workdir: '.'
 ---
 
@@ -13,36 +13,132 @@ knitr::opts_knit$set(progress = FALSE, root.dir = params$workdir)
 ```
 
 ```{r setup}
-library(RCAS)
-library(DBI)
-library(ggplot2)
-library(pheatmap)
+suppressWarnings(suppressMessages(library(RCAS)))
 mydb <- RSQLite::dbConnect(RSQLite::SQLite(), params$dbPath)
+motifFigureHeight <- 1
 ```
+
+```{r showDBcontent}
+message(paste0(RSQLite::dbListTables(mydb), sep = '\n'))
+```
+
 # How similar are these samples based on the gene overlap matrix?
 
-```{r gene_overlaps}
-geneOverlaps <- dbReadTable(mydb, 'geneOverlaps')
+```{r gene_overlaps, eval = TRUE}
+geneOverlaps <- RSQLite::dbReadTable(mydb, 'geneOverlaps')
 
 SM <- as.matrix(proxy::dist(x = as.matrix(geneOverlaps[,c(-1)]), method = 'Jaccard', by_rows = FALSE, diag = TRUE, upper = TRUE))
 pheatmap(SM, display_numbers = FALSE)
 ```
 
-
 # how similar are these samples based on their distribution at different transcript features? 
-```{r annotation_summaries}
-AS <- dbReadTable(mydb, 'annotationSummaries')
+
+```{r annotation_summaries, eval = TRUE}
+AS <-  RSQLite::dbReadTable(mydb, 'annotationSummaries')
 annotationSummaries <- as.matrix(AS[,c(-1)])
 rownames(annotationSummaries) <- AS$sampleName
 pheatmap(annotationSummaries, scale = 'row')
 ```
 
+# Motif Discovery 
 
-```{r coverage_profiles}
-cvg <- dbReadTable(mydb, 'featureBoundaryCoverageProfiles')
-cvg$sampleGroup <- stringi::stri_extract(cvg$sample, regex = '^.{4}')
-p <- ggplot(cvg, aes(x = bases, y = meanCoverage)) + geom_line(aes(colour = sampleGroup), fill = FALSE) + facet_grid(feature ~ boundary) + geom_vline(xintercept = 0)
-plotly::ggplotly(p)
+```{r motif_logos_prepare, eval = TRUE}
+motifData <- RSQLite::dbReadTable(mydb, 'discoveredMotifs') 
+#featuresToPlot <- unique(motifData$feature)
+featuresToPlot <- c('transcripts', 'promoters', 'fiveUTRs', 'threeUTRs', 'introns', 'cds')
+samplesToPlot <- sort(unique(motifData$sampleName))
+motifLogos <- lapply(X = samplesToPlot,
+       FUN = function(s) {
+         logos <- lapply(featuresToPlot, function(f) {
+           matches <- motifData[motifData$sampleName == s &
+                                  motifData$feature == f,]$matches
+           matches <- unlist(Biostrings::strsplit(matches, ';'))
+           p <- ggplot2::ggplot() + 
+             ggseqlogo::geom_logo(data = matches,
+                                  namespace = c('A', 'C', 'G', 'T', 'N', 'O','E'), 
+                                  method = 'bits') +
+             coord_fixed() + 
+             ggseqlogo::theme_logo() %+replace%
+             theme(axis.text.x = element_blank(), 
+                   axis.text.y = element_blank(), 
+                   axis.title.y = element_blank()) + 
+             labs(x = f)
+          return(p)}
+          )
+       return(cowplot::plot_grid(plotlist = logos, nrow = 1))
+       })
+```
+
+
+```{r motif_logos_plot, eval = TRUE, fig.width=10, fig.height=length(samplesToPlot)*1.3}
+#try to reserve 1.3 inches per each sample (for each sample there is one row of motifs and the height is dynamically adjusted 
+# as "number of samples multiplied by the height needed for one sample")
+
+p <- cowplot::plot_grid(plotlist = motifLogos, nrow = length(samplesToPlot), ncol = 1, labels = samplesToPlot, scale = 1)
+print(p)
+```
+
+# Feature Boundary Coverage Profiles
+
+## Smoothed line plots 
+
+```{r coverage_profiles, eval = TRUE, fig.width=8, fig.height=10}
+cvg <-  RSQLite::dbReadTable(mydb, 'featureBoundaryCoverageProfiles')
+cvg$sampleGroup <- stringi::stri_extract(cvg$sampleName, regex = '^.{4}')
+
+
+#scale meanCoverage values by sampleName and feature
+cvgScaled <- do.call(rbind, 
+                     lapply(split(cvg, cvg$sampleName),
+                            FUN = function(df) {
+                              df$scaledCoverage <- scale(df$meanCoverage)
+                              return(df)
+                              }))
+
+p <- plotly::ggplotly(ggplot2::ggplot(cvgScaled, aes(x = bases, y = scaledCoverage)) + 
+                        geom_vline(xintercept = 0, color = 'gray') +
+                        facet_grid(feature ~ boundary) + 
+                        geom_smooth(aes(color = sampleGroup, alpha = scaledCoverage)) + theme_minimal())
+layout(p)
+```
+
+
+```{r pca_coverageProfilesTabSet}
+plotPCA <- function(cv, title = '') {
+  cvM <- dcast(cv, sampleName ~ boundary + bases, value.var = 'meanCoverage')
+  M <- as.matrix(cvM[,-1])
+  rownames(M) <- cvM[,1]
+  pca1 <- prcomp(M, center = T, scale. = T)
+  scores = as.data.frame(pca1$x)
+  scores$sampleName <- cv[match(rownames(scores), cv$sampleName),]$sampleName
+  scores$sampleGroup <- cv[match(rownames(scores), cv$sampleName),]$sampleGroup
+
+  p <- ggplot2::ggplot(data = scores, aes(x = PC1, y = PC2, label = sampleName)) +
+    geom_point(aes(color = sampleGroup, shape = sampleGroup), size = 4) +
+    geom_hline(yintercept = 0, colour = "gray65") +
+    geom_vline(xintercept = 0, colour = "gray65") +
+    labs(title = title) + theme_minimal(base_size = 18) %+replace% 
+    theme(legend.position = 'bottom', legend.title = element_blank())
+  return(p)
+}
+
+pcaPlots <- lapply(unique(cvg$feature), function(f) {
+  plotPCA(cv = cvg[cvg$feature == f,], title = f)
+})
+names(pcaPlots) <- unique(cvg$feature)
+```
+
+## PCA plots of Samples by Feature Boundary Coverage Profiles  {.tabset}
+```{r, results='asis', echo = FALSE}
+for (i in 1:length(pcaPlots)) {
+  cat("### ",names(pcaPlots)[i],"\n")
+  print(pcaPlots[[i]])
+  cat('\n\n')
+}
+```
+
+```{r exit}
+RSQLite::dbDisconnect(mydb)
 ```
 
 # Acknowledgements
