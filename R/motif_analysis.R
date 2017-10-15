@@ -332,12 +332,13 @@ discoverFeatureSpecificMotifs <- function(queryRegions, txdbFeatures, ...) {
     } else {
       #notice that this must be in line with the select statement
       #from getMotifSummaryTable function's output
-      motifStats <- data.frame('patterns' = 'None', 
+      motifStats <- data.frame('patterns' = 'NONE', 
                                'fgSeq' = 0, 
                                'fgFrac' = 0,
                                'bgFrac' = 0,
                                'fgSeqTotal' = length(q),
-                               'matches' = 'None',
+                               'matches' = paste0(rep('NONE', 5), 
+                                                  collapse = ';'),
                                'feature' = f)
       return(motifStats)
     }

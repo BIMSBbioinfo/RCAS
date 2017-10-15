@@ -5,7 +5,7 @@
 \title{createDB}
 \usage{
 createDB(dbPath = file.path(getwd(), "rcasDB.sqlite"), projDataFile,
-  gtfFilePath, update = FALSE, nodeN = 1)
+  gtfFilePath = "", update = FALSE, genomeVersion = "hg19", nodeN = 1)
 }
 \arguments{
 \item{dbPath}{Path to the sqlite database file (could be an existing file or 
@@ -21,6 +21,10 @@ Ensembl database) that contains genome annotations}
 
 \item{update}{TRUE/FALSE (default: FALSE) whether an existing database 
 should be updated}
+
+\item{genomeVersion}{A character string to denote for which genome version 
+the analysis is being done. Available options are hg19/hg38 (human), mm9/mm10 
+(mouse), ce10 (worm) and dm3 (fly).}
 
 \item{nodeN}{Number of cpus to use for parallel processing (default: 1)}
 }
