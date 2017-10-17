@@ -116,7 +116,7 @@ based on how many genes the compared pair of samples co-overlap. \n")
 ```
 
 ```{r geneOverlaps, eval = evalGeneOverlaps}
-SM <- as.matrix(proxy::dist(x = as.matrix(geneOverlaps[,c(-1)]), method = 'Jaccard', by_rows = FALSE, diag = TRUE, upper = TRUE))
+SM <- as.matrix(proxy::dist(x = as.matrix(geneOverlaps), method = 'Jaccard', by_rows = FALSE, diag = TRUE, upper = TRUE))
 pheatmap(SM, display_numbers = FALSE)
 figureCount <- figureCount + 1
 ```
