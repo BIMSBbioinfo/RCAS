@@ -203,6 +203,7 @@ getIntervalOverlapMatrix <- function(queryRegionsList, targetRegions, targetRegi
 #' @export
 runReportMetaAnalysis <- function(reportFile, 
                                   dbPath = 'RCAS.sqlite',
+                                  sampleTablePath,
                                   outDir = getwd(),
                                   quiet = FALSE,
                                   selfContained = TRUE) {
@@ -228,6 +229,7 @@ runReportMetaAnalysis <- function(reportFile,
       self_contained = selfContained
     ),
     params = list(dbPath = dbPath,
+                  sampleTablePath = sampleTablePath,
                   workdir = outDir),
     quiet = quiet
   )
