@@ -39,7 +39,7 @@ if(RSQLite::dbExistsTable(mydb, 'geneOverlaps')){
   geneOverlaps <- RSQLite::dbReadTable(mydb, 'geneOverlaps')
   samplesNotFound <- setdiff(sampleTable$sampleName, colnames(geneOverlaps))
   if(length(samplesNotFound) > 0){
-    warning("Samples with names '",samplesNotFound,
+    warning("Samples with names '",paste0(samplesNotFound, collapse = ', '),
             "' do not exist in 'geneOverlaps' table. Skipping this table")
     } else {
       evalGeneOverlaps <- TRUE
@@ -56,7 +56,7 @@ if(RSQLite::dbExistsTable(mydb, 'annotationSummaries')){
   samplesNotFound <- setdiff(sampleTable$sampleName, rownames(annotationSummaries))
   
   if(length(samplesNotFound) > 0) {
-    warning("Samples with names '",samplesNotFound,
+    warning("Samples with names '",paste0(samplesNotFound, collapse = ', '),
           "' do not exist in 'annotationSummaries' table. Skipping this table")
     } else {
       evalAnnotationSummaries <- TRUE
@@ -70,7 +70,7 @@ if(RSQLite::dbExistsTable(mydb, 'discoveredMotifs')) {
   motifData <- RSQLite::dbReadTable(mydb, 'discoveredMotifs')
   samplesNotFound <- setdiff(sampleTable$sampleName, motifData$sampleName)
   if(length(samplesNotFound) > 0) {
-    warning("Samples with names '",samplesNotFound,
+    warning("Samples with names '",paste0(samplesNotFound, collapse = ', '),
             "' do not exist in 'discoveredMotifs' table. Skipping this table")
     } else {
       evalMotifDiscovery <- TRUE
@@ -84,7 +84,7 @@ if(RSQLite::dbExistsTable(mydb, 'featureBoundaryCoverageProfiles')) {
   cvg <-  RSQLite::dbReadTable(mydb, 'featureBoundaryCoverageProfiles')
   samplesNotFound <- setdiff(sampleTable$sampleName, cvg$sampleName)
   if(length(samplesNotFound) > 0) {
-    warning("Samples with names '",samplesNotFound,
+    warning("Samples with names '",paste0(samplesNotFound, collapse = ', '),
             "' do not exist in 'featureBoundaryCoverageProfiles' table. Skipping this table")
     } else {
       evalCoverageProfiles <- TRUE
@@ -214,7 +214,7 @@ plotPCA <- function(cv, title = '') {
   scores$sampleGroup <- cv[match(rownames(scores), cv$sampleName),]$sampleGroup
 
   p <- ggplot2::ggplot(data = scores, aes(x = PC1, y = PC2, label = sampleName)) +
-    geom_point(aes(color = sampleGroup, shape = sampleGroup), size = 4) +
+    geom_point(aes(color = sampleGroup), size = 4) +
     geom_hline(yintercept = 0, colour = "gray65") +
     geom_vline(xintercept = 0, colour = "gray65") +
     labs(title = title) + theme_minimal(base_size = 18) %+replace% 
