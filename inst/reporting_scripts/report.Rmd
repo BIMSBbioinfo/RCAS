@@ -296,33 +296,44 @@ cat('# motifRG analysis results \n')
 ```
 
 ```{r motif_analysis, results='hide', eval=motifAnalysis}
-#downsample the query regions to 10000 intervals for motif analysis
-#as we don't need the complete set of intervals for motif discovery
-#and the motif discovery part is a bottleneck for run time.
-queryRegionsExt <- queryRegions
+message("Started motif discovery module...")
+motifData <- discoverFeatureSpecificMotifs(
+  queryRegions = queryRegions,
+  txdbFeatures = txdbFeatures, 
+  resizeN = 15, 
+  sampleN = 10000,
+  genomeVersion = 'hg19', #replcae this with params$genomeVersion
+  motifN = 1, 
+  nCores = 2)
 
-if(length(queryRegionsExt) > 10000) {
-  queryRegionsExt <- queryRegionsExt[sample(x = 1:length(queryRegionsExt), size = 10000)]
-}
-
-#extend the queryRegions if shorter than 15 bp otherwise, motif analysis is not possible for such short segments
-queryRegionsExt[width(queryRegionsExt) < 15] <- GenomicRanges::resize(x = queryRegionsExt[width(queryRegionsExt) < 15], 
-                                                                      width = 15, 
-                                                                      fix = 'center')
-motifLogos <- getFeatureSpecificMotifLogos(queryRegions = queryRegionsExt, 
-                                           txdbFeatures = txdbFeatures, 
-                                           genomeVersion = params$genomeVersion, 
-                                           motifN = 1, nCores = 2)
-
+featuresToPlot <- unique(motifData$feature)
+motifLogos <- lapply(featuresToPlot, function(f) {
+           matches <- motifData[motifData$feature == f,]$matches
+           matches <- unlist(Biostrings::strsplit(matches, ';'))
+           #number of sequences in which a motif was searched for
+           fgSeqTotal <- motifData[motifData$feature == f,]$fgSeqTotal
+           #fraction of sequences with the motif
+           fgFrac <- motifData[motifData$feature == 'transcripts',]$fgFrac
+           p <- ggplot2::ggplot() + 
+             ggseqlogo::geom_logo(data = matches,
+                                  namespace = c('A', 'C', 'G', 'T', 'N', 'O','E'), #N, O, E ar
+                                  method = 'bits') +
+             coord_fixed() + 
+             ggseqlogo::theme_logo() +
+             labs(x = paste0(f,"\n% of sequences (n=",fgSeqTotal,") with motif: ",
+                        round(fgFrac * 100, 2),"%")) 
+          return(p)}
+          )
+names(motifLogos) <- featuresToPlot
 ```
 
 ```{r motif_analysis_plot_figcap, results='asis', eval=motifAnalysis}
-cat('## Top motifs discovered using motifRG \n')
-cat("**Figure",figureCount,":** Top motifs discovered in the sequences of the query regions\n\n")
-```
-
-```{r motif_analysis_plot, fig.width=10, fig.height=9, eval=motifAnalysis}
-cowplot::plot_grid(plotlist = motifLogos, ncol = 2, scale = 0.9)
+cat('## Top motifs discovered in the sequences of the query regions {.tabset}\n')
+for (i in 1:length(motifLogos)) {
+  cat("### ",names(motifLogos)[i],"\n")
+  print(motifLogos[[i]])
+  cat('\n\n')
+}
 figureCount <- figureCount + 1
 ```
 

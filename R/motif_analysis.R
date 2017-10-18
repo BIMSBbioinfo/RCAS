@@ -227,64 +227,6 @@ getMotifSummaryTable <- function(motifResults){
 }
 
 
-#' getFeatureSpecificMotifLogos
-#' 
-#' This function groups query regions based on their overlap with different transcript features
-#' and generates a logo of the top enriched motif for each given transcript feature type. 
-#' 
-#' @param queryRegions GRanges object containing coordinates of input query
-#'   regions imported by the \code{\link{importBed}} function
-#' @param txdbFeatures A list of GRanges objects where each GRanges object
-#'   corresponds to the genomic coordinates of gene features such as promoters,
-#'   introns, exons, 5'/3' UTRs and whole transcripts.
-#'   This list of GRanges objects are obtained by the function
-#'   \code{\link{getTxdbFeaturesFromGRanges}} or \code{\link{getTxdbFeatures}}.
-#' @param ... Other arguments passed to \code{\link{runMotifRG}} function.
-#'   Important arguments are 'genomeVersion' and motifN. If motifN is bigger
-#'   than 1, then multiple motifs will be found but only the top motif will be
-#'   plotted.
-#' @examples
-#' \dontrun{
-#' data(gff)
-#' data(queryRegions)
-#' txdbFeatures <- getTxdbFeaturesFromGRanges(gffData = gff)
-#' getFeatureSpecificMotifLogos(queryRegions = queryRegions, 
-#' genomeVersion = 'hg19', txdbFeatures = txdbFeatures, 
-#' motifN = 1, nCores = 1)}
-#' 
-#' @return A list of ggplot2/ggseqlogo objects 
-#' @import ggplot2
-#' @import ggseqlogo 
-#' @export 
-getFeatureSpecificMotifLogos <- function(queryRegions, txdbFeatures, ...) {
-  logos <- lapply(names(txdbFeatures), function(f) {
-    message("Looking for motifs in feature:",f)
-    featureCoords <- txdbFeatures[[f]]
-    #find query regions that overlap the target features
-    q <- queryRegions[unique(queryHits(findOverlaps(queryRegions, featureCoords)))]
-    motifResults <-  runMotifRG(queryRegions = q, ...)
-    if(length(motifResults$motifs) > 0) {
-      matches <- motifResults$motifs[[1]]@match$pattern
-      uniqueSeqs <- length(unique(motifResults$motifs[[1]]@match$seq.id))
-      p <- ggplot2::ggplot() + ggseqlogo::geom_logo(data = matches) + 
-        theme_logo() + 
-        labs(x = paste0(f,"\n% of sequences (n=",length(q),") with motif: ",
-                        round(uniqueSeqs/length(q) * 100, 2),"%")) 
-      return(p)
-    } else {
-      p <- ggplot(data.frame()) + 
-        geom_point() +  
-        theme_logo() + 
-        annotate(geom = 'text', 
-                 x = 1, y = 1, 
-                 label = 'No Motifs Found') + 
-        labs(x = paste0(f, "\nn=",length(q)))
-      return(p)
-    }
-  })
-  return(logos)
-}
-
 #' discoverFeatureSpecificMotifs
 #' 
 #' This function groups query regions based on their overlap with different
