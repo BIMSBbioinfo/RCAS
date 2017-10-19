@@ -344,6 +344,12 @@ deleteSampleDataFromDB <- function(dbPath, sampleNames) {
 #' @param genomeVersion  A character string to denote for which genome version 
 #'   the analysis is being done. Available options are hg19/hg38 (human), mm9/mm10 
 #'   (mouse), ce10 (worm) and dm3 (fly).
+#' @param annotationSummary TRUE/FALSE (default:TRUE) whether annotation summary
+#' module should be run
+#' @param coverageProfiles TRUE/FALSE (default: TRUE) whether coverage profiles
+#' module should be run
+#' @param motifAnalysis TRUE/FALSE (default: TRUE) whether motif discovery module
+#' should be run 
 #' @param nodeN Number of cpus to use for parallel processing (default: 1)
 #' @return Path to an SQLiteConnection object created by RSQLite package
 #' @importFrom RSQLite dbConnect
@@ -352,10 +358,52 @@ deleteSampleDataFromDB <- function(dbPath, sampleNames) {
 #' @importFrom RSQLite SQLite
 #' @importFrom data.table as.data.table
 #' @importFrom proxy dist
+#' @examples 
+#' FUS_path <- system.file("extdata", "FUS_Nakaya2013c_hg19.bed",
+#' package='RCAS') 
+#' 
+#' FMR1_path <- system.file("extdata",
+#' "FMR1_Ascano2012a_hg19.bed", package='RCAS') 
+#' 
+#' projData <- data.frame('sampleName' = c('FUS', 'FMR1'), 
+#' 'bedFilePath' = c(FUS_path,FMR1_path), stringsAsFactors = FALSE)
+#'  
+#' write.table(projData, 'myProjDataFile.tsv', sep = '\t', quote =FALSE, 
+#' row.names = FALSE) 
+#' 
+#' \dontrun{
+#' #To create a new database 
+#' createDB(dbPath = 'hg19.RCASDB.sqlite', 
+#' projDataFile = './myProjDataFile.tsv', 
+#' #download GTF file from ENSEMBL for build hg19 (Ensemblv75)
+#' #and provide path to this file for the argument gtfFilePath
+#' gtfFilePath = './Ensemble.human.v75.gtf',  
+#' genomeVersion = 'hg19')
+#' 
+#' # To update an existing database with additional data
+#' createDB(dbPath = 'hg19.RCASDB.sqlite', 
+#' projDataFile = './myProjDataFile.tsv', 
+#' #GTF file is no longer needed if the existing DB has processed GTF data  
+#' gtfFilePath = './Ensemble.human.v75.gtf', 
+#' update = TRUE, 
+#' genomeVersion = 'hg19')
+#' }
+#' 
+#' 
 #' @export
 createDB <- function(dbPath = file.path(getwd(), 'rcasDB.sqlite'), 
                      projDataFile, gtfFilePath = '', update = FALSE, 
-                     genomeVersion = 'hg19', nodeN = 1) {
+                     genomeVersion, 
+                     annotationSummary = TRUE, 
+                     coverageProfiles = TRUE, 
+                     motifAnalysis = TRUE, 
+                     nodeN = 1) {
+  
+  #check genome version
+  if (!genomeVersion %in% c('hg19', 'hg38', 'dm3', 'ce10', 'mm9', 'mm10')){
+    stop (genomeVersion,' is not a supported genome version.')
+  }
+  
   if(file.exists(dbPath) & update == FALSE) {
     stop("A database already exists at ",dbPath,"\n",
          "Either provide a different path or set argument 'update' to TRUE  
@@ -377,31 +425,38 @@ createDB <- function(dbPath = file.path(getwd(), 'rcasDB.sqlite'),
   
   bedData <- insertTableBedData(conn = mydb,projData = projData) 
 
-  insertTableAnnotationSummaries(conn = mydb, bedData = bedData, 
-                                 txdbFeatures = txdbFeatures, nodeN = nodeN)
+  if(annotationSummary == TRUE) {
+    insertTableAnnotationSummaries(conn = mydb, bedData = bedData, 
+                                   txdbFeatures = txdbFeatures, nodeN = nodeN)
+    
+    insertTableOverlapMatrix(conn = mydb, name = 'geneOverlaps',
+                             bedData = bedData, 
+                             targetRegions = gtfData[gtfData$type == 'gene',],
+                             targetRegionNames = gtfData[gtfData$type == 'gene',]$gene_name,
+                             nodeN = nodeN)
+  }
   
-  insertTableFeatureBoundaryCoverageProfiles(conn = mydb, bedData = bedData, 
+  if(coverageProfiles == TRUE) {
+    insertTableFeatureBoundaryCoverageProfiles(conn = mydb, bedData = bedData, 
                                              txdbFeatures = txdbFeatures, 
                                              sampleN = 10000)
+  }
   
-  insertTableDiscoveredMotifs(conn = mydb, 
-                              bedData = bedData, 
-                              txdbFeatures = txdbFeatures, 
-                              genomeVersion = genomeVersion, 
-                              motifN = 1,
-                              nCores = 2,
-                              resizeN = 15, 
-                              sampleN = 10000)
+  if(motifAnalysis == TRUE) {
+    insertTableDiscoveredMotifs(conn = mydb, 
+                                bedData = bedData, 
+                                txdbFeatures = txdbFeatures, 
+                                genomeVersion = genomeVersion, 
+                                motifN = 1,
+                                nCores = 2,
+                                resizeN = 15, 
+                                sampleN = 10000)
+  }
   
-  insertTableOverlapMatrix(conn = mydb, name = 'geneOverlaps',
-                           bedData = bedData, 
-                           targetRegions = gtfData[gtfData$type == 'gene',],
-                           targetRegionNames = gtfData[gtfData$type == 'gene',]$gene_name,
-                           nodeN = nodeN)
   RSQLite::dbWriteTable(mydb, 'processedSamples', projData, overwrite = TRUE)
   RSQLite::dbDisconnect(mydb)
   message("Finished preparing the database and disconnected.",
-      "\nType",paste0("RSQLite::dbConnect(RSQLite::SQLite(), \'",
+      "\nType",paste0(" RSQLite::dbConnect(RSQLite::SQLite(), \'",
                     dbPath,"\')")," to reconnect")
   return(dbPath)
 } 

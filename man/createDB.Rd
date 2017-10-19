@@ -5,7 +5,9 @@
 \title{createDB}
 \usage{
 createDB(dbPath = file.path(getwd(), "rcasDB.sqlite"), projDataFile,
-  gtfFilePath = "", update = FALSE, genomeVersion = "hg19", nodeN = 1)
+  gtfFilePath = "", update = FALSE, genomeVersion,
+  annotationSummary = TRUE, coverageProfiles = TRUE, motifAnalysis = TRUE,
+  nodeN = 1)
 }
 \arguments{
 \item{dbPath}{Path to the sqlite database file (could be an existing file or 
@@ -26,6 +28,15 @@ should be updated}
 the analysis is being done. Available options are hg19/hg38 (human), mm9/mm10 
 (mouse), ce10 (worm) and dm3 (fly).}
 
+\item{annotationSummary}{TRUE/FALSE (default:TRUE) whether annotation summary
+module should be run}
+
+\item{coverageProfiles}{TRUE/FALSE (default: TRUE) whether coverage profiles
+module should be run}
+
+\item{motifAnalysis}{TRUE/FALSE (default: TRUE) whether motif discovery module
+should be run}
+
 \item{nodeN}{Number of cpus to use for parallel processing (default: 1)}
 }
 \value{
@@ -34,4 +45,37 @@ Path to an SQLiteConnection object created by RSQLite package
 \description{
 Creates an sqlite database consisting of various tables of data obtained 
 from processed BED files
+}
+\examples{
+FUS_path <- system.file("extdata", "FUS_Nakaya2013c_hg19.bed",
+package='RCAS') 
+
+FMR1_path <- system.file("extdata",
+"FMR1_Ascano2012a_hg19.bed", package='RCAS') 
+
+projData <- data.frame('sampleName' = c('FUS', 'FMR1'), 
+'bedFilePath' = c(FUS_path,FMR1_path), stringsAsFactors = FALSE)
+ 
+write.table(projData, 'myProjDataFile.tsv', sep = '\\t', quote =FALSE, 
+row.names = FALSE) 
+
+\dontrun{
+#To create a new database 
+createDB(dbPath = 'hg19.RCASDB.sqlite', 
+projDataFile = './myProjDataFile.tsv', 
+#download GTF file from ENSEMBL for build hg19 (Ensemblv75)
+#and provide path to this file for the argument gtfFilePath
+gtfFilePath = './Ensemble.human.v75.gtf',  
+genomeVersion = 'hg19')
+
+# To update an existing database with additional data
+createDB(dbPath = 'hg19.RCASDB.sqlite', 
+projDataFile = './myProjDataFile.tsv', 
+#GTF file is no longer needed if the existing DB has processed GTF data  
+gtfFilePath = './Ensemble.human.v75.gtf', 
+update = TRUE, 
+genomeVersion = 'hg19')
+}
+
+
 }
