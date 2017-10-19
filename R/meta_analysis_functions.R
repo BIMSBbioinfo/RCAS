@@ -85,7 +85,7 @@ summarizeQueryRegionsMulti <- function(queryRegionsList, txdbFeatures, nodeN = 1
 #' kinds of transcript features for a given list of bed files imported as a 
 #' GRangesList object.
 #' 
-#' @param queryRegionsList GRangesList object imported from multiple BED files 
+#' @param bedData GRangesList object imported from multiple BED files 
 #'   using \code{importBedFiles} function
 #' @param txdbFeatures List of GRanges objects - outputs of 
 #'   \code{getTxdbFeaturesFromGRanges} and \code{getTxdbFeatures} functions
@@ -242,9 +242,12 @@ getIntervalOverlapMatrix <- function(queryRegionsList, targetRegions, targetRegi
 #'     sampleTablePath = 'sampleDataTable.tsv')
 #' @import rmarkdown
 #' @import knitr
-#' @import plotly
-#' @import cowplot
-#' @import ggseqlogo
+#' @importFrom plotly ggplotly
+#' @import ggplot2
+#' @importFrom pheatmap pheatmap
+#' @importFrom cowplot plot_grid
+#' @importFrom ggseqlogo geom_logo
+#' @importFrom ggseqlogo theme_logo
 #' @import DT
 #' @export
 runReportMetaAnalysis <- function(dbPath = 'RCAS.sqlite',
