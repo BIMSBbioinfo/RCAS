@@ -139,14 +139,14 @@ summary <- summarizeQueryRegions(queryRegions = queryRegions,
 
 df <- data.frame(summary)
 df$percent <- round((df$count / length(queryRegions)), 3) * 100
-p <- plot_ly( data = df, 
+p <- plotly::plot_ly( data = df, 
               x = rownames(df), 
               y = df$percent, 
               type = 'bar',
               text = paste("count:", df$count), 
               color = rownames(df)
               )
-layout(p = p, 
+plotly::layout(p = p, 
        xaxis = list(title = 'features'),
        yaxis = list(title = paste("% query,", 
                                   "n =", length(queryRegions)
@@ -198,12 +198,12 @@ df <- overlaps.dt[,length(unique(overlappingQuery)), by = biotype_col]
 colnames(df) <- c("feature", "count")
 df$percent <- round(df$count / length(queryRegions) * 100, 1)
 df <- df[order(count, decreasing = TRUE)]
-p <- plot_ly(data = df, 
+p <- plotly::plot_ly(data = df, 
              type = "bar",
              x = df$feature,
              y = df$percent,
              text = paste("count:", df$count), color=df$feature)
-layout(p = p, 
+plotly::layout(p = p, 
        margin = list(l=100, r=100, b=150), 
        xaxis = list(showticklabels = TRUE,  tickangle = 90), 
        yaxis = list(title = paste("% query,", 
@@ -274,16 +274,16 @@ cvgList <- calculateCoverageProfileList(queryRegions = queryRegions,
 p <- plotly::plot_ly(data = cvgList, type = 'scatter', mode = 'lines')
 for (f in unique(cvgList$feature)){
   data <- cvgList[cvgList$feature == f,]
-  p <- add_trace(p = p, data = data, x = ~bins, y = ~meanCoverage, 
+  p <- plotly::add_trace(p = p, data = data, x = ~bins, y = ~meanCoverage, 
                  legendgroup = f, showlegend = FALSE, opacity = 1, color = f)
-  p <- add_ribbons(p = p, data = data, x = ~bins, 
+  p <- plotly::add_ribbons(p = p, data = data, x = ~bins, 
                    ymin = data$meanCoverage - data$standardError*1.96,
                    ymax = data$meanCoverage + data$standardError*1.96, 
                    legendgroup = f, 
                    name = f, color = f
                    )
 }
-layout(p, font = list(size = 14))
+plotly::layout(p, font = list(size = 14))
 
 if(params$printProcessedTables == TRUE) {
   write.table(x = cvgList, file=paste0('Figure',figureCount,'.coverageprofilelist.data.tsv'), quote = FALSE, sep = '\t', row.names = TRUE)

@@ -571,7 +571,13 @@ getFeatureBoundaryCoverageBin <- function (queryRegions,
 #'   target feature (e.g. exons)
 #' @param sampleN If set to a positive integer, \code{targetRegions} will be 
 #'   downsampled to \code{sampleN} regions
-#'   
+#' @param bin.num Positive integer value (default: 100) to determine how many
+#'   bins the targetRegions should be split into (See
+#'   genomation::ScoreMatrixBin)
+#' @param bin.op The operation to apply for each bin: 'min', 'max', or 'mean'
+#'   (default: mean). (See genomation::ScoreMatrixBin)
+#' @param strand.aware TRUE/FALSE (default: TRUE) The strands of target regions
+#'   are considered.
 #' @return A ScoreMatrix object returned by \code{genomation::ScoreMatrixBin} 
 #'   function. Target regions are divided into 100 equal sized bins and coverage
 #'   level is calculated in a strand-specific manner.
@@ -624,7 +630,13 @@ calculateCoverageProfile = function (queryRegions,
 #'   coordinates of target features (e.g. transcripts, exons, introns)
 #' @param sampleN If set to a positive integer, \code{targetRegions} will be 
 #'   downsampled to \code{sampleN} regions
-#'   
+#' @param bin.num Positive integer value (default: 100) to determine how many
+#'   bins the targetRegions should be split into (See
+#'   genomation::ScoreMatrixBin)
+#' @param bin.op The operation to apply for each bin: 'min', 'max', or 'mean'
+#'   (default: mean). (See genomation::ScoreMatrixBin)
+#' @param strand.aware TRUE/FALSE (default: TRUE) The strands of target regions
+#'   are considered.
 #' @return A data.frame consisting of four columns: 1. bins level 2.
 #'   meanCoverage 3. standardError 4. feature Target regions are divided into
 #'   100 equal sized bins and coverage level is summarized in a strand-specific
@@ -854,7 +866,10 @@ findLongLines <- function (myfile, lineLimit = 80) {
 #'            }
 #' @import rmarkdown
 #' @import knitr
-#' @import plotly
+#' @importFrom plotly plot_ly
+#' @importFrom plotly add_trace
+#' @importFrom plotly add_ribbons
+#' @importFrom plotly layout
 #' @import DT
 #' @export
 runReport <- function(queryFilePath = 'testdata',

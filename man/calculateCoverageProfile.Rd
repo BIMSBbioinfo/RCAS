@@ -16,6 +16,16 @@ target feature (e.g. exons)}
 
 \item{sampleN}{If set to a positive integer, \code{targetRegions} will be 
 downsampled to \code{sampleN} regions}
+
+\item{bin.num}{Positive integer value (default: 100) to determine how many
+bins the targetRegions should be split into (See
+genomation::ScoreMatrixBin)}
+
+\item{bin.op}{The operation to apply for each bin: 'min', 'max', or 'mean'
+(default: mean). (See genomation::ScoreMatrixBin)}
+
+\item{strand.aware}{TRUE/FALSE (default: TRUE) The strands of target regions
+are considered.}
 }
 \value{
 A ScoreMatrix object returned by \code{genomation::ScoreMatrixBin} 

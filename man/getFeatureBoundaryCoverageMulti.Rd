@@ -7,15 +7,15 @@
 getFeatureBoundaryCoverageMulti(bedData, txdbFeatures, sampleN = 10000)
 }
 \arguments{
+\item{bedData}{GRangesList object imported from multiple BED files 
+using \code{importBedFiles} function}
+
 \item{txdbFeatures}{List of GRanges objects - outputs of 
 \code{getTxdbFeaturesFromGRanges} and \code{getTxdbFeatures} functions}
 
 \item{sampleN}{(default=10000) Positive integer value that is used to 
 randomly down-sample the target feature coordinates to improve the runtime.
 Set to 0 to avoid downsampling.}
-
-\item{queryRegionsList}{GRangesList object imported from multiple BED files 
-using \code{importBedFiles} function}
 }
 \value{
 A data.frame object with coverage data at three prime and five prime
