@@ -167,7 +167,7 @@ motifLogos <- lapply(X = samplesToPlot,
 cat("**Figure",figureCount,":** Feature specific motifs discovered for each sample\n")
 ```
 
-```{r motif_logos_plot, eval = evalMotifDiscovery, fig.width=10, fig.height=length(samplesToPlot)*1.4}
+```{r motif_logos_plot, eval = evalMotifDiscovery, fig.width=10, fig.height=ifelse(evalMotifDiscovery,  length(samplesToPlot)*1.4, 10)}
 #try to reserve 1.3 inches per each sample (for each sample there is one row of motifs and the height is dynamically adjusted 
 # as "number of samples multiplied by the height needed for one sample")
 
