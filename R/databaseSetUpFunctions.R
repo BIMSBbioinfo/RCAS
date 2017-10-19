@@ -239,6 +239,42 @@ insertTableOverlapMatrix <- function(conn, name, bedData, ...) {
   }
 }
 
+#' summarizeDatabaseContent 
+#' 
+#' Given a path to an sqlite database created using RCAS::createDB function,
+#' accesses the database and provides a quick summary of available samples 
+#' and number of entries of each sample in the available tables of the 
+#' database.  
+#' 
+#' @param dbPath Path to the sqlite database
+#' @return A data.frame object 
+#' @import RSQLite
+#' @export
+summarizeDatabaseContent <- function(dbPath) {
+  mydb <- RSQLite::dbConnect(RSQLite::SQLite(), dbPath)
+  tables <- RSQLite::dbListTables(mydb)
+  #exclude gtfData because it is independent from sample names
+  tables <- tables[!tables %in% c('gtfData')]
+
+  summary <- lapply(tables, function(tbl) {
+    df <- RSQLite::dbReadTable(mydb, tbl)
+    #tables that don't have 'sampleName' as a column have to be 
+    #handled separately. 
+    if (tbl == 'geneOverlaps') {
+      r <- data.frame(apply(subset(df, select = c(-rn)), 2, sum))
+      colnames(r) <- tbl
+      r$sampleName <- rownames(r)
+      return(r)
+    } else {
+      r <- data.frame(table(df$sampleName))
+      colnames(r) <- c('sampleName', tbl)
+      return(r)
+    }
+  })
+  summary <- Reduce(function(...) merge(..., all=T, by = 'sampleName'), summary)
+  RSQLite::dbDisconnect(mydb)
+  return(summary)
+}
 
 #' deleteSampleDataFromDB
 #' 
