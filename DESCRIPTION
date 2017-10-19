@@ -36,11 +36,6 @@ LazyData: TRUE
 Depends: R (>= 3.3.0),
     plotly (>= 4.5.2),
     DT (>= 0.2),
-    DBI, 
-    pheatmap,
-    ggplot2,
-    cowplot,
-    ggseqlogo,
     data.table,
     topGO,
     motifRG
@@ -63,7 +58,14 @@ Imports:
     plotrix,
     pbapply,
     RSQLite,
-    proxy
+    proxy,
+    DBI, 
+    pheatmap,
+    ggplot2,
+    cowplot,
+    ggseqlogo,
+    methods,
+    utils
 RoxygenNote: 6.0.1
 Suggests: BSgenome.Hsapiens.UCSC.hg38, 
     BSgenome.Mmusculus.UCSC.mm10, 
