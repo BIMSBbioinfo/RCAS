@@ -371,24 +371,17 @@ deleteSampleDataFromDB <- function(dbPath, sampleNames) {
 #' write.table(projData, 'myProjDataFile.tsv', sep = '\t', quote =FALSE, 
 #' row.names = FALSE) 
 #' 
-#' \dontrun{
-#' #To create a new database 
+#' gtfFilePath <- system.file("extdata",
+#' "hg19.sample.gtf", package='RCAS')
+#' 
 #' createDB(dbPath = 'hg19.RCASDB.sqlite', 
 #' projDataFile = './myProjDataFile.tsv', 
-#' #download GTF file from ENSEMBL for build hg19 (Ensemblv75)
-#' #and provide path to this file for the argument gtfFilePath
-#' gtfFilePath = './Ensemble.human.v75.gtf',  
-#' genomeVersion = 'hg19')
+#' gtfFilePath = gtfFilePath,  
+#' genomeVersion = 'hg19', 
+#' motifAnalysis = FALSE, 
+#' coverageProfiles = FALSE)
 #' 
-#' # To update an existing database with additional data
-#' createDB(dbPath = 'hg19.RCASDB.sqlite', 
-#' projDataFile = './myProjDataFile.tsv', 
-#' #GTF file is no longer needed if the existing DB has processed GTF data  
-#' gtfFilePath = './Ensemble.human.v75.gtf', 
-#' update = TRUE, 
-#' genomeVersion = 'hg19')
-#' }
-#' 
+#' #Note: to add new data to an existing database, set update = TRUE
 #' 
 #' @export
 createDB <- function(dbPath = file.path(getwd(), 'rcasDB.sqlite'), 
