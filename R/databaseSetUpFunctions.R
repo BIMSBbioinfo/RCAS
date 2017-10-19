@@ -1,4 +1,6 @@
 ## functions to create, update and manipulate the sqlite database for meta-analysis 
+
+#' @importFrom utils read.table
 validateProjDataFile <- function(projDataFile, conn) {
   projData <- read.table(file = projDataFile, header = TRUE, 
                          sep = '\t', stringsAsFactors = FALSE)
@@ -261,7 +263,7 @@ summarizeDatabaseContent <- function(dbPath) {
     #tables that don't have 'sampleName' as a column have to be 
     #handled separately. 
     if (tbl == 'geneOverlaps') {
-      r <- data.frame(apply(subset(df, select = c(-rn)), 2, sum))
+      r <- data.frame(apply(df[-1], 2, sum))
       colnames(r) <- tbl
       r$sampleName <- rownames(r)
       return(r)
