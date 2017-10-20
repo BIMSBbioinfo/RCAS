@@ -302,7 +302,7 @@ motifData <- discoverFeatureSpecificMotifs(
   txdbFeatures = txdbFeatures, 
   resizeN = 15, 
   sampleN = 10000,
-  genomeVersion = 'hg19', #replcae this with params$genomeVersion
+  genomeVersion = params$genomeVersion,
   motifN = 1, 
   nCores = 2)
 
