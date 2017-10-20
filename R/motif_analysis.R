@@ -143,12 +143,14 @@ runMotifRG <- function (queryRegions, resizeN = 0,
   
   if(resizeN > 0) {
     resizeIntervals <- width(queryRegions) < resizeN
-    message("Found ",sum(resizeIntervals)," query regions shorter than ", 
-            resizeN, " bps. Resizing those regions to ",resizeN,' bps')
-    queryRegions[resizeIntervals] <- GenomicRanges::resize(
-      x = queryRegions[resizeIntervals], 
-      width = 15, 
-      fix = 'center')
+    if(sum(resizeIntervals) > 0){
+      message("Found ",sum(resizeIntervals)," query regions shorter than ", 
+              resizeN, " bps. Resizing those regions to ",resizeN,' bps')
+      queryRegions[resizeIntervals] <- GenomicRanges::resize(
+        x = queryRegions[resizeIntervals], 
+        width = 15, 
+        fix = 'center')
+    }
   }
   
   controlRegions <- createControlRegions(queryRegions)
