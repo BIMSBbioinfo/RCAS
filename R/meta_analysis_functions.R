@@ -212,6 +212,8 @@ getIntervalOverlapMatrix <- function(queryRegionsList, targetRegions, targetRegi
 #'   header 1: sampleName, header 2: sampleGroup
 #' @param outDir Path to the output directory. (default: current working 
 #'   directory)
+#' @param outFile Name of the output HTML report (by default, the base name of
+#'   sampleTablePath value is used to create a name for the HTML report)
 #' @param quiet boolean value (default: FALSE). If set to TRUE, progress bars 
 #'   and chunk labels will be suppressed while knitting the Rmd file.
 #' @param selfContained boolean value (default: TRUE). By default, the generated
@@ -253,6 +255,7 @@ getIntervalOverlapMatrix <- function(queryRegionsList, targetRegions, targetRegi
 runReportMetaAnalysis <- function(dbPath = 'RCAS.sqlite',
                                   sampleTablePath,
                                   outDir = getwd(),
+                                  outFile = NULL,
                                   quiet = FALSE,
                                   selfContained = TRUE) {
   
@@ -262,9 +265,9 @@ runReportMetaAnalysis <- function(dbPath = 'RCAS.sqlite',
                             "header.html", package='RCAS')
   footerFile <- system.file("reporting_scripts", 
                             "footer.html", package='RCAS')
-  
-  outFile <- paste0(basename(dbPath), '.RCAS.metaAnalysisReport.html')
-  
+  if(is.null(outFile)) {
+    outFile <- paste0(basename(sampleTablePath), '.RCAS.metaAnalysisReport.html')
+  } 
   rmarkdown::render(
     input = reportFile, 
     output_dir = outDir,
