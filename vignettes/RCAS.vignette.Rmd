@@ -227,6 +227,7 @@ With the RCAS package, a motif analysis is also possible.
 RCAS uses motifRG library to find enriched motifs among the query regions.
 ```{r motif_analysis}
 motifResults <- runMotifRG(queryRegions = queryRegions, 
+                           resizeN = 15, sampleN = 10000,
                            genomeVersion = 'hg19', 
                            motifN = 2, nCores = 2)
 
@@ -393,12 +394,12 @@ runReport(printProcessedTables = TRUE)
 
 # Acknowledgements
 
-RCAS is developed by
-[Dr. Altuna Akalin](http://bioinformatics.mdc-berlin.de/team.html#altuna-akalin-phd)
-(head of the Scientific Bioinformatics Platform),
-[Dr. Bora Uyar](http://bioinformatics.mdc-berlin.de/team.html#bora-uyar-phd)
+RCAS is developed in the group of 
+[Altuna Akalin](http://bioinformatics.mdc-berlin.de/team.html#altuna-akalin-phd)
+(head of the Scientific Bioinformatics Platform) by
+[Bora Uyar](http://bioinformatics.mdc-berlin.de/team.html#bora-uyar-phd)
 (Bioinformatics Scientist),
-[Dr. Dilmurat Yusuf](http://bioinformatics.mdc-berlin.de/team.html#dilmurat-yusuf-phd)
+[Dilmurat Yusuf](http://bioinformatics.mdc-berlin.de/team.html#dilmurat-yusuf-phd)
 (Bioinformatics Scientist) and 
 [Ricardo Wurmus](http://bioinformatics.mdc-berlin.de/team.html#ricardo-wurmus)
 (System Administrator) at the Berlin Institute of Medical Systems Biology
