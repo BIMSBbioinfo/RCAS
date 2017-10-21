@@ -424,10 +424,12 @@ createDB <- function(dbPath = file.path(getwd(), 'rcasDB.sqlite'),
     insertTableAnnotationSummaries(conn = mydb, bedData = bedData, 
                                    txdbFeatures = txdbFeatures, nodeN = nodeN)
     
+    geneRanges <- unlist(range(split(gtfData, gtfData$gene_name)))
+    
     insertTableOverlapMatrix(conn = mydb, name = 'geneOverlaps',
                              bedData = bedData, 
-                             targetRegions = gtfData[gtfData$type == 'gene',],
-                             targetRegionNames = gtfData[gtfData$type == 'gene',]$gene_name,
+                             targetRegions = geneRanges,
+                             targetRegionNames = names(geneRanges),
                              nodeN = nodeN)
   }
   
