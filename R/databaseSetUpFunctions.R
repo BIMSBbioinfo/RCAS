@@ -3,7 +3,7 @@
 #' @importFrom utils read.table
 validateProjDataFile <- function(projDataFile, conn) {
   projData <- read.table(file = projDataFile, header = TRUE, 
-                         sep = '\t', stringsAsFactors = FALSE)
+                         stringsAsFactors = FALSE)
   if(sum(grepl(pattern = '-', x = projData$sampleName)) > 0){
     warning("Converting dashes (-) in sample names to underscore (_)\n")
     projData$sampleName <- gsub(pattern = '-', '_', x = projData$sampleName)
