@@ -3,7 +3,7 @@ title: "The RNA Centric Analysis System Report"
 author: "Bora Uyar, Dilmurat Yusuf, Ricardo Wurmus, Altuna Akalin"
 date: '`r Sys.time()`'
 params:
-  dbPath: './hg19.test.sqlite'
+  dbPath: './test.RCASdb.sqlite'
   sampleTablePath: ''
   workdir: '.'
 ---
@@ -98,9 +98,6 @@ figureCount <- 1
 tableCount <- 1
 ```
 
-```{r showDBcontent}
-message(paste0(RSQLite::dbListTables(mydb), sep = '\n'))
-```
 
 ```{r geneOverlapsHeader, results='asis', eval=evalGeneOverlaps}
 cat("# Distance of samples by various metrics\n")
@@ -208,7 +205,7 @@ plotPCA <- function(cv, title = '') {
   cvM <- dcast(cv, sampleName ~ boundary + bases, value.var = 'meanCoverage')
   M <- as.matrix(cvM[,-1])
   rownames(M) <- cvM[,1]
-  pca1 <- prcomp(M, center = T, scale. = T)
+  pca1 <- prcomp(M)
   scores = as.data.frame(pca1$x)
   scores$sampleName <- cv[match(rownames(scores), cv$sampleName),]$sampleName
   scores$sampleGroup <- cv[match(rownames(scores), cv$sampleName),]$sampleGroup
