@@ -66,3 +66,10 @@ test_that("Testing deleteSampleDataFromDB function", {
 
 RSQLite::dbDisconnect(mydb)
 
+if(file.exists('./test.RCASDB.sqlite')) {
+  file.remove('./test.RCASDB.sqlite')
+}
+
+if(file.exists('./myProjDataFile.tsv')){
+  file.remove('./myProjDataFile.tsv')
+}
