@@ -125,10 +125,10 @@ extractSequences <- function (queryRegions, genomeVersion) {
 #' @examples
 #' data(queryRegions)
 #' motifResults <- runMotifRG(queryRegions = queryRegions,
-#'                            resize = 15,
-#'                            genomeVersion = 'hg19',
-#'                            motifN = 1,
-#'                            nCores = 2)
+#'                           genomeVersion = 'hg19',
+#'                           resize = 15,
+#'                           motifN = 1,
+#'                           nCores = 2)
 #' @import motifRG
 #' @export
 runMotifRG <- function (queryRegions, resizeN = 0, 
@@ -183,6 +183,7 @@ runMotifRG <- function (queryRegions, resizeN = 0,
 #' data(queryRegions)
 #' motifResults <- runMotifRG(queryRegions = queryRegions,
 #'                           genomeVersion = 'hg19',
+#'                           resize = 15,
 #'                           motifN = 1,
 #'                           nCores = 2)
 #' motifSummary <- getMotifSummaryTable(motifResults)

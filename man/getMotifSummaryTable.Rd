@@ -21,6 +21,7 @@ A repurposed/simplified version of the \code{motifRG::summaryMotif} function.
 data(queryRegions)
 motifResults <- runMotifRG(queryRegions = queryRegions,
                           genomeVersion = 'hg19',
+                          resize = 15,
                           motifN = 1,
                           nCores = 2)
 motifSummary <- getMotifSummaryTable(motifResults)

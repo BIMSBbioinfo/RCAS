@@ -39,8 +39,8 @@ discovery from input query regions
 \examples{
 data(queryRegions)
 motifResults <- runMotifRG(queryRegions = queryRegions,
-                           resize = 15,
-                           genomeVersion = 'hg19',
-                           motifN = 1,
-                           nCores = 2)
+                          genomeVersion = 'hg19',
+                          resize = 15,
+                          motifN = 1,
+                          nCores = 2)
 }
