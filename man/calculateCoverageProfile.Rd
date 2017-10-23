@@ -37,11 +37,12 @@ This function checks overlaps between input query regions and annotation
 features, and then calculates coverage profile along target regions.
 }
 \examples{
+\dontrun{
 data(gff)
 data(queryRegions)
 txdbFeatures <- getTxdbFeaturesFromGRanges(gffData = gff)
 df <- calculateCoverageProfile(queryRegions = queryRegions,
                               targetRegions = txdbFeatures$exons,
                                     sampleN = 1000)
-
+}
 }

@@ -507,6 +507,7 @@ getFeatureBoundaryCoverage <- function (queryRegions,
 #'   distance (in bp) to the boundary
 #'
 #' @examples
+#' \dontrun{
 #' data(queryRegions)
 #' data(gff)
 #' txdb <- GenomicFeatures::makeTxDbFromGRanges(gff)
@@ -516,6 +517,7 @@ getFeatureBoundaryCoverage <- function (queryRegions,
 #'                                     featureCoords = transcriptCoords,
 #'                                     flankSize = 100,
 #'                                     sampleN = 1000)
+#'                                     }
 #' @import GenomicRanges
 #' @importFrom genomation ScoreMatrix
 #' @export
@@ -582,13 +584,14 @@ getFeatureBoundaryCoverageBin <- function (queryRegions,
 #'   function. Target regions are divided into 100 equal sized bins and coverage
 #'   level is calculated in a strand-specific manner.
 #' @examples
+#' \dontrun{
 #' data(gff)
 #' data(queryRegions)
 #' txdbFeatures <- getTxdbFeaturesFromGRanges(gffData = gff)
 #' df <- calculateCoverageProfile(queryRegions = queryRegions,
 #'                               targetRegions = txdbFeatures$exons,
 #'                                     sampleN = 1000)
-#'
+#' }
 #' @importFrom genomation ScoreMatrixBin
 #' @import GenomicRanges
 #' @export
@@ -645,12 +648,14 @@ calculateCoverageProfile = function (queryRegions,
 #'   calculated (\code{plotrix::std.error})
 #' @importFrom plotrix std.error
 #' @examples
+#' \dontrun{
 #' data(gff)
 #' data(queryRegions)
 #' txdbFeatures <- getTxdbFeaturesFromGRanges(gffData = gff)
 #' dfList <- calculateCoverageProfileList(queryRegions = queryRegions,
 #'                               targetRegionsList = txdbFeatures,
 #'                                     sampleN = 1000)
+#'                                     }
 #' @export
 calculateCoverageProfileList <- function (queryRegions,
                                           targetRegionsList,
@@ -692,12 +697,14 @@ calculateCoverageProfileList <- function (queryRegions,
 #'   coverage level is summarized in a strand-specific manner using the
 #'   \code{genomation::ScoreMatrixBin} function.
 #' @examples
+#' \dontrun{
 #' data(gff)
 #' data(queryRegions)
 #' txdb <- GenomicFeatures::makeTxDbFromGRanges(gff)
 #' df <- calculateCoverageProfileListFromTxdb(queryRegions = queryRegions,
 #'                                                    txdb = txdb,
 #'                                                 sampleN = 1000)
+#'                                                 }
 #'
 #' @export
 calculateCoverageProfileListFromTxdb <- function (queryRegions,
@@ -731,13 +738,14 @@ calculateCoverageProfileListFromTxdb <- function (queryRegions,
 #'   level is summarized in a strand-specific manner using the
 #'   \code{genomation::ScoreMatrixBin} function.
 #' @examples
+#' \dontrun{
 #' data(gff)
 #' data(queryRegions)
 #' txdb <- GenomicFeatures::makeTxDbFromGRanges(gff)
 #' df <- calculateCoverageProfileFromTxdb(queryRegions = queryRegions,
 #'                                                type = 'exons',
 #'                                                txdb = txdb,
-#'                                             sampleN = 1000)
+#'                                             sampleN = 1000)}
 #' @import GenomicFeatures
 #' @import GenomicRanges
 #' @importFrom BiocGenerics unlist
