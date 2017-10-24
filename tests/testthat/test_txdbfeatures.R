@@ -42,45 +42,44 @@ test_that("Summarizing query regions with txdbFeatures", {
   expect_equal(nrow(summary), length(names(features)) + 1)
 })
 
-### temporarily turning off the feature until genomation::scoreMatrixBin issue is solved
-# profile <- calculateCoverageProfile(queryRegions = queryRegions,
-#                                    targetRegions = features[[1]],
-#                                    sampleN = 1000)
-# test_that("Getting coverage profile of query regions
-#           over a single gene feature from txdbFeatures", {
-#   expect_is(profile, 'ScoreMatrix')
-#   expect_equal(ncol(profile), 100)
-# })
-# 
-# profileList <- calculateCoverageProfileList(queryRegions = queryRegions,
-#                                             targetRegionsList = features,
-#                                             sampleN = 1000)
-# test_that("Getting a list of coverage profiles
-#           over all gene features from txdbFeatures", {
-#   expect_is(profileList, 'data.frame')
-#   expect_equal(colnames(profileList), c('bins', 'meanCoverage', 'standardError', 'feature'))
-#   expect_equal(dim(profileList), c(700, 4))
-# })
-# 
-# profile <- calculateCoverageProfileFromTxdb(queryRegions = queryRegions,
-#                                                 txdb = txdb,
-#                                                 type = 'exons',
-#                                                 sampleN = 1000)
-# 
-# test_that("Getting coverage profile of query regions
-#           over a single gene feature from a TxDb object", {
-#             expect_is(profile, 'ScoreMatrix')
-#             expect_equal(ncol(profile), 100)
-#           })
-# 
-# profileList <- calculateCoverageProfileListFromTxdb(queryRegions = queryRegions,
-#                                                     txdb = txdb,
-#                                                     sampleN = 1000)
-# test_that("Getting a list of coverage profiles
-#           over all gene features from a txdb object", {
-#             expect_is(profileList, 'list')
-#             expect_equal(length(names(profileList)), length(features))
-#           })
+profile <- calculateCoverageProfile(queryRegions = queryRegions,
+                                   targetRegions = features[[1]],
+                                   sampleN = 1000)
+test_that("Getting coverage profile of query regions
+          over a single gene feature from txdbFeatures", {
+  expect_is(profile, 'ScoreMatrix')
+  expect_equal(ncol(profile), 100)
+})
+
+profileList <- calculateCoverageProfileList(queryRegions = queryRegions,
+                                            targetRegionsList = features,
+                                            sampleN = 1000)
+test_that("Getting a list of coverage profiles
+          over all gene features from txdbFeatures", {
+  expect_is(profileList, 'data.frame')
+  expect_equal(colnames(profileList), c('bins', 'meanCoverage', 'standardError', 'feature'))
+  expect_equal(dim(profileList), c(700, 4))
+})
+
+profile <- calculateCoverageProfileFromTxdb(queryRegions = queryRegions,
+                                                txdb = txdb,
+                                                type = 'exons',
+                                                sampleN = 1000)
+
+test_that("Getting coverage profile of query regions
+          over a single gene feature from a TxDb object", {
+            expect_is(profile, 'ScoreMatrix')
+            expect_equal(ncol(profile), 100)
+          })
+
+profileList <- calculateCoverageProfileListFromTxdb(queryRegions = queryRegions,
+                                                    txdb = txdb,
+                                                    sampleN = 1000)
+test_that("Getting a list of coverage profiles
+          over all gene features from a txdb object", {
+            expect_is(profileList, 'list')
+            expect_equal(length(names(profileList)), length(features))
+          })
 
 transcriptEndCoverage <- getFeatureBoundaryCoverage(
                                 queryRegions = queryRegions,
@@ -97,18 +96,17 @@ test_that("Calculating per base coverage profile at TES boundary", {
 })
 
 
-### temporarily turning off the feature until genomation::scoreMatrixBin issue is solved
-# transcriptEndCoverageBin <- getFeatureBoundaryCoverageBin(
-#   queryRegions = queryRegions,
-#   featureCoords = features$transcripts[1:1000],
-#   flankSize = 100,
-#   sampleN = 0
-# )
-# 
-# test_that("Calculating per bin coverage profile at TSS and TES boundaries", {
-#   expect_equal(colnames(transcriptEndCoverageBin), c("fivePrime","threePrime","bins"))
-#   expect_is(transcriptEndCoverageBin, 'data.frame')
-#   expect_equal(as.vector(colSums(transcriptEndCoverageBin)), c(15, 241, 0))
-# })
+transcriptEndCoverageBin <- getFeatureBoundaryCoverageBin(
+  queryRegions = queryRegions,
+  featureCoords = features$transcripts[1:1000],
+  flankSize = 100,
+  sampleN = 0
+)
+
+test_that("Calculating per bin coverage profile at TSS and TES boundaries", {
+  expect_equal(colnames(transcriptEndCoverageBin), c("fivePrime","threePrime","bins"))
+  expect_is(transcriptEndCoverageBin, 'data.frame')
+  expect_equal(as.vector(colSums(transcriptEndCoverageBin)), c(15, 241, 0))
+})
 
 

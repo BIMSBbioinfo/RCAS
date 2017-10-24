@@ -28,13 +28,10 @@ annotation features and calculates the coverage profile along the target
 regions.
 }
 \examples{
-\dontrun{
 data(gff)
 data(queryRegions)
 txdb <- GenomicFeatures::makeTxDbFromGRanges(gff)
 df <- calculateCoverageProfileListFromTxdb(queryRegions = queryRegions,
                                                    txdb = txdb,
                                                 sampleN = 1000)
-                                                }
-
 }

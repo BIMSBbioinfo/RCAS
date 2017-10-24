@@ -41,12 +41,10 @@ of annotation features, and then calculates the coverage profile along the
 target regions.
 }
 \examples{
-\dontrun{
 data(gff)
 data(queryRegions)
 txdbFeatures <- getTxdbFeaturesFromGRanges(gffData = gff)
 dfList <- calculateCoverageProfileList(queryRegions = queryRegions,
                               targetRegionsList = txdbFeatures,
                                     sampleN = 1000)
-                                    }
 }

@@ -32,12 +32,11 @@ annotation features and calculates the coverage profile along the target
 regions.
 }
 \examples{
-\dontrun{
 data(gff)
 data(queryRegions)
 txdb <- GenomicFeatures::makeTxDbFromGRanges(gff)
 df <- calculateCoverageProfileFromTxdb(queryRegions = queryRegions,
                                                type = 'exons',
                                                txdb = txdb,
-                                            sampleN = 1000)}
+                                            sampleN = 1000)
 }

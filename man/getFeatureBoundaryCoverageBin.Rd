@@ -31,7 +31,6 @@ given set of genomic features, splits them into 100 equally sized bins and
 computes the per-bin coverage of query regions across these boundaries.
 }
 \examples{
-\dontrun{
 data(queryRegions)
 data(gff)
 txdb <- GenomicFeatures::makeTxDbFromGRanges(gff)
@@ -41,5 +40,4 @@ transcriptEndCoverageBin <- getFeatureBoundaryCoverageBin (
                                     featureCoords = transcriptCoords,
                                     flankSize = 100,
                                     sampleN = 1000)
-                                    }
 }
