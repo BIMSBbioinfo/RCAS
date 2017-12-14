@@ -33,7 +33,7 @@ var RCAS = (function () {
         return true;
     }
 
-    function generateModebarButton (selector) {
+    function generateModebarButton (selector, name) {
         var el     = document.createElement('div'),
             a      = document.createElement('a'),
             button = '<svg viewBox="0 0 1000 1000" width="1em" height="1em">'+
@@ -41,7 +41,7 @@ var RCAS = (function () {
             '</svg>';
 
         a.href = '#';
-        a.setAttribute('download', 'rcas.svg');
+        a.setAttribute('download', 'rcas-' + name + '.svg');
         a.setAttribute('onClick', 'RCAS.captureSVG(this, \''+ selector +'\')');
         a.setAttribute('data-gravity', 'n');
         a.setAttribute('data-toggle', 'false');
@@ -57,7 +57,7 @@ var RCAS = (function () {
 
     function injectLink (pathToWidget) {
         var widget = document.getElementById(pathToWidget),
-            button = generateModebarButton('[id="' + pathToWidget + '"] .main-svg'),
+            button = generateModebarButton('[id="' + pathToWidget + '"] .main-svg', pathToWidget),
             bar    = widget.getElementsByClassName('modebar')[0];
         // insert at the very beginning
         bar.insertBefore(button, bar.firstChild.nextSibling);
