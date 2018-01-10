@@ -5,13 +5,10 @@ testBedFile <- system.file('extdata', 'testfile.bed', package = 'RCAS')
 
 test_that("Testing runReport function", {
   expect_error(runReport(genomeVersion = 'foo'),
-               regexp = "not a supported genome version.",
-               all = FALSE)
+               regexp = "not a supported genome version.")
   expect_error(runReport(genomeVersion = 'mm9'),
-               regexp = "Test-data only works for human",
-               all = FALSE)
+               regexp = "Test-data only works for human")
   expect_error(runReport(queryFilePath = testBedFile, genomeVersion = 'mm9'),
-               regexp = 'Test-data only works for human',
-               all = FALSE)
+               regexp = 'Test-data only works for human')
 })
 
