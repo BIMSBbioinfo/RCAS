@@ -1,8 +1,8 @@
 Package: RCAS
 Type: Package
 Title: RNA Centric Annotation System
-Version: 1.5.1
-Date: 2017-10-24
+Version: 1.5.2
+Date: 2018-01-10
 Authors@R: c(person("Bora", "Uyar", email='bora.uyar@mdc-berlin.de', role=c("aut", "cre")),
               person("Dilmurat", "Yusuf", role=c("aut")),
               person("Ricardo", "Wurmus", role=c("aut")),
