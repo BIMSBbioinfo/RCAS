@@ -1,7 +1,7 @@
 ---
 title: "The RNA Centric Analysis System Report"
 author: "Bora Uyar, Dilmurat Yusuf, Ricardo Wurmus, Altuna Akalin"
-date: "`r Sys.Date()`"
+date: "`r date()`"
 output:
   html_document:
     toc: true
@@ -16,7 +16,7 @@ vignette: >
 
 
 ```{r global_options, include=FALSE}
-knitr::opts_chunk$set(warning = FALSE, message = FALSE, eval = FALSE)
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, eval = TRUE)
 ```
 
 
@@ -24,13 +24,14 @@ knitr::opts_chunk$set(warning = FALSE, message = FALSE, eval = FALSE)
 library(RCAS)
 ```
 
+**Warning**: In this vignette, due to space limitations, we demonstrate the functions of RCAS using static images. I
+n order to see how an interactive report from RCAS looks see `RCAS::runReport()`. 
 
 # Introduction
 
 RCAS is an automated system that provides dynamic genome annotations for custom input files that contain transcriptomic regions. Such transcriptomic regions could be, for instance, peak regions detected by CLIP-Seq analysis that detect protein-RNA interactions, RNA modifications (alias the epitranscriptome), CAGE-tag locations, or any other collection of target regions at the level of the transcriptome.
 
-RCAS is designed as a reporting tool for the functional analysis of RNA-binding sites detected by high-throughput experiments. It takes as input a BED format file containing the genomic coordinates of the RNA binding sites and a GTF file that contains the genomic annotation features usually provided by publicly available databases such as Ensembl and UCSC. RCAS performs overlap operations between the genomic coordinates of the RNA binding sites and the genomic annotation features and produces in-depth annotation summaries such as the distribution of binding sites with respect to gene features (exons, introns, 5’/3’ UTR regions, exon-intron boundaries, promoter regions, and whole transcripts). Moreover, by detecting the collection of targeted transcripts, RCAS can carry out functional annotation tables for enriched gene sets (annotated by the Molecular Signatures Database) and GO terms. As one of the most important questions that arise during protein-RNA interaction analysis; RCAS has a module for detecting sequence motifs enriched in the targeted regions of the transcriptome. The final report of RCAS consists of high-quality dynamic figures and tables, which are readily applicable for publications or other academic usage.
-
+RCAS is designed as a reporting tool for the functional analysis of RNA-binding sites detected by high-throughput experiments. It takes as input a BED format file containing the genomic coordinates of the RNA binding sites and a GTF file that contains the genomic annotation features usually provided by publicly available databases such as Ensembl and UCSC. RCAS performs overlap operations between the genomic coordinates of the RNA binding sites and the genomic annotation features and produces in-depth annotation summaries such as the distribution of binding sites with respect to transcript features (exons, introns, 5’/3’ UTR regions, exon-intron boundaries, promoter regions, and whole transcripts). Moreover, by detecting the collection of targeted transcripts, RCAS can carry out functional annotation tables for enriched gene sets (annotated by the Molecular Signatures Database) and GO terms. As one of the most important questions that arise during protein-RNA interaction analysis; RCAS has a module for detecting sequence motifs enriched in the targeted regions of the transcriptome. The final report of RCAS consists of high-quality dynamic figures and tables, which are readily applicable for publications or other academic usage.
 
 #  Data input
 
@@ -63,64 +64,56 @@ To reduce memory usage and time consumption,
 we advise the user to set `sampleN=10000` to avoid
 huge input of intervals.
 
-Before running following the code chunks in your R interpreter,
-please remove `#` comment sign.
-```{r RCAS_import_data}
-#library(RCAS)
-#queryRegions <- importBed(filePath = <path to BED file>, sampleN = 10000)
-#gff <- importGtf(filePath = <path to GTF file>)
+```{r RCAS_import_data, eval = FALSE}
+queryRegions <- importBed(filePath = <path to BED file>, sampleN = 10000)
+gff <- importGtf(filePath = <path to GTF file>)
 ```
 
 # Summarizing Overlaps of Query Regions with Genomic Annotation Features
 
 ## Querying the annotation file 
 ```{r queryGFF}
-overlaps <- queryGff(queryRegions = queryRegions, gffData = gff)
-#data.table is used to do quick summary operations
-overlaps.dt <- data.table(as.data.frame(overlaps)) 
+overlaps <- as.data.table(queryGff(queryRegions = queryRegions, gffData = gff))
 ```
 
 
 ### Finding targeted gene types
 To find out the distribution of the query regions across gene types:
 ```{r query_gene_types}
-biotype_col <- grep('gene_biotype', colnames(overlaps.dt), value = T)
-df <- overlaps.dt[,length(unique(overlappingQuery)), by = biotype_col]
+biotype_col <- grep('gene_biotype', colnames(overlaps), value = T)
+df <- overlaps[,length(unique(overlappingQuery)), by = biotype_col]
 colnames(df) <- c("feature", "count")
 df$percent <- round(df$count / length(queryRegions) * 100, 1)
 df <- df[order(count, decreasing = TRUE)]
-p <- plot_ly(data = df, 
-             type = "bar",
-             x = df$feature,
-             y = df$percent,
-             text = paste("count:", df$count), color=df$feature)
-layout(p = p, 
-       margin = list(l=100, r=100, b=150), 
-       xaxis = list(showticklabels = TRUE,  tickangle = 90), 
-       yaxis = list(title = paste("percentage of query regions,", 
-                                  "n =", length(queryRegions))))
-
+ggplot2::ggplot(df, aes(x = reorder(feature, -percent), y = percent)) + 
+  geom_bar(stat = 'identity', aes(fill = feature)) + 
+  geom_label(aes(y = percent + 0.5), label = df$count) + 
+  labs(x = 'transcript feature', y = paste0('percent overlap (n = ', length(queryRegions), ')')) + 
+  theme_bw(base_size = 14) + 
+  theme(axis.text.x = element_text(angle = 90))
 ```
 
 ## Extending the annotation feature space 
 
 GTF files contain some annotation features (e.g. exons, transcripts) that are 
-usually explicitly defined, however, some gene features such as introns,
+usually explicitly defined, however, some transcript features such as introns,
 exon-intron boundaries, promoter regions are only implicitly defined. Such 
 implicit features can be extracted from a GTF file using makeTxDb family of 
 functions from the GenomicFeatures library.
 
-First we create a GRangesList object, where each list element contains all
-the available coordinates of gene features such as transcripts, exons, introns,
+First we create a list of GRanges objects, where each list element contains all
+the available coordinates of transcript features such as transcripts, exons, introns,
 5'/3' UTRs, exon-intron boundaries, and promoter regions. 
 
 ```{r getTxdbFeatures}
 txdbFeatures <- getTxdbFeaturesFromGRanges(gff)
 ```
 
-### Plotting overlap counts between query regions and gene features
+### Plotting overlap counts between query regions and transcript features
 To have a global overview of the distribution of query regions across gene
-features, we can use the summarizeQueryRegions function.
+features, we can use the summarizeQueryRegions function. If a given query region 
+does not overlap with any of the given coordinates of the transcript features, 
+it is categorized under `NoFeatures`. 
 
 ```{R summarizeQueryRegions}
 summary <- summarizeQueryRegions(queryRegions = queryRegions, 
@@ -128,44 +121,28 @@ summary <- summarizeQueryRegions(queryRegions = queryRegions,
 
 df <- data.frame(summary)
 df$percent <- round((df$count / length(queryRegions)), 3) * 100
-p <- plot_ly( data = df, 
-              x = rownames(df), 
-              y = df$percent, 
-              type = 'bar',
-              text = paste("count:", df$count), 
-              color = rownames(df)
-              )
-layout(p = p, 
-       xaxis = list(title = 'features'),
-       yaxis = list(title = paste("percentage of query regions,", 
-                                  "n =", length(queryRegions)
-                                  )
-                    ), 
-       margin = list(b = 150, r = 50)
-       )
+df$feature <- rownames(df)
+ggplot2::ggplot(df, aes(x = reorder(feature, -percent), y = percent)) + 
+  geom_bar(stat = 'identity', aes(fill = feature)) + 
+  geom_label(aes(y = percent + 3), label = df$count) + 
+  labs(x = 'transcript feature', y = paste0('percent overlap (n = ', length(queryRegions), ')')) + 
+  theme_bw(base_size = 14) + 
+  theme(axis.text.x = element_text(angle = 90))
 ```
 
 ### Obtaining a table of overlap counts between query regions and genes 
 To find out which genes overlap with how many queries and categorise overlaps by
-gene features; we use getTargetedGenesTable function, which returns a data.frame
-object. Then we use datatable function from 'DT' library to print an interactive
-table of genes that overlap query Regions. 
+transcript features; we use `getTargetedGenesTable` function, which returns a data.frame
+object.  
 ```{r getTargetedGenesTable}
 dt <- getTargetedGenesTable(queryRegions = queryRegions, 
                            txdbFeatures = txdbFeatures)
 dt <- dt[order(transcripts, decreasing = TRUE)]
 
-DT::datatable(dt[1:100], 
-          extensions = c('Buttons', 'FixedColumns'), 
-          options = list(fixedColumns = TRUE, 
-                         scrollX = TRUE,
-                         dom = 'Bfrtip',
-                         buttons = c('copy', 'print', 'csv','excel', 'pdf')),
-          filter = 'bottom'
-          )
+knitr::kable(dt[1:10,])
 ```
 
-### Profiling the coverage of query regions across gene features 
+### Profiling the coverage of query regions across transcript features 
 
 #### Coverage profile of query regions at feature boundaries 
 
@@ -176,17 +153,35 @@ get such signal distributions at transcription start/end sites. The same approac
 collection of transcript features (exons, introns, promoters, UTRs etc.)
 
 ```{r transcriptBoundaryCoverage}
-cvgF <- getFeatureBoundaryCoverage(queryRegions = queryRegions, featureCoords = txdbFeatures$transcripts, flankSize = 1000, boundaryType = 'fiveprime', sampleN = 10000)
-cvgT <- getFeatureBoundaryCoverage(queryRegions = queryRegions, featureCoords = txdbFeatures$transcripts, flankSize = 1000, boundaryType = 'threeprime', sampleN = 10000)
+cvgF <- getFeatureBoundaryCoverage(queryRegions = queryRegions, 
+                                   featureCoords = txdbFeatures$transcripts, 
+                                   flankSize = 1000, 
+                                   boundaryType = 'fiveprime', 
+                                   sampleN = 10000)
+cvgT <- getFeatureBoundaryCoverage(queryRegions = queryRegions, 
+                                   featureCoords = txdbFeatures$transcripts, 
+                                   flankSize = 1000, 
+                                   boundaryType = 'threeprime', 
+                                   sampleN = 10000)
 
-plotFeatureBoundaryCoverage(cvgF = cvgF, cvgT = cvgT, featureName = 'transcripts')
+cvgF$boundary <- 'fiveprime'
+cvgT$boundary <- 'threeprime'
+
+df <- rbind(cvgF, cvgT)
+
+ggplot2::ggplot(df, aes(x = bases, y = meanCoverage)) + 
+  geom_ribbon(fill = 'lightgreen', 
+              aes(ymin = meanCoverage - standardError * 1.96, 
+                  ymax = meanCoverage + standardError * 1.96)) + 
+ geom_line(color = 'black') + 
+ facet_grid( ~ boundary) + theme_bw(base_size = 14) 
 
 ```
 
-#### Coverage profile of query regions for all gene features
-Coverage profiles can be obtained for a single type of gene feature or a list of
-gene features. Here we demonstrate how to get coverage profile of query regions 
-across all available gene features. It might be a good idea to use sampleN
+#### Coverage profile of query regions for all transcript features
+Coverage profiles can be obtained for a single type of transcript feature or a list of
+transcript features. Here we demonstrate how to get coverage profile of query regions 
+across all available transcript features. It might be a good idea to use sampleN
 parameter to randomly downsample the target regions to speed up the 
 calculations.
 
@@ -195,36 +190,19 @@ cvgList <- calculateCoverageProfileList(queryRegions = queryRegions,
                                        targetRegionsList = txdbFeatures, 
                                        sampleN = 10000)
 
-p <- plotly::plot_ly(data = cvgList, type = 'scatter', mode = 'lines')
-for (f in unique(cvgList$feature)){
-  data <- cvgList[cvgList$feature == f,]
-  p <- add_trace(p = p, data = data, x = ~bins, y = ~meanCoverage, 
-                 legendgroup = f, showlegend = FALSE, opacity = 1, color = f)
-  p <- add_ribbons(p = p, data = data, x = ~bins, 
-                   ymin = data$meanCoverage - data$standardError*1.96,
-                   ymax = data$meanCoverage + data$standardError*1.96, 
-                   legendgroup = f, 
-                   name = f, color = f
-                   )
-}
-layout(p, font = list(size = 14))
+ggplot2::ggplot(cvgList, aes(x = bins, y = meanCoverage)) + 
+  geom_ribbon(fill = 'lightgreen', 
+              aes(ymin = meanCoverage - standardError * 1.96, 
+                  ymax = meanCoverage + standardError * 1.96)) + 
+ geom_line(color = 'black') + theme_bw(base_size = 14) +
+ facet_wrap( ~ feature, ncol = 3) 
 ```
-
-
-#### Coverage profile of query regions at/around Feature Boundaries
-
-Another way of profiling the signal at different gene features is to look into the depth of
-coverage of the query regions at the boundaries such as the transcription start/end sites,  
-exon-intron boundaries, and so on. Below, we demonstrate how to get the signal distribution
-at the flanking regions of the transcription start/end sites. The signal can be either binned by
-a window of certain number of base-pairs (using **getFeatureBoundaryCoverageBin** function) or the signal can be computed for each base-pair around the boundary region including a certain length of flanking bases (using the **getFeatureBoundaryCoverage** function). Plotting the coverage profiles of 
-TSS and TES regions side-by-side, we can quickly observe that for this particular dataset, the signal concentrates around the 3' end of the transcript. 
 
 # Motif Analysis using motifRG
 
 ## Calculating enriched motifs
 With the RCAS package, a motif analysis is also possible.
-RCAS uses motifRG library to find enriched motifs among the query regions.
+RCAS uses `motifRG` library to find enriched motifs among the query regions.
 ```{r motif_analysis}
 motifResults <- runMotifRG(queryRegions = queryRegions, 
                            resizeN = 15, sampleN = 10000,
@@ -244,14 +222,7 @@ for (i in 1:length(motifResults$motifs)) {
 A summary table from the motif analysis results can be obtained
 ```{r motif_analysis_table}
 summary <- getMotifSummaryTable(motifResults)
-DT::datatable(summary, 
-          extensions = c('Buttons', 'FixedColumns'), 
-          options = list(fixedColumns = TRUE, 
-                         scrollX = TRUE,
-                         dom = 'Bfrtip',
-                         buttons = c('copy', 'print', 'csv','excel', 'pdf')),
-          filter = 'bottom'
-          )
+knitr::kable(summary)
 ```
 
 
@@ -277,14 +248,8 @@ goBP <- runTopGO(ontology = 'BP',
 goBP <- goBP[order(goBP$foldEnrichment, decreasing = TRUE),]
 rownames(goBP) <- goBP$GO.ID
 goBP <- subset(goBP, select = -c(Annotated,classicFisher, bh, GO.ID))
-DT::datatable(goBP[1:10,], 
-          extensions = c('Buttons', 'FixedColumns'), 
-          options = list(fixedColumns = TRUE, 
-                         scrollX = TRUE,
-                         dom = 'Bfrtip',
-                         buttons = c('copy', 'print', 'csv', 'excel', 'pdf')),
-          filter = 'bottom'
-          )
+
+knitr::kable(goBP[1:10,])
 ```
 
 
@@ -296,7 +261,7 @@ and calculate gene set enrichment analysis (GSEA)
 to find out which gene sets are enriched
 among the genes targeted by the query regions. 
 
-Below we demonstrate a GSEA case using randomly generated gene sets (in order not to breach MSIGDB licence agreement) that are provided as built-in data in RCAS. The actual MSIGDB gene set annotations must be downloaded by the user from the MSIGDB website. RCAS provides functions to parse the annotations and map them to species other to enable GSEA on other species such as mouse and fly. 
+Below we demonstrate a GSEA case using randomly generated gene sets (in order not to breach MSIGDB licence agreement) that are provided as built-in data in RCAS. The actual MSIGDB gene set annotations must be downloaded by the user from the MSIGDB website. RCAS provides functions to parse the annotations (`RCAS::parseMsigdb`) and map them to other species via orthology (`RCAS::createOrthologousGeneSetList`) to enable GSEA on other species such as mouse and fly. 
 
 ```{r msigdb_analysis}
 #geneSets <- parseMsigdb(< path to msigdbFile>)
@@ -305,18 +270,11 @@ resultsGSEA <- runGSEA(geneSetList = geneSets,
                        backgroundGenes = backgroundGenes, 
                        targetedGenes = targetedGenes)
 
-datatable(resultsGSEA[1:10,],
-    extensions = 'FixedColumns',
-  options = list(
-    dom = 't',
-    scrollX = TRUE,
-    scrollCollapse = TRUE
-  ))
-
+knitr::kable(x = resultsGSEA[1:10,])
 ```
 
 RCAS also provides functions to map the MSIGDB annotations from human to fly and mouse. 
-``` 
+```
 #parse human annotations
 refGeneSets <- parseMsigdb(filePath = <path to MSIGDB annotation file>)
 
@@ -325,9 +283,7 @@ refGeneSets <- parseMsigdb(filePath = <path to MSIGDB annotation file>)
 orthGeneSets <- createOrthologousGeneSetList(referenceGeneSetList = refGeneSets, 
                                                 refGenomeVersion = 'hg19', 
                                                 targetGenomeVersion = 'mm9')
-
 #the mapped gene sets can be used for GSEA analysis using the runGSEA command.
-
 ```
 
 # Generating a full report 
