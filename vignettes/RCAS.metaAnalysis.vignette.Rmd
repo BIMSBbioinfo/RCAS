@@ -96,8 +96,15 @@ invisible(createDB(dbPath = databasePath, projDataFile = projDataFile, gtfFilePa
 ```
 
 However, it is also possible to update an existing database by setting the `update` argument to `TRUE`. This is useful when you want to add new datasets to an existing project. This will only add processed data for samples that don't already exist in the database. This will not attempt to overwrite existing data for existing samples. 
+
 ```
 createDB(dbPath = databasePath, projDataFile = projDataFile, gtfFilePath = gtfFilePath, genomeVersion = 'hg19', update = TRUE)
+```
+
+It is also possible to turn off certain analysis modules by setting `annotationSummary`, `coverageProfiles`, or `motifAnalysis` modules to `FALSE`. For instance, the following command will create the same database except for the `discoveredMotifs` table.
+
+```
+createDB(dbPath = databasePath, projDataFile = projDataFile, gtfFilePath = gtfFilePath, genomeVersion = 'hg19', motifAnalysis = FALSE)
 ```
 
 If the user wishes to overwrite datasets for existing samples, all relevant data for the given samples must be first purged from the database. It is possible to do so via:
@@ -149,7 +156,7 @@ Let's first create a sample data file. The sample names found in this file shoul
 
 ```{r}
 sampleData <- data.frame('sampleName' = c('FUS_1', 'FUS_2', 'EIF4A3_1', 'EIF4A3_2'), 
-                         'sampleGroup' = c('FUS', 'EIF4A3'), 
+                         'sampleGroup' = c('FUS', 'FUS', 'EIF4A3', 'EIF4A3'), 
                          stringsAsFactors = FALSE) 
 sampleDataFile <- file.path(getwd(), 'mySampleDataTable.tsv')
 write.table(sampleData, sampleDataFile, sep = '\t', quote =FALSE, row.names = FALSE)
@@ -157,5 +164,6 @@ write.table(sampleData, sampleDataFile, sep = '\t', quote =FALSE, row.names = FA
 
 Now, we are ready to get an HTML report:
 ```{r}
-runReportMetaAnalysis(dbPath = databasePath, sampleTablePath = sampleDataFile, genomeVersion = 'hg19')
+runReportMetaAnalysis(dbPath = databasePath, sampleTablePath = sampleDataFile, 
+                      outFile = file.path(getwd(), 'myProject.html'))
 ```
