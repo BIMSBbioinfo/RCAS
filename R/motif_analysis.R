@@ -265,28 +265,33 @@ discoverFeatureSpecificMotifs <- function(queryRegions, txdbFeatures, ...) {
     featureCoords <- txdbFeatures[[f]]
     #find query regions that overlap the target features
     q <- queryRegions[unique(queryHits(findOverlaps(queryRegions, featureCoords)))]
-    motifResults <- runMotifRG(queryRegions = q, ...)
-    if(length(motifResults$motifs) > 0) {
-      motifStats <- subset(getMotifSummaryTable(motifResults)[1,], 
-                           select = c('patterns', 'fgSeq', 'fgFrac', 'bgFrac'))
-      motifStats$fgSeqTotal <- length(q)
-      motifStats$matches <- paste0(motifResults$motifs[[1]]@match$pattern, 
-                                   collapse = ';')
-      motifStats$feature <- f
-      return(motifStats)
-    } else {
-      #notice that this must be in line with the select statement
-      #from getMotifSummaryTable function's output
-      motifStats <- data.frame('patterns' = 'NONE', 
-                               'fgSeq' = 0, 
-                               'fgFrac' = 0,
-                               'bgFrac' = 0,
-                               'fgSeqTotal' = length(q),
-                               'matches' = paste0(rep('NONE', 5), 
-                                                  collapse = ';'),
-                               'feature' = f)
-      return(motifStats)
-    }
-  }))
+    
+    #notice that this must be in line with the select statement
+    #from getMotifSummaryTable function's output
+    motifStats <- data.frame('patterns' = 'NONE', 
+                             'fgSeq' = 0, 
+                             'fgFrac' = 0,
+                             'bgFrac' = 0,
+                             'fgSeqTotal' = length(q),
+                             'matches' = paste0(rep('NONE', 5), 
+                                                collapse = ';'),
+                             'feature' = f)
+    
+    if(length(q) > 0) {
+      motifResults <- runMotifRG(queryRegions = q, ...)
+
+      if(length(motifResults$motifs) > 0) {
+        motifStats <- subset(getMotifSummaryTable(motifResults)[1,], 
+                             select = c('patterns', 'fgSeq', 'fgFrac', 'bgFrac'))
+        motifStats$fgSeqTotal <- length(q)
+        motifStats$matches <- paste0(motifResults$motifs[[1]]@match$pattern, 
+                                     collapse = ';')
+        motifStats$feature <- f
+      }
+      
+      }
+    return(motifStats)
+  }
+  ))  
   return(results)
 }
