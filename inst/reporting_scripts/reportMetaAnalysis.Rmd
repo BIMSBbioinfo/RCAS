@@ -1,6 +1,6 @@
 ---
 title: "The RNA Centric Analysis System Report"
-author: "Bora Uyar, Dilmurat Yusuf, Ricardo Wurmus, Altuna Akalin"
+author: "Bora Uyar, Ricardo Wurmus, Altuna Akalin"
 date: '`r Sys.time()`'
 params:
   dbPath: './test.RCASdb.sqlite'
