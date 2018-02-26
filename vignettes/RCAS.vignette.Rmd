@@ -1,13 +1,8 @@
 ---
 title: "The RNA Centric Analysis System Report"
 author: "Bora Uyar, Dilmurat Yusuf, Ricardo Wurmus, Altuna Akalin"
-date: "`r date()`"
-output:
-  html_document:
-    toc: true
-    toc_float: true
-    number_sections: true
-    theme: simplex
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Introduction - single sample analysis}
   %\VignetteEngine{knitr::rmarkdown}
@@ -16,7 +11,7 @@ vignette: >
 
 
 ```{r global_options, include=FALSE}
-knitr::opts_chunk$set(warning = FALSE, message = FALSE, eval = TRUE)
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, eval = TRUE, fig.width = 7, fig.height = 4.2)
 ```
 
 
@@ -24,8 +19,9 @@ knitr::opts_chunk$set(warning = FALSE, message = FALSE, eval = TRUE)
 library(RCAS)
 ```
 
-**Warning**: In this vignette, due to space limitations, we demonstrate the functions of RCAS using static images. I
-n order to see how an interactive report from RCAS looks see `RCAS::runReport()`. 
+**Warning**: In this vignette, due to space limitations, we demonstrate the functions of RCAS using static images. In order to see how an interactive report from RCAS looks see `RCAS::runReport()`. 
+
+For the most up-to-date functionality, usage and installation instructions, and example outputs, see our [github repository here](https://github.com/BIMSBbioinfo/RCAS). 
 
 # Introduction
 
@@ -185,7 +181,7 @@ across all available transcript features. It might be a good idea to use sampleN
 parameter to randomly downsample the target regions to speed up the 
 calculations.
 
-```{r coverageprofilelist}
+```{r coverageprofilelist, fig.height=6}
 cvgList <- calculateCoverageProfileList(queryRegions = queryRegions, 
                                        targetRegionsList = txdbFeatures, 
                                        sampleN = 10000)
