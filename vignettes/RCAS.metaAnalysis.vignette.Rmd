@@ -1,8 +1,11 @@
 ---
-title: "How to do meta-analysis of multiple samples with RCAS"
+title: "How to do meta-analysis of CLIP-seq peaks from multiple samples with RCAS"
 author: "Bora Uyar, Ricardo Wurmus, Altuna Akalin"
 date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+    toc_depth: 2
 vignette: >
   %\VignetteIndexEntry{How to do meta-analysis of multiple samples}
   %\VignetteEngine{knitr::rmarkdown}
@@ -18,6 +21,8 @@ knitr::opts_chunk$set(warning = FALSE, message = FALSE, eval = FALSE, fig.width 
 library(RCAS)
 ```
 
+**Warning**: Due to space limitations, we demonstrate the useful functions in this workflow without images. In order to see an HTML report generated based on the full genome annotations and complete datasets described in the vignette, please see [here](https://bimsbstatic.mdc-berlin.de/akalin/buyar/RCAS/1.4.2/RCAS.html).
+
 For the most up-to-date functionality, usage and installation instructions, and example outputs, see our [github repository here](https://github.com/BIMSBbioinfo/RCAS). 
 
 # Introduction
@@ -29,9 +34,9 @@ The first release of RCAS was designed to produce quality controls and explorato
    
 Since the release of RCAS 1.4.0, it is possible to process more than one input BED files and generate a self-containing HTML report with plots and tables that compare/contrast the input samples. 
 
-In this vignette, we will use example datasets from PAR-CLIP experiments to show how to use the meta-analysis functionality of the RCAS package. However, the same workflow can be applied to any kind of high-throughput dataset that pertains to transripts and can be expressed as genomic ranges in a BED format file. 
+In this vignette, we will use example datasets from CLIP based sequencing experiments to show how to use the meta-analysis functionality of the RCAS package. However, the same workflow can be applied to any kind of high-throughput dataset that pertains to transripts and can be expressed as genomic ranges in a BED format file. 
 
-## Preparing the inputs
+# Preparing the inputs
 
 When starting from scratch, the two necessary inputs are:
   
@@ -40,11 +45,9 @@ When starting from scratch, the two necessary inputs are:
     - bedFilePath: The path to the BED format file that contains the genomic ranges for the analysed sample. 
   2. **GTF File**: GTF file contains the genome annotations in [GTF format](https://www.ensembl.org/info/website/upload/gff.html). 
   
-### Project Data File
+## Project Data File
 
-In this vignette, we will analyse the peak regions discovered via CLIP-sequencing experiments of the [RNA-binding protein FUS](http://www.uniprot.org/uniprot/P35637) by [Nakaya et al, 2013](https://www.ncbi.nlm.nih.gov/pubmed/23389473) and [Synaptic Functional Regulator FMR1](http://www.uniprot.org/uniprot/Q06787) by [Ascano et al. 2012](https://www.ncbi.nlm.nih.gov/pubmed/23235829) and [Eukaryotic initiation factor 4A-III](http://www.uniprot.org/uniprot/P38919) by [Sauliere et al, 2012](https://www.ncbi.nlm.nih.gov/pubmed/23085716). We use two replicates from both experiments and constrain the analysis to a small portion of the genome (the first 1 million base pairs of chromosome 1).
-
-Both the genome annotations and the peaks detected within these regions are available as built-in data in the RCAS package. To obtain the full datasets, please refer to the [doRiNa database](http://dorina.mdc-berlin.de/regulators). 
+In this vignette, we will analyse the peak regions discovered via CLIP-sequencing experiments of the [RNA-binding protein FUS](http://www.uniprot.org/uniprot/P35637) by [Nakaya et al, 2013](https://www.ncbi.nlm.nih.gov/pubmed/23389473), [Synaptic Functional Regulator FMR1](http://www.uniprot.org/uniprot/Q06787) by [Ascano et al. 2012](https://www.ncbi.nlm.nih.gov/pubmed/23235829), and [Eukaryotic initiation factor 4A-III](http://www.uniprot.org/uniprot/P38919) by [Sauliere et al, 2012](https://www.ncbi.nlm.nih.gov/pubmed/23085716). We use two replicates from both experiments and constrain the analysis to a small portion of the genome (the first 1 million base pairs of chromosome 1). Both the genome annotations and the peaks detected within these regions are available as built-in data in the RCAS package. To obtain the full datasets, please refer to the [doRiNa database](http://dorina.mdc-berlin.de/regulators). 
 
 First, we detect the paths to these datasets:
 ```{r}
@@ -68,7 +71,7 @@ projDataFile <- file.path(getwd(), 'myProjDataFile.tsv')
 write.table(projData, projDataFile, sep = '\t', quote =FALSE, row.names = FALSE) 
 ```
 
-### GTF File (genome annotations)
+## GTF File (genome annotations)
 
 The second input is the path to the GTF file containing genome annotations. 
 Here we use the first 1 million bases of the chromosome 1 from the Ensembl Database (version 75 - corresponds to GRCh37 build - hg19 in UCSC). 
@@ -77,7 +80,7 @@ Here we use the first 1 million bases of the chromosome 1 from the Ensembl Datab
 gtfFilePath <- system.file("extdata", "hg19.sample.gtf", package = "RCAS")
 ```
 
-## Creating a RSQLite database  
+# Creating a RSQLite database  
 
 In order to avoid redundant preprocessing of the same input files, we have developed a function `RCAS::createDB` to save all preprocessed data into an SQLite database using the R package [RSQLite](https://cran.r-project.org/web/packages/RSQLite/index.html). With this function, all input files from the project data file are processed, the resulting processed data are saved in the following SQL tables: 
  
@@ -141,7 +144,7 @@ knitr::kable(annotationSummaries)
 For most tables it is the desired format, however some of the tables need converting from `data.frame` to the desired class (e.g. `GenomicRanges` for `gtfData` table) for downstream processing. 
 
 
-## Generating a meta-analysis report 
+# Generating a meta-analysis report 
 
 Once an sqlite database is obtained, `RCAS::runReportMetaAnalysis()` function can be utilized to quickly generate comparative analysis reports between whichever sample groups are desired to be compared. To generate this report, only two inputs are required:
 
@@ -167,3 +170,27 @@ Now, we are ready to get an HTML report:
 runReportMetaAnalysis(dbPath = databasePath, sampleTablePath = sampleDataFile, 
                       outFile = file.path(getwd(), 'myProject.html'))
 ```
+
+
+# Acknowledgements
+
+RCAS is developed in the group of 
+[Altuna Akalin](http://bioinformatics.mdc-berlin.de/team.html#altuna-akalin-phd)
+(head of the Scientific Bioinformatics Platform) at the Berlin Institute of Medical Systems Biology
+([BIMSB](https://www.mdc-berlin.de/13800178/en/bimsb))
+at the Max-Delbrueck-Center for Molecular Medicine
+([MDC](https://www.mdc-berlin.de)) in Berlin.
+
+RCAS is developed as a bioinformatics service as part of
+the [RNA Bioinformatics Center](http://www.denbi.de/index.php/rbc),
+which is one of the eight centers of
+the German Network for Bioinformatics Infrastructure
+([de.NBI](http://www.denbi.de/)).  
+
+To cite RCAS in publications use:
+
+  > Bora Uyar, Dilmurat Yusuf, Ricardo Wurmus, Nikolaus Rajewsky, Uwe Ohler, Altuna Akalin; RCAS: an RNA centric annotation system
+  > for transcriptome-wide regions of interest. Nucleic Acids Res 2017 gkx120. doi: 10.1093/nar/gkx120
+
+
+
