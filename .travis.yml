@@ -9,6 +9,9 @@ bioc_required: true
 bioc_packages:
   - BiocCheck
 
+r_packages:
+  - devtools
+  
 after_script:
   - ls -lah
   - FILE=$(ls -1t *.tar.gz | head -n 1)
