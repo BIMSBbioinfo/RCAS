@@ -47,45 +47,25 @@ devtools::install_github('BIMSBbioinfo/RCAS')
 
 ## usage:
 
-- GTF file (Required)
+### Package vignettes and reference manual
 
-Firstly, download the input datasets from ENSEMBL (GTF file) and doRiNA (BED file), and optionally gene-set annotations from the [MSIGDB](http://software.broadinstitute.org/gsea/msigdb/)
-
-```
-wget ftp://ftp.ensembl.org/pub/release-75/gtf/homo_sapiens/Homo_sapiens.GRCh37.75.gtf.gz
-gunzip Homo_sapiens.GRCh37.75.gtf.gz
-```
-
-- BED file (Required)
-
-Sample BED file from a HITSCLIP study of LIN28A protein [Wilbert ML, et al, 2012](https://www.ncbi.nlm.nih.gov/pubmed/22959275) downloaded from DoRiNA database
-```
-wget https://bimsbstatic.mdc-berlin.de/akalin/buyar/RCAS/HITSCLIP_LIN28AWilbert2012a_hg19.bed
-```
-
-- Gene set annotations (Optional)
-
-Download the human gene set annotations from the Molecular Signatures Database.
-The recommended set of gene set annotations is the [curated gene sets](http://software.broadinstitute.org/gsea/msigdb/collections.jsp#C2) with 'Entrez' gene identifiers.
-
-If the gene set enrichment analysis using the MSIGDB annotations is needed for other species, RCAS can take the MSIGDB annotations for human and map them to mouse and fly genomes via orthologous genes. In any case, it must be the human gene-set annotations provided to the main reporting function of RCAS (**runReport**). The mapping to other species happens in the background.
-
-Generate an annotation report using the GTF file and built-in test data (BED format) as input.
-```
-library('RCAS')
-RCAS::runReport(gffFilePath = "./Homo_sapiens.GRCh37.75.gtf",  queryFilePath = "./HITSCLIP_LIN28AWilbert2012a_hg19.bed", msigdbFilePath = <path to MSIGDB gene-sets with ENTREZ gene ids>, genomeVersion = 'hg19')
-```
-
-## Package vignette and reference manual
-
-See the [package vignette](http://bioconductor.org/packages/3.4/bioc/vignettes/RCAS/inst/doc/RCAS.vignette.html) and [the reference manual](http://bioconductor.org/packages/3.4/bioc/manuals/RCAS/man/RCAS.pdf) for more information about the detailed functions available in RCAS.
+For detailed instructions on how to use RCAS, please see: 
+  - [package vignette for single sample analysis](http://bioconductor.org/packages/release/bioc/vignettes/RCAS/inst/doc/RCAS.vignette.html) 
+  - [package vignette for multi-sample analysis - TODO update link]()
+  - [reference manual](http://bioconductor.org/packages/3.4/bioc/manuals/RCAS/man/RCAS.pdf) for more information about the detailed functions available in RCAS.
 
 ## Use cases from published RNA-based omics datasets
+
+### Multi-sample analysis use case
+
+- See an [example report](https://bimsbstatic.mdc-berlin.de/akalin/buyar/RCAS/1.4.2/RCAS.html) comparing the peak regions discovered via CLIP-sequencing experiments of the [RNA-binding protein FUS](http://www.uniprot.org/uniprot/P35637) by [Nakaya et al, 2013](https://www.ncbi.nlm.nih.gov/pubmed/23389473), [Synaptic Functional Regulator FMR1](http://www.uniprot.org/uniprot/Q06787) by [Ascano et al. 2012](https://www.ncbi.nlm.nih.gov/pubmed/23235829), and [Eukaryotic initiation factor 4A-III](http://www.uniprot.org/uniprot/P38919) by [Sauliere et al, 2012](https://www.ncbi.nlm.nih.gov/pubmed/23085716).
+
+
+### Single Sample Analysis Use Cases
 
 - The reference files needed for reproducing the reports below:
     - [Homo_sapiens.GRCh37.75.gtf.gz]( http://ftp.ensembl.org/pub/release-75/gtf/homo_sapiens/Homo_sapiens.GRCh37.75.gtf.gz)
     - [c2.all.v5.1.entrez.gmt](http://software.broadinstitute.org/gsea/msigdb/download_file.jsp?filePath=/resources/msigdb/5.1/c2.all.v5.1.entrez.gmt)
-
 
 - [RCAS report](https://bimsbstatic.mdc-berlin.de/akalin/buyar/RCAS/1.1.1/PARCLIP_PUM2_Hafner2010b_hg19.bed.RCAS.report.html) for [PUM2](http://www.uniprot.org/uniprot/Q8TB72) RNA-binding sites detected by **PAR-CLIP** technique ([Hafner et al, 2010](https://www.ncbi.nlm.nih.gov/pubmed/20371350))
   - input:  [PARCLIP_PUM2_Hafner2010b_hg19](http://dorina.mdc-berlin.de/api/v1.0/download/regulator/hg19/PARCLIP_PUM2_Hafner2010b_hg19)
