@@ -9,9 +9,6 @@ bioc_required: true
 bioc_packages:
   - BiocCheck
 
-r_github_packages:
-  - jimhester/covr
-
 after_script:
   - ls -lah
   - FILE=$(ls -1t *.tar.gz | head -n 1)
