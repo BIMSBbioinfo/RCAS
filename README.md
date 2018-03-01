@@ -51,7 +51,7 @@ devtools::install_github('BIMSBbioinfo/RCAS')
 
 For detailed instructions on how to use RCAS, please see: 
   - [package vignette for single sample analysis](http://bioconductor.org/packages/release/bioc/vignettes/RCAS/inst/doc/RCAS.vignette.html) 
-  - [package vignette for multi-sample analysis - TODO update link]()
+  - [package vignette for multi-sample analysis](http://bioconductor.org/packages/release/bioc/vignettes/RCAS/inst/doc/RCAS.metaAnalysis.vignette.html)
   - [reference manual](http://bioconductor.org/packages/3.4/bioc/manuals/RCAS/man/RCAS.pdf) for more information about the detailed functions available in RCAS.
 
 ## Use cases from published RNA-based omics datasets
