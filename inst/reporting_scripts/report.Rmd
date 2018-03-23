@@ -308,7 +308,7 @@ motifData <- discoverFeatureSpecificMotifs(
 
 featuresToPlot <- unique(motifData$feature)
 motifLogos <- lapply(featuresToPlot, function(f) {
-           matches <- motifData[motifData$feature == f,]$matches
+           matches <- as.character(motifData[motifData$feature == f,]$matches)
            matches <- unlist(Biostrings::strsplit(matches, ';'))
            #number of sequences in which a motif was searched for
            fgSeqTotal <- motifData[motifData$feature == f,]$fgSeqTotal
