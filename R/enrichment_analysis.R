@@ -172,16 +172,13 @@ printMsigdbDataset = function(dataset, outputFilename){
 #'   two mart objects
 #'
 #' @examples
-#' mart1_hg19 <- biomaRt::useMart(biomart = 'ENSEMBL_MART_ENSEMBL',
-#'                                   host = 'feb2014.archive.ensembl.org',
+#' mart1 <- biomaRt::useMart(biomart = 'ENSEMBL_MART_ENSEMBL',
 #'                                dataset = "hsapiens_gene_ensembl")
-#' mart2_mm9 <- biomaRt::useMart(biomart = 'ENSEMBL_MART_ENSEMBL',
-#'                                  host = 'may2012.archive.ensembl.org',
+#' mart2 <- biomaRt::useMart(biomart = 'ENSEMBL_MART_ENSEMBL',
 #'                               dataset = "mmusculus_gene_ensembl")
 #' genes <- c('2645','5232', '5230','5162','5160')
-#' orthologs <- retrieveOrthologs( mart1 = mart1_hg19,
-#'                                 mart2 = mart2_mm9,
-#'                                 geneSet = genes)
+#' orthologs <- retrieveOrthologs( mart1, mart2, genes)
+#' 
 #' @importFrom biomaRt getLDS
 #' @export
 retrieveOrthologs <- function(mart1, mart2, geneSet){
@@ -194,36 +191,11 @@ retrieveOrthologs <- function(mart1, mart2, geneSet){
 }
 
 #' @importFrom biomaRt useMart
-getBioMartConnection <- function (genomeVersion) {
-   if (genomeVersion == 'hg38') {
-    mart <- biomaRt::useMart( biomart = 'ENSEMBL_MART_ENSEMBL',
-                              host = 'mar2017.archive.ensembl.org',
-                              dataset = "hsapiens_gene_ensembl")
-  } else if (genomeVersion == 'hg19') {
-    mart <- biomaRt::useMart( biomart = 'ENSEMBL_MART_ENSEMBL',
-                              host = 'feb2014.archive.ensembl.org',
-                              dataset = "hsapiens_gene_ensembl")
-  } else if (genomeVersion == 'mm10') {
-    mart <- biomaRt::useMart( biomart = 'ENSEMBL_MART_ENSEMBL',
-                              host = 'mar2017.archive.ensembl.org',
-                              dataset = "mmusculus_gene_ensembl")
-  } else if (genomeVersion == 'mm9') {
-    mart <- biomaRt::useMart( biomart = 'ENSEMBL_MART_ENSEMBL',
-                              host = 'may2012.archive.ensembl.org',
-                              dataset = "mmusculus_gene_ensembl")
-  } else if (genomeVersion == 'dm3') {
-    mart <- biomaRt::useMart( biomart = 'ENSEMBL_MART_ENSEMBL',
-                              host = 'dec2014.archive.ensembl.org',
-                              dataset = "dmelanogaster_gene_ensembl")
-  } else if (genomeVersion == 'ce10') {
-    #ENSEMBL v67 hosts WBcel215 version of C.elegans (WS215 - WS234)
-    mart <- biomaRt::useMart( biomart = 'ENSEMBL_MART_ENSEMBL',
-                              host = 'may2012.archive.ensembl.org',
-                              dataset = "celegans_gene_ensembl") 
-  } else {
-    stop ("Cannot create a BioMart connection for genome versions except:
-          hg38, hg19, mm9, mm10, ce10, and dm3\n")
-  }
+getBioMartConnection <- function (species) {
+  mart <- biomaRt::useMart( 
+    biomart = 'ENSEMBL_MART_ENSEMBL',
+    dataset = paste0(species, "_gene_ensembl")
+  )
   return (mart)
 }
 
@@ -237,9 +209,8 @@ getBioMartConnection <- function (genomeVersion) {
 #' @param referenceGeneSetList A named list of vectors where each vector
 #'   consists of a set of Entrez gene ids (for instance, returned by
 #'   \code{parseMsigdb} function
-#' @param refGenomeVersion Genome version of a reference species. (default:hg19)
-#' @param targetGenomeVersion Genome version of a target species. Available 
-#'   options are mm9, dm3, and ce10
+#' @param refSpecies Reference species (e.g. hsapiens)
+#' @param targetSpecies Target species (e.g. mmusculus)
 #'   
 #' @return A list of vectors where each vector consists of a set of Entrez gene 
 #'   ids
@@ -252,39 +223,39 @@ getBioMartConnection <- function (genomeVersion) {
 #' #Map the gene sets to a target genome (supported genomes: mm9, dm3, or ce10)
 #' orthGeneSets <- createOrthologousGeneSetList(
 #'                              referenceGeneSetList = geneSets,
-#'                              refGenomeVersion = 'hg19',
-#'                              targetGenomeVersion = 'mm9'
+#'                              refSpecies = 'hsapiens',
+#'                              targetSpecies = 'mmusculus'
 #'                              )
 #' 
 #' @export
 createOrthologousGeneSetList <- function(referenceGeneSetList,
-                                           refGenomeVersion = 'hg19',
-                                           targetGenomeVersion) {
+                                           refSpecies = 'hsapiens',
+                                           targetSpecies) {
 
   #define all available reference genes in all the given gene sets
   refGenes <- unique(paste(unlist(referenceGeneSetList)))
 
   # to be able to retrieve orthologs of the genes in the input gene sets - use
   # biomaRt to get ortholog data from Ensembl
-  refMart <- getBioMartConnection (genomeVersion = refGenomeVersion)
-  targetMart <- getBioMartConnection (genomeVersion = targetGenomeVersion)
+  refMart <- getBioMartConnection (refSpecies)
+  targetMart <- getBioMartConnection (targetSpecies)
   message('Created the database connections to biomart for ',
-      refGenomeVersion, ' and ', targetGenomeVersion)
+          refSpecies, ' and ', targetSpecies)
 
   #retrieve orthologs lists for all human genes found in the MSIGDB gene sets
   orthologs <- retrieveOrthologs(mart1 = refMart, mart2 = targetMart, refGenes)
-  message('Retrieved', nrow(orthologs),
+  message('Retrieved ', nrow(orthologs),
       ' orthologous relations between ',
       length(unique(orthologs[,1])),
-      " genes from ", refGenomeVersion,
+      " genes from ", refSpecies,
       ' and ', length(unique(orthologs[,2])),
-      " genes from ", targetGenomeVersion)
+      " genes from ", targetSpecies)
 
   orthGeneSetList <- list()
   for (i in 1:length(referenceGeneSetList)){
     refSet <- unique(as.numeric(paste(unlist(referenceGeneSetList[i]))))
-    s <- orthologs$EntrezGene.ID %in% refSet
-    orthologSet <- unique(orthologs[s,]$EntrezGene.ID.1)
+    s <- orthologs$NCBI.gene.ID %in% refSet
+    orthologSet <- unique(orthologs[s,]$NCBI.gene.ID.1)
     refSetName <- names(referenceGeneSetList)[i]
     orthGeneSetList[[refSetName]] <- orthologSet
   }

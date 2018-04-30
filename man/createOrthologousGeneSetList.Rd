@@ -4,18 +4,17 @@
 \alias{createOrthologousGeneSetList}
 \title{createOrthologousMsigdbDataset}
 \usage{
-createOrthologousGeneSetList(referenceGeneSetList, refGenomeVersion = "hg19",
-  targetGenomeVersion)
+createOrthologousGeneSetList(referenceGeneSetList, refSpecies = "hsapiens",
+  targetSpecies)
 }
 \arguments{
 \item{referenceGeneSetList}{A named list of vectors where each vector
 consists of a set of Entrez gene ids (for instance, returned by
 \code{parseMsigdb} function}
 
-\item{refGenomeVersion}{Genome version of a reference species. (default:hg19)}
+\item{refSpecies}{Reference species (e.g. hsapiens)}
 
-\item{targetGenomeVersion}{Genome version of a target species. Available 
-options are mm9, dm3, and ce10}
+\item{targetSpecies}{Target species (e.g. mmusculus)}
 }
 \value{
 A list of vectors where each vector consists of a set of Entrez gene 
@@ -35,8 +34,8 @@ data(geneSets)
 #Map the gene sets to a target genome (supported genomes: mm9, dm3, or ce10)
 orthGeneSets <- createOrthologousGeneSetList(
                              referenceGeneSetList = geneSets,
-                             refGenomeVersion = 'hg19',
-                             targetGenomeVersion = 'mm9'
+                             refSpecies = 'hsapiens',
+                             targetSpecies = 'mmusculus'
                              )
 
 }

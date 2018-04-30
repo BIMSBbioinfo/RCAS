@@ -25,14 +25,11 @@ Given two biomart connections and a set of entrez gene identifiers; retrieve
 orthologs between mart1 and mart2 for the given list of genes
 }
 \examples{
-mart1_hg19 <- biomaRt::useMart(biomart = 'ENSEMBL_MART_ENSEMBL',
-                                  host = 'feb2014.archive.ensembl.org',
+mart1 <- biomaRt::useMart(biomart = 'ENSEMBL_MART_ENSEMBL',
                                dataset = "hsapiens_gene_ensembl")
-mart2_mm9 <- biomaRt::useMart(biomart = 'ENSEMBL_MART_ENSEMBL',
-                                 host = 'may2012.archive.ensembl.org',
+mart2 <- biomaRt::useMart(biomart = 'ENSEMBL_MART_ENSEMBL',
                               dataset = "mmusculus_gene_ensembl")
 genes <- c('2645','5232', '5230','5162','5160')
-orthologs <- retrieveOrthologs( mart1 = mart1_hg19,
-                                mart2 = mart2_mm9,
-                                geneSet = genes)
+orthologs <- retrieveOrthologs( mart1, mart2, genes)
+
 }
