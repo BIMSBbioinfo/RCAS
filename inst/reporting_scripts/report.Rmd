@@ -31,6 +31,11 @@ provideMotifSummary <- FALSE #if params$motifAnalysis is TRUE and any motif is f
 goSummaryBP <- FALSE 
 goSummaryMF <- FALSE
 goSummaryCC <- FALSE 
+
+SPECIES <- list('human' = 'hsapiens', 
+                'worm' = 'celegans',
+                'mouse' = 'mmusculus',
+                'fly' = 'dmelanogaster')
 ```
 
 ```{r load_libraries, results='hide'}
@@ -441,9 +446,10 @@ cat("**Table",tableCount,":** Significant MSigDB Gene Sets (FDR < 0.1) enriched 
 ```{r GSEA, eval=msigdbAnalysis}
 if (params$species != 'human') {
   refGeneSets <- parseMsigdb(filePath = params$msigdb)
+  
   geneSets <- createOrthologousGeneSetList(referenceGeneSetList = refGeneSets, 
-                                                refGenomeVersion = 'hg19', 
-                                                targetGenomeVersion = params$genomeVersion)
+                                                refSpecies = 'hsapiens', 
+                                                targetSpecies = SPECIES[[params$species]])
 } else if (params$msigdb == 'testdata') {
   data(geneSets)
 } else {
