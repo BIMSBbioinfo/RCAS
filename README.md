@@ -27,7 +27,8 @@ GO term and gene-set enrichment analyses are supported for hg19, hg38, mm9, mm10
 ## installation:
 
 ### Installing from [Bioconductor](http://bioconductor.org/packages/3.4/bioc/html/RCAS.html)
-`source('http://bioconductor.org/biocLite.R')`
+`if (!requireNamespace("BiocManager", quietly=TRUE))`
+    `install.packages("BiocManager")`
 
 `biocLite('RCAS')`
 
