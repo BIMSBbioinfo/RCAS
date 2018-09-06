@@ -30,7 +30,7 @@ GO term and gene-set enrichment analyses are supported for hg19, hg38, mm9, mm10
 `if (!requireNamespace("BiocManager", quietly=TRUE))`
     `install.packages("BiocManager")`
 
-`biocLite('RCAS')`
+`BiocManager::install('RCAS')`
 
 ### Installing the development version from Github
 ```
