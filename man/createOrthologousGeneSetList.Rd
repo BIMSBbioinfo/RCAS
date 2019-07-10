@@ -4,8 +4,8 @@
 \alias{createOrthologousGeneSetList}
 \title{createOrthologousMsigdbDataset}
 \usage{
-createOrthologousGeneSetList(referenceGeneSetList, refSpecies = "hsapiens",
-  targetSpecies)
+createOrthologousGeneSetList(referenceGeneSetList,
+  refSpecies = "hsapiens", targetSpecies)
 }
 \arguments{
 \item{referenceGeneSetList}{A named list of vectors where each vector

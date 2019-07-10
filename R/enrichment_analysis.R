@@ -172,31 +172,26 @@ printMsigdbDataset = function(dataset, outputFilename){
 #'   two mart objects
 #'
 #' @examples
-#' mart1 <- biomaRt::useMart(biomart = 'ENSEMBL_MART_ENSEMBL',
-#'                                dataset = "hsapiens_gene_ensembl")
-#' mart2 <- biomaRt::useMart(biomart = 'ENSEMBL_MART_ENSEMBL',
-#'                               dataset = "mmusculus_gene_ensembl")
+#' mart1 <- biomaRt::useMart("ensembl", dataset = "hsapiens_gene_ensembl")
+#' mart2 <- biomaRt::useMart("ensembl", dataset = "mmusculus_gene_ensembl")
 #' genes <- c('2645','5232', '5230','5162','5160')
 #' orthologs <- retrieveOrthologs( mart1, mart2, genes)
 #' 
 #' @importFrom biomaRt getLDS
 #' @export
 retrieveOrthologs <- function(mart1, mart2, geneSet){
-  biomaRt::getLDS( attributes = c("entrezgene"),
-                   filters = "entrezgene",
+  biomaRt::getLDS( attributes = c("entrezgene_id"),
+                   filters = c("entrezgene_id"),
                    values = geneSet,
                    mart = mart1,
-                   attributesL = c("entrezgene"),
+                   attributesL = c("entrezgene_id"),
                    martL = mart2)
 }
 
 #' @importFrom biomaRt useMart
 getBioMartConnection <- function (species) {
-  mart <- biomaRt::useMart( 
-    biomart = 'ENSEMBL_MART_ENSEMBL',
-    dataset = paste0(species, "_gene_ensembl")
-  )
-  return (mart)
+  mart <- biomaRt::useMart("ensembl", paste0(species, "_gene_ensembl"))
+  return(mart)
 }
 
 #' createOrthologousMsigdbDataset

@@ -4,7 +4,8 @@
 \alias{runTopGO}
 \title{runTopGO}
 \usage{
-runTopGO(ontology = "BP", species = "human", backgroundGenes, targetedGenes)
+runTopGO(ontology = "BP", species = "human", backgroundGenes,
+  targetedGenes)
 }
 \arguments{
 \item{ontology}{A character string denoting which type of GO ontology to use.
