@@ -4,8 +4,8 @@
 \alias{importBed}
 \title{importBed}
 \usage{
-importBed(filePath, sampleN = 0, keepStandardChr = TRUE, debug = TRUE,
-  ...)
+importBed(filePath, sampleN = 0, keepStandardChr = TRUE,
+  debug = TRUE, ...)
 }
 \arguments{
 \item{filePath}{Path to a BED file}

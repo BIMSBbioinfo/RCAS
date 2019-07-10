@@ -4,8 +4,8 @@
 \alias{calculateCoverageProfileList}
 \title{calculateCoverageProfileList}
 \usage{
-calculateCoverageProfileList(queryRegions, targetRegionsList, sampleN = 0,
-  bin.num = 100, bin.op = "mean", strand.aware = TRUE)
+calculateCoverageProfileList(queryRegions, targetRegionsList,
+  sampleN = 0, bin.num = 100, bin.op = "mean", strand.aware = TRUE)
 }
 \arguments{
 \item{queryRegions}{GRanges object imported from a BED file using 

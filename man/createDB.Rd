@@ -6,8 +6,8 @@
 \usage{
 createDB(dbPath = file.path(getwd(), "rcasDB.sqlite"), projDataFile,
   gtfFilePath = "", update = FALSE, genomeVersion,
-  annotationSummary = TRUE, coverageProfiles = TRUE, motifAnalysis = TRUE,
-  nodeN = 1)
+  annotationSummary = TRUE, coverageProfiles = TRUE,
+  motifAnalysis = TRUE, nodeN = 1)
 }
 \arguments{
 \item{dbPath}{Path to the sqlite database file (could be an existing file or 
