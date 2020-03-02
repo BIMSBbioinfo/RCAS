@@ -137,6 +137,9 @@ extractMatches <- function(seqs, patterns, minMismatch = 0, maxMismatch = 0) {
   return(matches)
 }
 
+#' Find Differential Motifs 
+#' 
+#' @export
 findDifferentialMotifs <- function(querySeqs, 
                                    controlSeqs, 
                                    motifWidth = 6,
@@ -184,6 +187,9 @@ findDifferentialMotifs <- function(querySeqs,
   return(p)
 }
 
+#' run motifRG 
+#' 
+#' @export
 runMotifRG <- function() {
   .Deprecated("runMotifDiscovery")
 }
