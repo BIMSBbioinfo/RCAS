@@ -65,7 +65,7 @@ Imports:
     ggseqlogo,
     methods,
     utils
-RoxygenNote: 6.1.1
+RoxygenNote: 7.0.2
 Suggests: BSgenome.Hsapiens.UCSC.hg38, 
     BSgenome.Mmusculus.UCSC.mm10, 
     BSgenome.Mmusculus.UCSC.mm9,
