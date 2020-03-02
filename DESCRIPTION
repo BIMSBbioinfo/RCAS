@@ -37,8 +37,7 @@ Depends: R (>= 3.3.0),
     plotly (>= 4.5.2),
     DT (>= 0.2),
     data.table,
-    topGO,
-    motifRG
+    topGO
 Imports:
     biomaRt,
     AnnotationDbi,
