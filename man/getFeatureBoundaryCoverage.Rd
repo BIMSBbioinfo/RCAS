@@ -4,8 +4,13 @@
 \alias{getFeatureBoundaryCoverage}
 \title{getFeatureBoundaryCoverage}
 \usage{
-getFeatureBoundaryCoverage(queryRegions, featureCoords, flankSize = 500,
-  boundaryType, sampleN = 0)
+getFeatureBoundaryCoverage(
+  queryRegions,
+  featureCoords,
+  flankSize = 500,
+  boundaryType,
+  sampleN = 0
+)
 }
 \arguments{
 \item{queryRegions}{GRanges object imported from a BED file using 

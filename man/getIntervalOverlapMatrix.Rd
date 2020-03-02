@@ -4,8 +4,12 @@
 \alias{getIntervalOverlapMatrix}
 \title{getIntervalOverlapMatrix}
 \usage{
-getIntervalOverlapMatrix(queryRegionsList, targetRegions,
-  targetRegionNames = NULL, nodeN = 1)
+getIntervalOverlapMatrix(
+  queryRegionsList,
+  targetRegions,
+  targetRegionNames = NULL,
+  nodeN = 1
+)
 }
 \arguments{
 \item{queryRegionsList}{A GRangesList object}

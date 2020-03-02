@@ -4,8 +4,11 @@
 \alias{createOrthologousGeneSetList}
 \title{createOrthologousMsigdbDataset}
 \usage{
-createOrthologousGeneSetList(referenceGeneSetList,
-  refSpecies = "hsapiens", targetSpecies)
+createOrthologousGeneSetList(
+  referenceGeneSetList,
+  refSpecies = "hsapiens",
+  targetSpecies
+)
 }
 \arguments{
 \item{referenceGeneSetList}{A named list of vectors where each vector
@@ -28,7 +31,7 @@ relationships to human genes.
 }
 \examples{
 #Recommended gene sets (with Entrez Ids) from MSIGDB database can be downloaded
-#from \\url{http://software.broadinstitute.org/gsea/msigdb/collections.jsp#C2}
+#from \url{http://software.broadinstitute.org/gsea/msigdb/collections.jsp#C2}
 #Here we use built-in random gene sets to show how the function works
 data(geneSets)
 #Map the gene sets to a target genome (supported genomes: mm9, dm3, or ce10)

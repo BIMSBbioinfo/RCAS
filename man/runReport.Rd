@@ -4,12 +4,21 @@
 \alias{runReport}
 \title{Generate a RCAS Report for a list of transcriptome-level segments}
 \usage{
-runReport(queryFilePath = "testdata", gffFilePath = "testdata",
-  msigdbFilePath = "testdata", annotationSummary = TRUE,
-  goAnalysis = TRUE, msigdbAnalysis = TRUE, motifAnalysis = TRUE,
-  genomeVersion = "hg19", outDir = getwd(),
-  printProcessedTables = FALSE, sampleN = 0, quiet = FALSE,
-  selfContained = TRUE)
+runReport(
+  queryFilePath = "testdata",
+  gffFilePath = "testdata",
+  msigdbFilePath = "testdata",
+  annotationSummary = TRUE,
+  goAnalysis = TRUE,
+  msigdbAnalysis = TRUE,
+  motifAnalysis = TRUE,
+  genomeVersion = "hg19",
+  outDir = getwd(),
+  printProcessedTables = FALSE,
+  sampleN = 0,
+  quiet = FALSE,
+  selfContained = TRUE
+)
 }
 \arguments{
 \item{queryFilePath}{a BED format file which contains genomic coordinates of 

@@ -4,8 +4,14 @@
 \alias{importGtf}
 \title{importGtf}
 \usage{
-importGtf(filePath, saveObjectAsRds = TRUE, readFromRds = TRUE,
-  overwriteObjectAsRds = FALSE, keepStandardChr = TRUE, ...)
+importGtf(
+  filePath,
+  saveObjectAsRds = TRUE,
+  readFromRds = TRUE,
+  overwriteObjectAsRds = FALSE,
+  keepStandardChr = TRUE,
+  ...
+)
 }
 \arguments{
 \item{filePath}{Path to a GTF file}

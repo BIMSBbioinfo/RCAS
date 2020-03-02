@@ -4,10 +4,17 @@
 \alias{createDB}
 \title{createDB}
 \usage{
-createDB(dbPath = file.path(getwd(), "rcasDB.sqlite"), projDataFile,
-  gtfFilePath = "", update = FALSE, genomeVersion,
-  annotationSummary = TRUE, coverageProfiles = TRUE,
-  motifAnalysis = TRUE, nodeN = 1)
+createDB(
+  dbPath = file.path(getwd(), "rcasDB.sqlite"),
+  projDataFile,
+  gtfFilePath = "",
+  update = FALSE,
+  genomeVersion,
+  annotationSummary = TRUE,
+  coverageProfiles = TRUE,
+  motifAnalysis = TRUE,
+  nodeN = 1
+)
 }
 \arguments{
 \item{dbPath}{Path to the sqlite database file (could be an existing file or 
@@ -56,7 +63,7 @@ FMR1_path <- system.file("extdata",
 projData <- data.frame('sampleName' = c('FUS', 'FMR1'), 
 'bedFilePath' = c(FUS_path,FMR1_path), stringsAsFactors = FALSE)
  
-write.table(projData, 'myProjDataFile.tsv', sep = '\\t', quote =FALSE, 
+write.table(projData, 'myProjDataFile.tsv', sep = '\t', quote =FALSE, 
 row.names = FALSE) 
 
 gtfFilePath <- system.file("extdata",
