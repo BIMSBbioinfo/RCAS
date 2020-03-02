@@ -101,11 +101,102 @@ extractSequences <- function (queryRegions, genomeVersion) {
   return (sequences)
 }
 
-#' runMotifRG
+generateKmers <- function(width, letters = c("A", "C", "G", "T")) {
+  kmer <- c()
+  for(i in 1:width){
+    kmer <- unlist(lapply(letters, function(x){paste(kmer, x, sep="")}))
+  }
+  return(kmer)
+}
+
+countPattern <- function(seqs, patterns, maxMismatch = 0, nCores = 1) {
+  cl <- parallel::makeCluster(nCores)
+  parallel::clusterExport(cl = cl, varlist = c('seqs', 'patterns', 'maxMismatch'), 
+                          envir = environment())
+  M <- do.call(rbind, pbapply::pblapply(cl = cl, X = patterns, 
+                               FUN = function(x) {
+                                 Biostrings::vcountPattern(x, seqs, 
+                                                           max.mismatch = maxMismatch)
+                               }))
+  parallel::stopCluster(cl)
+  rownames(M) <- patterns
+  return(t(M))
+}
+
+extractMatches <- function(seqs, patterns, minMismatch = 0, maxMismatch = 0) {
+  matches <- lapply(patterns, function(x) {
+    m <- Biostrings::vmatchPattern(pattern = x, subject = seqs, max.mismatch = maxMismatch)
+    m <- unlist(m[lengths(m) > 0])
+    # remove out of bounds matches
+    m <- m[start(m) >= 1]
+    m <- m[end(m) <= IRanges::width(seqs[names(m)])]
+    m <- split(m, names(m))
+    common <- intersect(names(m), names(seqs))
+    paste(unlist(Biostrings::extractAt(seqs[common], m[common])))
+  })
+  return(matches)
+}
+
+findDifferentialMotifs <- function(querySeqs, 
+                                   controlSeqs, 
+                                   motifWidth = 6,
+                                   motifN, 
+                                   nCores, 
+                                   maxMismatch = 1) {
+  
+  kmers <- generateKmers(width = motifWidth)
+  
+  if(length(querySeqs) > 1000) {
+    selected <- sample(1:length(querySeqs), 1000)
+  }
+  
+  query <- countPattern(querySeqs[selected], kmers, maxMismatch, nCores)
+  ctrl <- countPattern(controlSeqs[selected], kmers, maxMismatch, nCores)
+
+  # only keep patterns that are more frequent in the query
+  queryHits <- apply(query, 2, function(x) sum(x > 0))
+  controlHits <- apply(ctrl, 2, function(x) sum(x > 0))
+  candidates <- names(which(log2((queryHits + 1) / (controlHits+1)) > 0))
+  
+  query <- query[,candidates]
+  ctrl <- ctrl[,candidates]
+  
+  # train a random forest model 
+  df <- as.data.frame(rbind(query[,candidates], ctrl[,candidates]))
+  df$label <- c(rep("query", nrow(query)), 
+                   rep("ctrl", nrow(ctrl)))
+  
+  fit <- ranger::ranger(label ~ ., df, importance = 'impurity')
+  var.imp <- sort(ranger::importance(fit), decreasing = T)
+  #get top variables 
+  top <- names(var.imp[1:motifN])
+
+  matches <- extractMatches(seqs = querySeqs, patterns = top, maxMismatch = maxMismatch)
+  # convert T's to U's 
+  matches <- lapply(matches, function(x){
+    gsub("T", "U", x)
+  })
+  p <- ggseqlogo::ggseqlogo(matches)
+  
+  #matches_c <- e(seqs = s_c, patterns = top)
+  
+  #lengths(matches)/lengths(matches_c)
+  return(p)
+}
+
+runMotifRG <- function() {
+  .Deprecated("runMotifDiscovery")
+}
+
+#' runMotifDiscovery
 #'
-#' This function makes use of \code{motifRG} library to carry out de novo motif
-#' discovery from input query regions
-#'
+#' This function builds a random forest classifier to find the top most
+#' discriminative motifs in the query regions compared to the background. The
+#' background sequences are automatically generated based on the query regions.
+#' First k-mers of a fixed length are generated. The query and control sequences
+#' are searched for k-mers allowing for mismatches. A random forest model is 
+#' trained to find the most discriminative motifs.  
+#' 
 #' @param queryRegions GRanges object containing coordinates of input query 
 #'   regions imported by the \code{\link{importBed}} function
 #' @param resizeN Integer value (default: 0) to resize query regions if they are
@@ -124,14 +215,14 @@ extractSequences <- function (queryRegions, genomeVersion) {
 #' @return a list of objects returned by the \code{motifRG::findMotif} function
 #' @examples
 #' data(queryRegions)
-#' motifResults <- runMotifRG(queryRegions = queryRegions,
-#'                           genomeVersion = 'hg19',
-#'                           resize = 15,
-#'                           motifN = 1,
-#'                           nCores = 2)
-#' @import motifRG
+#' motifResults <- runMotifDiscovery(queryRegions = queryRegions,
+#'                                   genomeVersion = 'hg19',
+#'                                   resize = 15,
+#'                                   motifN = 1,
+#'                                   nCores = 2)
+#' @import IRanges
 #' @export
-runMotifRG <- function (queryRegions, resizeN = 0, 
+runMotifDiscovery <- function (queryRegions, resizeN = 0, 
                         sampleN = 0, genomeVersion, 
                         motifN = 5, nCores = 4) {
 
@@ -161,13 +252,12 @@ runMotifRG <- function (queryRegions, resizeN = 0,
   message('extracting background sequences from fasta..')
   controlSeqs <- extractSequences(controlRegions, genomeVersion)
 
-  message('running motifRG...')
-  motifResults <- motifRG::findMotifFgBg(fg.seq = querySeqs,
-                                         bg.seq = controlSeqs,
-                                         enriched.only = TRUE,
-                                         max.motif = motifN,
-                                         both.strand = FALSE,
-                                         mc.cores = nCores)
+  message('running motif discovery ... ')
+  motifResults <- findDifferentialMotifs(querySeqs = querySeqs, 
+                                         controlSeqs = controlSeqs, 
+                                         motifWidth = 6, 
+                                         motifN = motifN, 
+                                         nCores = nCores)
   return(motifResults)
 }
 
