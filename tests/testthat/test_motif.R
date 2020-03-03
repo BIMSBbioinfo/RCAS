@@ -4,11 +4,6 @@ context("Functions to do motif enrichment analysis")
 data(queryRegions)
 peaks <- queryRegions[1:1000]
 
-#createControlRegions
-#extractSequences
-#runMotifRG
-#getMotifSummaryTable
-
 controls <- createControlRegions(queryRegions = peaks)
 test_that("Generating control regions to compare with query regions", {
   expect_is(controls, 'GRanges')
@@ -22,13 +17,14 @@ test_that("Extracting sequences of a GRanges object from a BSGenome object", {
   expect_error(extractSequences(peaks[1:5], 'foo'))
 })
 
-motifs <- runMotifRG(queryRegions = queryRegions, genomeVersion = 'hg19', motifN = 1, nCores = 2)
-test_that("Motif analysis using motifRG package",{
+motifs <- runMotifDiscovery(queryRegions = queryRegions, genomeVersion = 'hg19', 
+                            motifWidth = 5, maxMismatch = 0, 
+                            motifN = 1, nCores = 1)
+test_that("Motif analysis ... ",{
   expect_is(motifs, 'list')
-  expect_equal(length(motifs$motifs[[1]]@pattern), 1)
 })
 
 test_that("Motif summary table", {
-  expect_equal(length(colnames(getMotifSummaryTable(motifs))), 9)
+  expect_equal(length(colnames(getMotifSummaryTable(motifs))), 7)
   expect_equal(colnames(getMotifSummaryTable(motifs))[1], 'patterns')
 })
