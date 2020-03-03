@@ -642,12 +642,6 @@ calculateCoverageProfileFromTxdb <- function () {
   .Deprecated('calculateCoverageProfile')
 }
 
-findLongLines <- function (myfile, lineLimit = 80) {
-  counts <- lapply(X = readLines(myfile), FUN = function (x) {l=nchar(x)})
-  names(counts) <- c(1:length(counts))
-  return(names(counts)[counts > lineLimit])
-}
-
 #' Generate a RCAS Report for a list of transcriptome-level segments
 #' 
 #' This is the main report generation function for RCAS. This function can take 
