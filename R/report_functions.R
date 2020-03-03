@@ -635,68 +635,11 @@ calculateCoverageProfileListFromTxdb <- function () {
 
 #' calculateCoverageProfileFromTxdb
 #'
-#' This function overlaps the input query regions with a target list of
-#' annotation features and calculates the coverage profile along the target
-#' regions.
-#'
-#' @param queryRegions GRanges object imported from a BED file using
-#'   \code{importBed} function
-#' @param txdb A txdb object obtained by using \code{GenomicFeatures::makeTxDb}
-#'   family of functions
-#' @param sampleN If set to a positive integer, the targetRegions will be
-#'   downsampled to \code{sampleN} regions
-#' @param type A character string defining the type of gene feature for which a
-#'   profile should be calculated. The options are: transcripts, exons, introns,
-#'   promoters, fiveUTRs, threeUTRs, and cds.
-#' @return A data.frame object consisting of two columns: 1. coverage level 2.
-#'   bins. The target regions are divided into 100 equal sized bins and coverage
-#'   level is summarized in a strand-specific manner using the
-#'   \code{genomation::ScoreMatrixBin} function.
-#' @examples
-#' data(gff)
-#' data(queryRegions)
-#' txdb <- GenomicFeatures::makeTxDbFromGRanges(gff)
-#' df <- calculateCoverageProfileFromTxdb(queryRegions = queryRegions,
-#'                                                type = 'exons',
-#'                                                txdb = txdb,
-#'                                             sampleN = 1000)
-#' @import GenomicFeatures
-#' @import GenomicRanges
-#' @importFrom BiocGenerics unlist
+#' This function is deprecated. Use ?calculateCoverageProfile instead. 
+#' 
 #' @export
-calculateCoverageProfileFromTxdb <- function (queryRegions,
-                                              txdb,
-                                              type,
-                                              sampleN = 0) {
-
-  if (type == 'transcripts') {
-    targetRegions <- GenomicFeatures::transcripts(txdb)
-  } else if (type == 'exons') {
-    tmp <- GenomicFeatures::exonsBy(x = txdb, by = "tx", use.names = TRUE)
-    targetRegions <- BiocGenerics::unlist(tmp)
-  } else if (type == 'introns') {
-    tmp <- GenomicFeatures::intronsByTranscript(x = txdb, use.names = TRUE)
-    targetRegions <- BiocGenerics::unlist(tmp)
-  } else if (type == 'promoters') {
-    targetRegions <- GenomicFeatures::promoters(txdb)
-  } else if (type == 'fiveUTRs') {
-    tmp <- GenomicFeatures::fiveUTRsByTranscript(x = txdb, use.names = TRUE)
-    targetRegions <- BiocGenerics::unlist(tmp)
-  } else if (type == 'threeUTRs') {
-    tmp <- GenomicFeatures::threeUTRsByTranscript(x = txdb, use.names = TRUE)
-    targetRegions <- BiocGenerics::unlist()
-  } else if (type == 'cds') {
-    tmp <- GenomicFeatures::cdsBy(x = txdb, by = "tx", use.names = TRUE)
-    targetRegions <- BiocGenerics::unlist(tmp)
-  } else {
-    stop ("Can calculate coverage profiles for only:
-          transcripts, exons, introns,
-          promoters, fiveUTRs, threeUTRs, and cds")
-  }
-  result = calculateCoverageProfile(queryRegions = queryRegions,
-                                    targetRegions = targetRegions,
-                                    sampleN = sampleN)
-  return (result)
+calculateCoverageProfileFromTxdb <- function () {
+  .Deprecated('calculateCoverageProfile')
 }
 
 findLongLines <- function (myfile, lineLimit = 80) {
