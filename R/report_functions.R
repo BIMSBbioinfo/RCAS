@@ -642,6 +642,58 @@ calculateCoverageProfileFromTxdb <- function () {
   .Deprecated('calculateCoverageProfile')
 }
 
+#' checkSeqDb
+#' 
+#' Given a string that denotes a genome version (e.g. hg19)
+#' returns the BSgenome object matching the genome version 
+#' that are available in BSgenome::available.genomes() 
+#' 
+#' @param genomeVersion String that denotes genome version. 
+#' To unambigously select a BSgenome object, provide a string
+#' that matches the end of the available genomes at: 
+#' BSgenome::available.genomes().
+#' @return Returns a BSgenome object that uniquely matches the 
+#' genomeVersion. 
+#' @examples 
+#' checkSeqDb('hg19')
+#' @importFrom BSgenome available.genomes
+#' @export
+checkSeqDb <- function(genomeVersion) {
+  availableGenomes <- BSgenome::available.genomes()
+  db <- grep(paste0(genomeVersion, '$'),
+         BSgenome::available.genomes(),
+         value = T)
+  if (length(db) == 0) {
+    stop(
+      "Can't find a genome sequence with the given genome version:",
+      genomeVersion,
+      "\n\tRun BSgenome::available.genomes() to see which ones are available"
+    )
+  } else if (length(db) > 1) {
+    stop(
+      "Can't match the genome version to an unambigous genome sequence object.",
+      "\nmatching genomes are: ",
+      paste(db, collapse = '\t'),
+      "\nPlease update your genomeVersion input to uniquely match",
+      "\nAlso see BSgenome::available.genomes()"
+    )
+  }
+  
+  if (!requireNamespace(db, quietly = TRUE)) {
+    stop(
+      "Can't find the package ",
+      db,
+      " in your system. \n Please install via => ",
+      paste0("BiocManager::install('", db, "')")
+    )
+  }
+  
+  message(date(), " => Returning ", db, " as BSgenome object")
+  
+  requireNamespace(package = db)
+  return(get(db))
+}
+
 #' Generate a RCAS Report for a list of transcriptome-level segments
 #' 
 #' This is the main report generation function for RCAS. This function takes a
@@ -721,6 +773,8 @@ runReport <- function(queryFilePath = 'testdata',
                       quiet = FALSE,
                       selfContained = TRUE) {
 
+  db <- checkSeqDb(genomeVersion)
+  
   if(queryFilePath != 'testdata') {
     queryFilePath <- normalizePath(queryFilePath)
   }

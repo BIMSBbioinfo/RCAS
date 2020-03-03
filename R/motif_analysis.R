@@ -76,23 +76,8 @@ createControlRegions <- function (queryRegions) {
 #' @importFrom Biostrings getSeq
 #' @export
 extractSequences <- function (queryRegions, genomeVersion) {
-
-  if (genomeVersion == 'hg38') {
-    seqDb <- BSgenome.Hsapiens.UCSC.hg38::Hsapiens
-  } else if (genomeVersion == 'hg19') {
-    seqDb <- BSgenome.Hsapiens.UCSC.hg19::Hsapiens
-  } else if (genomeVersion == 'mm10') {
-    seqDb <- BSgenome.Mmusculus.UCSC.mm10::Mmusculus
-  } else if (genomeVersion == 'mm9') {
-    seqDb <- BSgenome.Mmusculus.UCSC.mm9::Mmusculus
-  } else if (genomeVersion == 'ce10') {
-    seqDb <- BSgenome.Celegans.UCSC.ce10::Celegans
-  } else if (genomeVersion == 'dm3') {
-    seqDb <- BSgenome.Dmelanogaster.UCSC.dm3::Dmelanogaster
-  } else {
-    stop ("Cannot extract fasta sequences from genome versions except:
-          hg38, hg19, mm10, mm9, ce10 and dm3\n")
-  }
+  
+  seqDb <- checkSeqDb(genomeVersion)
   style <- GenomeInfoDb::seqlevelsStyle(queryRegions)
   GenomeInfoDb::seqlevelsStyle(seqDb) <- style
   sequences <- Biostrings::getSeq(seqDb, queryRegions)
@@ -100,7 +85,6 @@ extractSequences <- function (queryRegions, genomeVersion) {
 
   return (sequences)
 }
-
 
 #' Generate K-mers
 #' 
