@@ -16,6 +16,8 @@
 #' 
 #' @param targetGenes Vector of Ensembl gene ids or gene names 
 #' @param species First letter of genus + species name: e.g. hsapiens
+#' 
+#' @export
 findEnrichedFunctions <- function(targetGenes, species) {
  res <- gprofiler2::gost(query = targetGenes, organism = species)
  return(res$result)
