@@ -7,23 +7,24 @@
 getMotifSummaryTable(motifResults)
 }
 \arguments{
-\item{motifResults}{Output object of \code{runMotifRG} function}
+\item{motifResults}{Output object of \code{runMotifDiscovery} function}
 }
 \value{
 A data.frame object containing summary statistics about the
   discovered motifs
 }
 \description{
-A repurposed/simplified version of the \code{motifRG::summaryMotif} function.
+Get summary stats for top discovered motifs
 }
 \examples{
 
 data(queryRegions)
-motifResults <- runMotifRG(queryRegions = queryRegions,
-                          genomeVersion = 'hg19',
-                          resize = 15,
-                          motifN = 1,
-                          nCores = 2)
+motifResults <- runMotifDiscovery(queryRegions = queryRegions[1:1000],
+                                  genomeVersion = 'hg19',
+                                  resize = 15,
+                                  motifN = 1,
+                                  maxMismatch = 1,
+                                  nCores = 2)
 motifSummary <- getMotifSummaryTable(motifResults)
 
 }

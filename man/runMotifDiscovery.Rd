@@ -7,8 +7,10 @@
 runMotifDiscovery(
   queryRegions,
   resizeN = 0,
+  motifWidth = 6,
   sampleN = 0,
   genomeVersion,
+  maxMismatch = 1,
   motifN = 5,
   nCores = 4
 )
@@ -48,9 +50,11 @@ trained to find the most discriminative motifs.
 }
 \examples{
 data(queryRegions)
-motifResults <- runMotifDiscovery(queryRegions = queryRegions,
+motifResults <- runMotifDiscovery(queryRegions = queryRegions[1:1000],
                                   genomeVersion = 'hg19',
+                                  motifWidth = 6, 
                                   resize = 15,
                                   motifN = 1,
+                                  maxMismatch = 1,
                                   nCores = 2)
 }

@@ -101,9 +101,21 @@ extractSequences <- function (queryRegions, genomeVersion) {
   return (sequences)
 }
 
-generateKmers <- function(width, letters = c("A", "C", "G", "T")) {
+
+#' Generate K-mers
+#' 
+#' Given a list of characters, generates all possible fixed length strings 
+#' 
+#' @param k The length of the strings to be generated 
+#' @param letters A character vector 
+#' @return Vector of strings 
+#' @examples
+#' generateKmers(3, c('A', 'C', 'G'))
+#' 
+#' @export
+generateKmers <- function(k, letters = c("A", "C", "G", "T")) {
   kmer <- c()
-  for(i in 1:width){
+  for(i in 1:k){
     kmer <- unlist(lapply(letters, function(x){paste(kmer, x, sep="")}))
   }
   return(kmer)
@@ -127,13 +139,20 @@ extractMatches <- function(seqs, patterns, minMismatch = 0, maxMismatch = 0) {
   matches <- lapply(patterns, function(x) {
     m <- Biostrings::vmatchPattern(pattern = x, subject = seqs, max.mismatch = maxMismatch)
     m <- unlist(m[lengths(m) > 0])
+    if(length(m) == 0) {
+      return(NULL)
+    }
     # remove out of bounds matches
     m <- m[start(m) >= 1]
     m <- m[end(m) <= IRanges::width(seqs[names(m)])]
     m <- split(m, names(m))
     common <- intersect(names(m), names(seqs))
+    if(length(common) == 0) {
+      return(NULL)
+    }
     paste(unlist(Biostrings::extractAt(seqs[common], m[common])))
   })
+  names(matches) <- patterns
   return(matches)
 }
 
@@ -149,6 +168,7 @@ findDifferentialMotifs <- function(querySeqs,
   
   kmers <- generateKmers(width = motifWidth)
   
+  selected <- seq(1:length(querySeqs))
   if(length(querySeqs) > 1000) {
     selected <- sample(1:length(querySeqs), 1000)
   }
@@ -174,17 +194,15 @@ findDifferentialMotifs <- function(querySeqs,
   #get top variables 
   top <- names(var.imp[1:motifN])
 
-  matches <- extractMatches(seqs = querySeqs, patterns = top, maxMismatch = maxMismatch)
-  # convert T's to U's 
-  matches <- lapply(matches, function(x){
-    gsub("T", "U", x)
-  })
-  p <- ggseqlogo::ggseqlogo(matches)
-  
-  #matches_c <- e(seqs = s_c, patterns = top)
-  
-  #lengths(matches)/lengths(matches_c)
-  return(p)
+  results <- list("counts_query" = query[,top, drop = F], 
+                  "counts_ctrl" = ctrl[,top,drop = F], 
+                  "matches_query" = extractMatches(seqs = querySeqs, 
+                                                   patterns = top, 
+                                                   maxMismatch = maxMismatch), 
+                  "matches_ctrl" = extractMatches(seqs = controlSeqs, 
+                                                  patterns = top, 
+                                                  maxMismatch = maxMismatch))
+  return(results)
 }
 
 #' run motifRG 
@@ -221,15 +239,17 @@ runMotifRG <- function() {
 #' @return a list of objects returned by the \code{motifRG::findMotif} function
 #' @examples
 #' data(queryRegions)
-#' motifResults <- runMotifDiscovery(queryRegions = queryRegions,
+#' motifResults <- runMotifDiscovery(queryRegions = queryRegions[1:1000],
 #'                                   genomeVersion = 'hg19',
+#'                                   motifWidth = 6, 
 #'                                   resize = 15,
 #'                                   motifN = 1,
+#'                                   maxMismatch = 1,
 #'                                   nCores = 2)
 #' @import IRanges
 #' @export
-runMotifDiscovery <- function (queryRegions, resizeN = 0, 
-                        sampleN = 0, genomeVersion, 
+runMotifDiscovery <- function (queryRegions, resizeN = 0, motifWidth = 6,
+                        sampleN = 0, genomeVersion, maxMismatch = 1,
                         motifN = 5, nCores = 4) {
 
   if(sampleN > 0 && length(queryRegions) > sampleN) {
@@ -249,80 +269,54 @@ runMotifDiscovery <- function (queryRegions, resizeN = 0,
         fix = 'center')
     }
   }
-  
-  controlRegions <- createControlRegions(queryRegions)
 
-  message('extracting peak sequences from fasta..')
+  message('extracting sequences from fasta..')
   querySeqs <- extractSequences(queryRegions, genomeVersion)
 
   message('extracting background sequences from fasta..')
+  controlRegions <- createControlRegions(queryRegions)
   controlSeqs <- extractSequences(controlRegions, genomeVersion)
 
   message('running motif discovery ... ')
   motifResults <- findDifferentialMotifs(querySeqs = querySeqs, 
                                          controlSeqs = controlSeqs, 
                                          motifWidth = 6, 
-                                         motifN = motifN, 
+                                         motifN = motifN,
+                                         maxMismatch = maxMismatch, 
                                          nCores = nCores)
   return(motifResults)
 }
 
 #' getMotifSummaryTable
 #'
-#' A repurposed/simplified version of the \code{motifRG::summaryMotif} function.
+#' Get summary stats for top discovered motifs 
 #'
-#' @param motifResults Output object of \code{runMotifRG} function
+#' @param motifResults Output object of \code{runMotifDiscovery} function
 #' @return A data.frame object containing summary statistics about the
 #'   discovered motifs
 #' @examples
 #'
 #' data(queryRegions)
-#' motifResults <- runMotifRG(queryRegions = queryRegions,
-#'                           genomeVersion = 'hg19',
-#'                           resize = 15,
-#'                           motifN = 1,
-#'                           nCores = 2)
+#' motifResults <- runMotifDiscovery(queryRegions = queryRegions[1:1000],
+#'                                   genomeVersion = 'hg19',
+#'                                   resize = 15,
+#'                                   motifN = 1,
+#'                                   maxMismatch = 1,
+#'                                   nCores = 2)
 #' motifSummary <- getMotifSummaryTable(motifResults)
 #'
 #' @export
 getMotifSummaryTable <- function(motifResults){
 
-  if(is.null(motifResults)) {return(NULL)}
-  motifs <- motifResults$motifs
-  category <- motifResults$category
-  scores <- c()
-  motifPatterns <- c()
-  hitsCounts1 <- c()
-  hitsCounts2 <- c()
-  seqCounts1 <- c()
-  seqCounts2 <- c()
-  fgSet <- category == 1
-  bgSet <- !fgSet
-  fgSize <- sum(fgSet)
-  bgSize <- sum(bgSet)
-  #summarize motif
-  for(i in 1:length(motifs)){
-    motifPatterns <- c(motifPatterns, motifs[[i]]@pattern)
-    scores[i] <- motifs[[i]]@score
-    count <- motifs[[i]]@count
-    hitsCounts1[i] <- sum(count[fgSet])
-    hitsCounts2[i] <- sum(count[bgSet])
-    seqCounts1[i] <-  sum(count[fgSet] > 0)
-    seqCounts2[i] <-  sum(count[bgSet] > 0)
-  }
-  ratio <- (hitsCounts1/hitsCounts2)/(fgSize/bgSize)
-  frac1 <- seqCounts1/fgSize
-  frac2 <- seqCounts2/bgSize
-  summary <- data.frame(patterns = motifPatterns,
-                        scores = round(scores,1),
-                        fgHits = hitsCounts1,
-                        bgHits = hitsCounts2,
-                        fgSeq = seqCounts1,
-                        bgSeq = seqCounts2,
-                        ratio = round(ratio,1),
-                        fgFrac = round(frac1,4),
-                        bgFrac = round(frac2,4))
-  return(summary)
+  data.frame('patterns' = names(motifResults$matches_query),
+             'queryHits' = colSums(motifResults$counts_query),
+             'controlHits' = colSums(motifResults$counts_ctrl),
+             'querySeqs' = colSums(motifResults$counts_query > 0),
+             'controlSeqs' = colSums(motifResults$counts_ctrl > 0),
+             'queryFraction' = round(colSums(motifResults$counts_query > 0) / 
+                                       nrow(motifResults$counts_query), 2),
+             'controlFraction' = round(colSums(motifResults$counts_ctrl > 0) / 
+                                         nrow(motifResults$counts_ctrl), 2))
 }
 
 
@@ -365,29 +359,23 @@ discoverFeatureSpecificMotifs <- function(queryRegions, txdbFeatures, ...) {
     #notice that this must be in line with the select statement
     #from getMotifSummaryTable function's output
     motifStats <- data.frame('patterns' = 'NONE', 
-                             'fgSeq' = 0, 
-                             'fgFrac' = 0,
-                             'bgFrac' = 0,
-                             'fgSeqTotal' = length(q),
-                             'matches' = paste0(rep('NONE', 5), 
-                                                collapse = ';'),
+                             'queryHits' = 0, 
+                             'controlHits' = 0,
+                             'querySeqs' = 0,
+                             'controlSeqs' = 0,
+                             'queryFraction' = 0,
+                             'controlFraction' = 0,
                              'feature' = f)
     
     if(length(q) > 0) {
-      motifResults <- runMotifRG(queryRegions = q, ...)
-
-      if(length(motifResults$motifs) > 0) {
-        motifStats <- subset(getMotifSummaryTable(motifResults)[1,], 
-                             select = c('patterns', 'fgSeq', 'fgFrac', 'bgFrac'))
-        motifStats$fgSeqTotal <- length(q)
-        motifStats$matches <- paste0(motifResults$motifs[[1]]@match$pattern, 
-                                     collapse = ';')
-        motifStats$feature <- f
-      }
-      
+      motifResults <- runMotifDiscovery(queryRegions = q, ...)
+      motifStats <- subset(getMotifSummaryTable(motifResults), 
+                           select = c('patterns', 
+                                      'queryFraction', 'controlFraction'))
+      motifStats$querySeqTotal <- length(q)
+      motifStats$feature <- f
       }
     return(motifStats)
-  }
-  ))  
+  }))  
   return(results)
 }
