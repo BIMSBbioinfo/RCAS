@@ -247,7 +247,7 @@ cat("**Figure",figureCount,":** The depth of coverage of query regions at exon -
 ```{r exonIntronCoverage, eval = annotationSummary}
 #split the exons into corresponding transcripts
 exons <- txdbFeatures$exons
-exonCounts <- BiocGenerics::lengths(rtracklayer::split(exons, names(exons)))
+exonCounts <- lengths(rtracklayer::split(exons, names(exons)))
 
 #To find the internal exons, for each transcript, remove the first and last exons from the GRanges object
 #thus we can make sure that each exon in the end we are looking at is adjacent to an intron
@@ -297,39 +297,34 @@ figureCount <- figureCount + 1
 ```
 
 ```{r plot_motif_results_figcap, results='asis', eval=motifAnalysis}
-cat('# motifRG analysis results \n')
+cat('# Motif Discovery Results \n')
 ```
 
 ```{r motif_analysis, results='hide', eval=motifAnalysis}
 message("Started motif discovery module...")
-motifData <- discoverFeatureSpecificMotifs(
-  queryRegions = queryRegions,
-  txdbFeatures = txdbFeatures, 
-  resizeN = 15, 
-  sampleN = 10000,
-  genomeVersion = params$genomeVersion,
-  motifN = 1, 
-  nCores = 2)
+motifData <- discoverFeatureSpecificMotifs(queryRegions = queryRegions,
+                                           txdbFeatures = txdbFeatures, 
+                                           resizeN = 15, 
+                                           sampleN = 10000,
+                                           genomeVersion = params$genomeVersion,
+                                           motifN = 1, 
+                                           nCores = 1)
+motifStats <- lapply(motifData, function(x) {
+  df <- subset(getMotifSummaryTable(x), select = c('queryFraction', 'controlFraction'))
+  df$pattern <- rownames(df)
+  return(reshape2::melt(df, id.vars = 'pattern'))
+})
 
-featuresToPlot <- unique(motifData$feature)
-motifLogos <- lapply(featuresToPlot, function(f) {
-           matches <- as.character(motifData[motifData$feature == f,]$matches)
-           matches <- unlist(Biostrings::strsplit(matches, ';'))
-           #number of sequences in which a motif was searched for
-           fgSeqTotal <- motifData[motifData$feature == f,]$fgSeqTotal
-           #fraction of sequences with the motif
-           fgFrac <- motifData[motifData$feature == 'transcripts',]$fgFrac
-           p <- ggplot2::ggplot() + 
-             ggseqlogo::geom_logo(data = matches,
-                                  namespace = c('A', 'C', 'G', 'T', 'N', 'O','E'), #N, O, E ar
-                                  method = 'bits') +
-             coord_fixed() + 
-             ggseqlogo::theme_logo() +
-             labs(x = paste0(f,"\n% of sequences (n=",fgSeqTotal,") with motif: ",
-                        round(fgFrac * 100, 2),"%")) 
-          return(p)}
-          )
-names(motifLogos) <- featuresToPlot
+motifLogos <- lapply(names(motifData), function(f) {
+    p1 <- ggseqlogo::ggseqlogo(data = motifData[[f]]$matches_query[[1]]) 
+    p2 <- ggplot(motifStats[[f]], 
+                 aes(x = variable, y = value)) + 
+      geom_bar(stat = 'identity', aes(fill = variable), show.legend = F) + 
+      labs(x = '', title = 'Fraction of sequences with motif matches') + 
+      theme_bw(base_size = 12)
+    return(cowplot::plot_grid(p1, p2, nrow = 1))
+  })
+names(motifLogos) <- names(motifData)
 ```
 
 ```{r motif_analysis_plot_figcap, results='asis', eval=motifAnalysis}
