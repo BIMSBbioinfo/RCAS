@@ -139,61 +139,10 @@ importBed <- function (filePath, sampleN = 0, keepStandardChr = TRUE, debug = TR
 
 
 #' getTxdbFeatures
-#'
-#' This function takes as input a txdb object from GenomicFeatures library. Then
-#' extracts the coordinates of gene features such as promoters, introns, exons,
-#' 5'/3' UTRs, and whole transcripts.
-#'
-#' @param txdb A txdb object imported by GenomicFeatures::makeTxDb family of
-#'   functions
-#'
-#' @examples
-#' data(gff)
-#' txdb <- GenomicFeatures::makeTxDbFromGRanges(gff)
-#' txdbFeatures <- getTxdbFeatures(txdb)
-#'
-#' @return A list of GRanges objects 
-#'
-#' @import GenomicFeatures
-#' @import GenomicRanges
-#' @importFrom BiocGenerics unlist
-#' @export
+#' 
+#' This function is deprecated. Use getTxdbFeaturesFromGRanges instead. 
 getTxdbFeatures <- function (txdb) {
-
-  transcripts <- GenomicFeatures::transcripts(txdb)
-
-  tmp <- GenomicFeatures::exonsBy(x = txdb, by = "tx", use.names = TRUE)
-  exons <- BiocGenerics::unlist(tmp)
-  exons$tx_name <- names(exons)
-
-  tmp <- GenomicFeatures::intronsByTranscript(x = txdb, use.names = TRUE)
-  introns <- BiocGenerics::unlist(tmp)
-  introns$tx_name <- names(introns)
-
-  promoters <- GenomicFeatures::promoters(txdb)
-
-  tmp <- range(GenomicFeatures::fiveUTRsByTranscript(x = txdb, use.names = TRUE))
-  fiveUTRs <- BiocGenerics::unlist(tmp)
-  fiveUTRs$tx_name <- names(fiveUTRs)
-
-  tmp <- range(GenomicFeatures::threeUTRsByTranscript(x = txdb, use.names = TRUE))
-  threeUTRs <- BiocGenerics::unlist(tmp)
-  threeUTRs$tx_name <- names(threeUTRs)
-
-  tmp <- GenomicFeatures::cdsBy(x = txdb, by = "tx", use.names = TRUE)
-  cds <- BiocGenerics::unlist(tmp)
-  cds$tx_name <- names(cds)
-
-  txdbFeatures <- list(
-    'transcripts' = transcripts,
-    'exons'       = exons,
-    'promoters'   = promoters,
-    'fiveUTRs'    = fiveUTRs,
-    'introns'     = introns,
-    'cds'         = cds,
-    'threeUTRs'   = threeUTRs
-  )
-  return(txdbFeatures)
+  .Deprecated("getTxdbFeaturesFromGRanges")
 }
 
 #' getTxdbFeaturesFromGRanges
