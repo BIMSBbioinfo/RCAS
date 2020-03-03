@@ -4,46 +4,8 @@
 \alias{runTopGO}
 \title{runTopGO}
 \usage{
-runTopGO(ontology = "BP", species = "human", backgroundGenes, targetedGenes)
-}
-\arguments{
-\item{ontology}{A character string denoting which type of GO ontology to use.
-Options are BP (biological processes), MF (molecular functions) and CC
-(cellular compartments).}
-
-\item{species}{A character string denoting which species is under analysis.
-Options are 'human', 'mouse', 'fly' and 'worm'.}
-
-\item{backgroundGenes}{A vector of Ensembl gene ids that serve as background
-set of genes for GO term enrichment. In the context of RCAS, this should be
-the whole set of genes found in an input GTF data.}
-
-\item{targetedGenes}{A vector of Ensembl gene ids that serve as the set for
-which GO term enrichment should be carried out. In the context of RCAS,
-this should be the set of genes that overlap with the query regions in an
-input BED file.}
-}
-\value{
-A data.frame object containing enriched GO terms and associated
-  statistics
+runTopGO()
 }
 \description{
-A wrapper function to facilitate GO term enrichment analysis using
-\code{topGO} package
-}
-\examples{
-\dontrun{
-#get all genes from the gff data
-data(gff)
-data(queryRegions)
-backgroundGenes <- unique(gff$gene_id)
-#get genes that overlap query regions
-overlaps <- queryGff(queryRegions, gff)
-targetedGenes <- unique(overlaps$gene_id)
-#run TopGO
-goResults = runTopGO( ontology = 'BP',
-                      species = 'human',
-                      backgroundGenes = backgroundGenes,
-                      targetedGenes = targetedGenes)
-                      }
+This function is deprecated. Use findEnrichedFunctions instead.
 }

@@ -2,43 +2,14 @@
 % Please edit documentation in R/enrichment_analysis.R
 \name{createOrthologousGeneSetList}
 \alias{createOrthologousGeneSetList}
-\title{createOrthologousMsigdbDataset}
+\title{createOrthologousMsigdbDataset
+This function is deprecated. For functional enrichment 
+analysis, use findEnrichedFunctions.}
 \usage{
-createOrthologousGeneSetList(
-  referenceGeneSetList,
-  refSpecies = "hsapiens",
-  targetSpecies
-)
-}
-\arguments{
-\item{referenceGeneSetList}{A named list of vectors where each vector
-consists of a set of Entrez gene ids (for instance, returned by
-\code{parseMsigdb} function}
-
-\item{refSpecies}{Reference species (e.g. hsapiens)}
-
-\item{targetSpecies}{Target species (e.g. mmusculus)}
-}
-\value{
-A list of vectors where each vector consists of a set of Entrez gene 
-  ids
+createOrthologousGeneSetList()
 }
 \description{
-Gene set annotations in public databases are usually geared towards human. 
-This function is used to utilize human gene set annotations to create such
-gene sets for other species such as mouse, fly, and worm via orthologous
-relationships to human genes.
-}
-\examples{
-#Recommended gene sets (with Entrez Ids) from MSIGDB database can be downloaded
-#from \url{http://software.broadinstitute.org/gsea/msigdb/collections.jsp#C2}
-#Here we use built-in random gene sets to show how the function works
-data(geneSets)
-#Map the gene sets to a target genome (supported genomes: mm9, dm3, or ce10)
-orthGeneSets <- createOrthologousGeneSetList(
-                             referenceGeneSetList = geneSets,
-                             refSpecies = 'hsapiens',
-                             targetSpecies = 'mmusculus'
-                             )
-
+createOrthologousMsigdbDataset
+This function is deprecated. For functional enrichment 
+analysis, use findEnrichedFunctions.
 }

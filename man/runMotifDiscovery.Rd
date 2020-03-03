@@ -12,7 +12,7 @@ runMotifDiscovery(
   genomeVersion,
   maxMismatch = 1,
   motifN = 5,
-  nCores = 4
+  nCores = 1
 )
 }
 \arguments{
@@ -56,5 +56,5 @@ motifResults <- runMotifDiscovery(queryRegions = queryRegions[1:1000],
                                   resize = 15,
                                   motifN = 1,
                                   maxMismatch = 1,
-                                  nCores = 2)
+                                  nCores = 1)
 }

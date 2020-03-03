@@ -2,29 +2,11 @@
 % Please edit documentation in R/enrichment_analysis.R
 \name{printMsigdbDataset}
 \alias{printMsigdbDataset}
-\title{Print MSIGDB Dataset to a file
-This function is used to print a MSIGDB dataset into a file. Mostly
-useful when human data is mapped to another species, and that mapping
-is required to run the report.}
+\title{Print MSIGDB Dataset to a file}
 \usage{
-printMsigdbDataset(dataset, outputFilename)
-}
-\arguments{
-\item{dataset}{A list of vectors containing gene sets from MSIGDB}
-
-\item{outputFilename}{A character string that denotes the output file name}
-}
-\value{
-A text file printed to the current directory
+printMsigdbDataset()
 }
 \description{
-Print MSIGDB Dataset to a file
-This function is used to print a MSIGDB dataset into a file. Mostly
-useful when human data is mapped to another species, and that mapping
-is required to run the report.
-}
-\examples{
-data(geneSets)
-printMsigdbDataset(geneSets, 'output.gmt')
-
+This function is deprecated. For functional enrichment 
+analysis, use findEnrichedFunctions.
 }

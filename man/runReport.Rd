@@ -7,12 +7,11 @@
 runReport(
   queryFilePath = "testdata",
   gffFilePath = "testdata",
-  msigdbFilePath = "testdata",
   annotationSummary = TRUE,
   goAnalysis = TRUE,
-  msigdbAnalysis = TRUE,
   motifAnalysis = TRUE,
   genomeVersion = "hg19",
+  species = "hsapiens",
   outDir = getwd(),
   printProcessedTables = FALSE,
   sampleN = 0,
@@ -27,21 +26,11 @@ protein-RNA binding sites}
 \item{gffFilePath}{A GTF format file which contains genome annotations 
 (preferably from ENSEMBL)}
 
-\item{msigdbFilePath}{Gene set annotations for Homo sapiens from Molecular 
-Signatures Database or any text file that has the same structure. 
-Regardless of which species is being studied (see genomeVersion parameter),
-msigdbFilePath must contain annotations for human genes. The gene sets will
-be mapped from human to other species if genomeVersion is set to anything
-except human genome versions (e.g. mm9 or dm3).}
-
 \item{annotationSummary}{TRUE/FALSE (default: TRUE) A switch to decide if 
 RCAS should provide annotation summaries from overlap operations}
 
 \item{goAnalysis}{TRUE/FALSE (default: TRUE) A switch to decide if RCAS 
 should run GO term enrichment analysis}
-
-\item{msigdbAnalysis}{TRUE/FALSE (default: TRUE) A switch to decide if RCAS 
-should run gene set enrichment analysis}
 
 \item{motifAnalysis}{TRUE/FALSE (default: TRUE) A switch to decide if RCAS 
 should run motif analysis}
@@ -77,12 +66,10 @@ An html generated using rmarkdown/knitr/pandoc that contains
   experiment
 }
 \description{
-This is the main report generation function for RCAS. This function can take 
-a BED file, a GTF file and optionally an MSIGDB gene set annotation (or any
-text file containing annotations with the same structure as defined in
-MSIGDB); and use these input to run multiple RCAS functions to create a
-summary report regarding the annotation data that overlap the input BED file,
-enrichment analysis for GO terms, gene sets from MSIGDB, and motif analysis.
+This is the main report generation function for RCAS. This function takes a
+BED file, a GTF file to create a summary report regarding the annotation data
+that overlap the input BED file, enrichment analysis for functional terms,
+and motif analysis.
 }
 \examples{
 #Default run will generate a report using built-in test data for hg19 genome.
@@ -93,27 +80,14 @@ runReport()
 #A custom run for human
 \dontrun{
 runReport( queryFilePath = 'input.BED',
-           gffFilePath = 'annotation.gtf',
-           msigdbFilePath = 'human_msigdb.gmt')
+           gffFilePath = 'annotation.gtf', 
+           genomeVersion = 'hg19')
            }
 # To turn off certain modules of the report
 \dontrun{
 runReport( queryFilePath = 'input.BED',
            gffFilePath = 'annotation.gtf',
-           msigdbFilePath = 'human_msigdb.gmt',
            motifAnalysis = FALSE,
            goAnalysis = FALSE )
-           }
-# To run the pipeline for species other than human
-# If the msigdb module is needed, the msigdbFilePath
-# must be set to the MSIGDB annotations for 'human'.
-# MSIGDB datasets for other species will be calculated
-# in the background using the createOrthologousMsigdbDataset
-# function
-\dontrun{
-runReport( queryFilePath = 'input.mm9.BED',
-           gffFilePath = 'annotation.mm9.gtf',
-           msigdbFilePath = 'msigdb.human.gmt',
-           genomeVersion = 'mm9' )
            }
 }

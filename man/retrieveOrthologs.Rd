@@ -4,30 +4,9 @@
 \alias{retrieveOrthologs}
 \title{retrieveOrthologs}
 \usage{
-retrieveOrthologs(mart1, mart2, geneSet)
-}
-\arguments{
-\item{mart1}{An Ensembl biomart connection for reference species created
-using the \code{biomaRt::useMart()} function}
-
-\item{mart2}{An Ensembl biomart connection for target species created using
-the \code{biomaRt::useMart()} function}
-
-\item{geneSet}{A vector of Entrez gene ids from a reference species (should
-be available at the biomart object, mart1)}
-}
-\value{
-A data.frame object containing a mapping of orthologouse genes from
-  two mart objects
+retrieveOrthologs()
 }
 \description{
-Given two biomart connections and a set of entrez gene identifiers; retrieve
-orthologs between mart1 and mart2 for the given list of genes
-}
-\examples{
-mart1 <- biomaRt::useMart("ensembl", dataset = "hsapiens_gene_ensembl")
-mart2 <- biomaRt::useMart("ensembl", dataset = "mmusculus_gene_ensembl")
-genes <- c('2645','5232', '5230','5162','5160')
-orthologs <- retrieveOrthologs( mart1, mart2, genes)
-
+This function is deprecated. For functional enrichment 
+analysis, use findEnrichedFunctions.
 }
