@@ -166,7 +166,7 @@ findDifferentialMotifs <- function(querySeqs,
                                    nCores, 
                                    maxMismatch = 1) {
   
-  kmers <- generateKmers(width = motifWidth)
+  kmers <- generateKmers(k = motifWidth)
   
   selected <- seq(1:length(querySeqs))
   if(length(querySeqs) > 1000) {
@@ -245,12 +245,12 @@ runMotifRG <- function() {
 #'                                   resize = 15,
 #'                                   motifN = 1,
 #'                                   maxMismatch = 1,
-#'                                   nCores = 2)
+#'                                   nCores = 1)
 #' @import IRanges
 #' @export
 runMotifDiscovery <- function (queryRegions, resizeN = 0, motifWidth = 6,
                         sampleN = 0, genomeVersion, maxMismatch = 1,
-                        motifN = 5, nCores = 4) {
+                        motifN = 5, nCores = 1) {
 
   if(sampleN > 0 && length(queryRegions) > sampleN) {
     message("Randomly sampling query regions for motif analysis. 
@@ -280,7 +280,7 @@ runMotifDiscovery <- function (queryRegions, resizeN = 0, motifWidth = 6,
   message('running motif discovery ... ')
   motifResults <- findDifferentialMotifs(querySeqs = querySeqs, 
                                          controlSeqs = controlSeqs, 
-                                         motifWidth = 6, 
+                                         motifWidth = motifWidth, 
                                          motifN = motifN,
                                          maxMismatch = maxMismatch, 
                                          nCores = nCores)
@@ -350,32 +350,17 @@ getMotifSummaryTable <- function(motifResults){
 #' @return A data.frame object  
 #' @export 
 discoverFeatureSpecificMotifs <- function(queryRegions, txdbFeatures, ...) {
-  results <- do.call(rbind, lapply(names(txdbFeatures), function(f) {
+  results <- lapply(names(txdbFeatures), function(f) {
     message("Looking for motifs in feature:",f)
     featureCoords <- txdbFeatures[[f]]
     #find query regions that overlap the target features
     q <- queryRegions[unique(queryHits(findOverlaps(queryRegions, featureCoords)))]
     
-    #notice that this must be in line with the select statement
-    #from getMotifSummaryTable function's output
-    motifStats <- data.frame('patterns' = 'NONE', 
-                             'queryHits' = 0, 
-                             'controlHits' = 0,
-                             'querySeqs' = 0,
-                             'controlSeqs' = 0,
-                             'queryFraction' = 0,
-                             'controlFraction' = 0,
-                             'feature' = f)
-    
     if(length(q) > 0) {
       motifResults <- runMotifDiscovery(queryRegions = q, ...)
-      motifStats <- subset(getMotifSummaryTable(motifResults), 
-                           select = c('patterns', 
-                                      'queryFraction', 'controlFraction'))
-      motifStats$querySeqTotal <- length(q)
-      motifStats$feature <- f
-      }
-    return(motifStats)
-  }))  
+      return(motifResults)
+    }
+  })
+  names(results) <- names(txdbFeatures)
   return(results)
 }
