@@ -37,16 +37,13 @@ Depends: R (>= 3.3.0),
     plotly (>= 4.5.2),
     DT (>= 0.2),
     data.table,
-    topGO
 Imports:
-    biomaRt,
     AnnotationDbi,
     GenomicRanges,
     BSgenome.Hsapiens.UCSC.hg19,
     GenomeInfoDb (>= 1.12.0),
     Biostrings,
     rtracklayer,
-    org.Hs.eg.db,
     GenomicFeatures,
     rmarkdown (>= 0.9.5),
     genomation (>= 1.5.5),
@@ -66,15 +63,7 @@ Imports:
     methods,
     utils
 RoxygenNote: 7.0.2
-Suggests: BSgenome.Hsapiens.UCSC.hg38, 
-    BSgenome.Mmusculus.UCSC.mm10, 
-    BSgenome.Mmusculus.UCSC.mm9,
-    BSgenome.Celegans.UCSC.ce10,
-    BSgenome.Dmelanogaster.UCSC.dm3,
-    org.Mm.eg.db,
-    org.Ce.eg.db,
-    org.Dm.eg.db,
-    testthat,
+Suggests: testthat,
     covr
 SystemRequirements: pandoc (>= 1.12.3)
 VignetteBuilder: knitr
