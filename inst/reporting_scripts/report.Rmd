@@ -5,13 +5,11 @@ date: "`r Sys.time()`"
 params: 
   query: 'testdata'
   gff: 'testdata'
-  msigdb: 'testdata'
   annotationSummary: TRUE
   goAnalysis: TRUE
-  msigdbAnalysis: TRUE
   motifAnalysis: TRUE
   genomeVersion: 'hg19'
-  species: 'human'
+  species: 'hsapiens'
   printProcessedTables: FALSE
   sampleN: 0
   workdir: '.'
@@ -25,17 +23,9 @@ knitr::opts_knit$set(progress = FALSE, root.dir = params$workdir)
 ```{r chunk_eval_options}
 annotationSummary <- params$annotationSummary
 goAnalysis <- params$goAnalysis
-msigdbAnalysis <- params$msigdbAnalysis
 motifAnalysis <- params$motifAnalysis
 provideMotifSummary <- FALSE #if params$motifAnalysis is TRUE and any motif is found, this will set to TRUE
-goSummaryBP <- FALSE 
-goSummaryMF <- FALSE
-goSummaryCC <- FALSE 
-
-SPECIES <- list('human' = 'hsapiens', 
-                'worm' = 'celegans',
-                'mouse' = 'mmusculus',
-                'fly' = 'dmelanogaster')
+goSummary <- FALSE 
 ```
 
 ```{r load_libraries, results='hide'}
@@ -44,9 +34,26 @@ library(RCAS)
 
 # Introduction
 
-RCAS is an automated system that provides dynamic genome annotations for custom input files that contain transcriptomic regions. Such transcriptomic regions could be, for instance, peak regions detected by CLIP-Seq analysis that detect protein-RNA interactions, RNA modifications (alias the epitranscriptome), CAGE-tag locations, or any other collection of target regions at the level of the transcriptome.
+RCAS is an automated system that provides dynamic genome annotations for custom
+input files that contain transcriptomic regions. Such transcriptomic regions
+could be, for instance, peak regions detected by CLIP-Seq analysis that detect
+protein-RNA interactions, RNA modifications (alias the epitranscriptome),
+CAGE-tag locations, or any other collection of target regions at the level of
+the transcriptome.
 
-RCAS is designed as a reporting tool for the functional analysis of RNA-binding sites detected by high-throughput experiments. It takes as input a BED format file containing the genomic coordinates of the RNA binding sites and a GTF file that contains the genomic annotation features usually provided by publicly available databases such as Ensembl and UCSC. RCAS performs overlap operations between the genomic coordinates of the RNA binding sites and the genomic annotation features and produces in-depth annotation summaries such as the distribution of binding sites with respect to gene features (exons, introns, 5’/3’ UTR regions, exon-intron boundaries, promoter regions, and whole transcripts). Moreover, by detecting the collection of targeted transcripts, RCAS can carry out functional annotation tables for enriched gene sets (annotated by the Molecular Signatures Database) and GO terms. As one of the most important questions that arise during protein-RNA interaction analysis; RCAS has a module for detecting sequence motifs enriched in the targeted regions of the transcriptome. The final report of RCAS consists of high-quality dynamic figures and tables, which are readily applicable for publications or other academic usage.
+RCAS is designed as a reporting tool for the functional analysis of RNA-binding
+sites detected by high-throughput experiments. It takes as input a BED format
+file containing the genomic coordinates of the RNA binding sites and a GTF file
+that contains the genomic annotation features usually provided by publicly
+available databases such as Ensembl and UCSC. RCAS performs overlap operations
+between the genomic coordinates of the RNA binding sites and the genomic
+annotation features and produces in-depth annotation summaries such as the
+distribution of binding sites with respect to gene features (exons, introns,
+5’/3’ UTR regions, exon-intron boundaries, promoter regions, and whole
+transcripts) along with functionally enriched term for targeted genes. Moreover,
+RCAS can darry out discriminative motif discovery in the query regions. The
+final report of RCAS consists of high-quality dynamic figures and tables, which
+are readily applicable for publications or other academic usage.
 
 ```{r initiate_figure_table_counts}
 figureCount <- 1
@@ -57,10 +64,8 @@ tableCount <- 1
 ```{r printInputSettings}
 inputParameterDesc <- c('Query BED file', 
                      'Target GTF file',
-                     'Gene set Annotations',
                      'Annotation Summary Module',
                      'GO Analysis Module',
-                     'Gene Set Enrichment Analysis Module',
                      'Motif Analysis Module',
                      'Genome Version',
                      'Species',
@@ -69,10 +74,8 @@ inputParameterDesc <- c('Query BED file',
                      'Working Directory')
 inputParameterValues <- c(params$query, 
                           params$gff,
-                          params$msigdb,
                           params$annotationSummary,
                           params$goAnalysis,
-                          params$msigdbAnalysis,
                           params$motifAnalysis,
                           params$genomeVersion,
                           params$species,
@@ -83,10 +86,6 @@ inputParameterValues <- c(params$query,
 inputSettings <- data.frame(parameters = inputParameterDesc,
                             values = inputParameterValues, 
                             stringsAsFactors = FALSE)
-
-#inputSettings[inputSettings$values==TRUE,]$values <- 'ON'
-#inputSettings[inputSettings$values==FALSE,]$values <- 'OFF'
-#inputSettings[inputSettings$values==0,]$values <- 'OFF'
 
 DT::datatable(data = inputSettings,
               extensions = 'FixedColumns',
@@ -338,139 +337,32 @@ figureCount <- figureCount + 1
 ```
 
 
-```{r GO_section_header, results='asis', eval=goAnalysis}
-cat("# GO Term Analysis Results\n")
-```
+```{r GOanalysis, results='asis', eval=goAnalysis}
+cat("# Functional Term Enrichment Analysis Results\n")
+GP <- findEnrichedFunctions(targetedGenes, params$species)
+#order by p-value
+#GP <- GP[order(GP$p.value),]
 
+cat("**Table",tableCount,":** Significant terms (FDR < 0.1) 
+    enriched for genes that overlap query regions\n")  
 
-```{r GO analysis, results='hide', eval=goAnalysis}
+#only display top GO terms in the HTML report.
+max <- ifelse(nrow(GP) > 1000, 1000, nrow(GP))
 
-#run TopGO
-goBP <- runTopGO(ontology = 'BP', 
-                      species = params$species, 
-                      backgroundGenes = backgroundGenes, 
-                      targetedGenes = targetedGenes)
-
-goMF <- runTopGO(ontology = 'MF', 
-                      species = params$species, 
-                      backgroundGenes = backgroundGenes, 
-                      targetedGenes = targetedGenes)
-
-goCC <- runTopGO(ontology = 'CC', 
-                      species = params$species, 
-                      backgroundGenes = backgroundGenes, 
-                      targetedGenes = targetedGenes)
-
-if (!is.null(goBP)) { goSummaryBP <- TRUE }
-if (!is.null(goMF)) { goSummaryMF <- TRUE }
-if (!is.null(goCC)) { goSummaryCC <- TRUE }
-```
-
-```{r goBP_tabcap, results='asis', eval=goSummaryBP}
-cat("## Biological Processes\n")
-cat("**Table",tableCount,":** Significant Biological Process GO terms (FDR < 0.1) enriched for genes that overlap query regions\n")  
-goBP <- goBP[order(goBP$foldEnrichment, decreasing = TRUE),]
-rownames(goBP) <- goBP$GO.ID
-goBP <- subset(goBP, select = -c(Annotated,classicFisher, GO.ID))
-DT::datatable(goBP[goBP$bh < 0.1,], 
-          extensions = c('Buttons', 'FixedColumns'), 
-          options = list(fixedColumns = TRUE, 
-                         scrollX = TRUE,
-                         dom = 'Bfrtip',
-                         buttons = c('copy', 'print', 'csv', 'excel', 'pdf')),
-          filter = 'bottom'
-          )
-
-if(params$printProcessedTables == TRUE) {
-  write.table(x = goBP, file=paste0('Table',tableCount,'.goBP.data.tsv'), quote = FALSE, sep = '\t', row.names = TRUE)
-} 
-
-tableCount <- tableCount + 1
-```
-
-```{r goMF_tabcap, results='asis', eval=goSummaryMF}
-cat("## Molecular Functions\n")
-cat("**Table",tableCount,":** Significant Molecular Function GO terms (FDR < 0.1) enriched for genes that overlap query regions\n")  
-goMF <- goMF[order(goMF$foldEnrichment, decreasing = TRUE),]
-rownames(goMF) <- goMF$GO.ID
-goMF <- subset(goMF, select = -c(Annotated,classicFisher, GO.ID))
-
-DT::datatable(goMF[goMF$bh < 0.1,], 
-          extensions = c('Buttons', 'FixedColumns'), 
-          options = list(fixedColumns = TRUE, 
-                         scrollX = TRUE,
-                         dom = 'Bfrtip',
-                         buttons = c('copy', 'print', 'csv','excel', 'pdf')),
-          filter = 'bottom'
-          )
-
-if(params$printProcessedTables == TRUE) {
-  write.table(x = goMF, file=paste0('Table',tableCount,'.goMF.data.tsv'), quote = FALSE, sep = '\t', row.names = TRUE)
-} 
-
-tableCount <- tableCount + 1
-```
-
-```{r goCC_tabcap, results='asis', eval=goSummaryCC}
-cat("## Cellular Compartments\n")
-cat("**Table",tableCount,":** Significant Cellular Compartment GO terms (FDR < 0.1) enriched for genes that overlap query regions\n")  
-goCC <- goCC[order(goCC$foldEnrichment, decreasing = TRUE),]
-rownames(goCC) <- goCC$GO.ID
-goCC <- subset(goCC, select = -c(Annotated,classicFisher, GO.ID))
-
-DT::datatable(goCC[goCC$bh < 0.1,], 
-          extensions = c('Buttons', 'FixedColumns'), 
-          options = list(fixedColumns = TRUE, 
-                         scrollX = TRUE,
-                         dom = 'Bfrtip',
-                         buttons = c('copy', 'print', 'csv','excel', 'pdf')),
-          filter = 'bottom'
-          )
-
-if(params$printProcessedTables == TRUE) {
-  write.table(x = goCC, file=paste0('Table',tableCount,'.goCC.data.tsv'), quote = FALSE, sep = '\t', row.names = TRUE)
-} 
-tableCount <- tableCount + 1
-```
-
-```{r GSEA_tabcap, results='asis', eval=msigdbAnalysis}
-cat("# Gene Set Enrichment Analysis Results\n")
-cat("**Table",tableCount,":** Significant MSigDB Gene Sets (FDR < 0.1) enriched for genes that overlap query regions\n")
-```
-
-```{r GSEA, eval=msigdbAnalysis}
-if (params$species != 'human') {
-  refGeneSets <- parseMsigdb(filePath = params$msigdb)
-  
-  geneSets <- createOrthologousGeneSetList(referenceGeneSetList = refGeneSets, 
-                                                refSpecies = 'hsapiens', 
-                                                targetSpecies = SPECIES[[params$species]])
-} else if (params$msigdb == 'testdata') {
-  data(geneSets)
-} else {
-  geneSets <- parseMsigdb(filePath = params$msigdb)
-}
-
-resultsGSEA <- runGSEA(geneSetList = geneSets, 
-                       species = params$species,
-                       backgroundGenes = backgroundGenes, 
-                       targetedGenes = targetedGenes)
-
-rownames(resultsGSEA) = gsub(pattern = '_', replacement = ' ', x = rownames(resultsGSEA))
-resultsGSEA <- subset(resultsGSEA, select = -c(treatmentSize, fisherPVal))
-
-DT::datatable(resultsGSEA[resultsGSEA$BH < 0.1,], 
-          extensions = c('Buttons', 'FixedColumns'), 
-          options = list(fixedColumns = TRUE, 
-                         scrollX = TRUE,
-                         dom = 'Bfrtip',
-                         buttons = c('copy', 'print', 'csv', 'excel', 'pdf')),
-          filter = 'bottom'
-          )
-
-if(params$printProcessedTables == TRUE) {
-  write.table(x = resultsGSEA, file=paste0('Table',tableCount,'.GSEA.data.tsv'), quote = FALSE, sep = '\t', row.names = TRUE)
-} 
+DT::datatable(GP[1:max,], 
+        extensions = c('Buttons', 'FixedColumns', 'Scroller'), 
+        options = list(fixedColumns = TRUE, 
+                       scrollY = 400,
+                       scrollX = TRUE,
+                       scroller = TRUE,
+                       dom = 'Bfrtip',
+                       buttons = c('colvis', 'copy', 'print', 'csv','excel', 'pdf'), 
+                       columnDefs = list(
+                         list(targets = c(0,1,2,5,9,11,13,14), visible = FALSE)
+                       )
+                       ),
+        filter = 'bottom'
+        )
 
 tableCount <- tableCount + 1
 ```

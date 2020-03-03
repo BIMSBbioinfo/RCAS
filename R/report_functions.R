@@ -644,29 +644,19 @@ calculateCoverageProfileFromTxdb <- function () {
 
 #' Generate a RCAS Report for a list of transcriptome-level segments
 #' 
-#' This is the main report generation function for RCAS. This function can take 
-#' a BED file, a GTF file and optionally an MSIGDB gene set annotation (or any
-#' text file containing annotations with the same structure as defined in
-#' MSIGDB); and use these input to run multiple RCAS functions to create a
-#' summary report regarding the annotation data that overlap the input BED file,
-#' enrichment analysis for GO terms, gene sets from MSIGDB, and motif analysis.
+#' This is the main report generation function for RCAS. This function takes a
+#' BED file, a GTF file to create a summary report regarding the annotation data
+#' that overlap the input BED file, enrichment analysis for functional terms,
+#' and motif analysis.
 #' 
 #' @param queryFilePath a BED format file which contains genomic coordinates of 
 #'   protein-RNA binding sites
 #' @param gffFilePath A GTF format file which contains genome annotations 
 #'   (preferably from ENSEMBL)
-#' @param msigdbFilePath Gene set annotations for Homo sapiens from Molecular 
-#'   Signatures Database or any text file that has the same structure. 
-#'   Regardless of which species is being studied (see genomeVersion parameter),
-#'   msigdbFilePath must contain annotations for human genes. The gene sets will
-#'   be mapped from human to other species if genomeVersion is set to anything
-#'   except human genome versions (e.g. mm9 or dm3).
 #' @param annotationSummary TRUE/FALSE (default: TRUE) A switch to decide if 
 #'   RCAS should provide annotation summaries from overlap operations
 #' @param goAnalysis TRUE/FALSE (default: TRUE) A switch to decide if RCAS 
 #'   should run GO term enrichment analysis
-#' @param msigdbAnalysis TRUE/FALSE (default: TRUE) A switch to decide if RCAS 
-#'   should run gene set enrichment analysis
 #' @param motifAnalysis TRUE/FALSE (default: TRUE) A switch to decide if RCAS 
 #'   should run motif analysis
 #' @param genomeVersion  A character string to denote for which genome version 
@@ -700,28 +690,15 @@ calculateCoverageProfileFromTxdb <- function () {
 #' #A custom run for human
 #' \dontrun{
 #' runReport( queryFilePath = 'input.BED',
-#'            gffFilePath = 'annotation.gtf',
-#'            msigdbFilePath = 'human_msigdb.gmt')
+#'            gffFilePath = 'annotation.gtf', 
+#'            genomeVersion = 'hg19')
 #'            }
 #' # To turn off certain modules of the report
 #' \dontrun{
 #' runReport( queryFilePath = 'input.BED',
 #'            gffFilePath = 'annotation.gtf',
-#'            msigdbFilePath = 'human_msigdb.gmt',
 #'            motifAnalysis = FALSE,
 #'            goAnalysis = FALSE )
-#'            }
-#' # To run the pipeline for species other than human
-#' # If the msigdb module is needed, the msigdbFilePath
-#' # must be set to the MSIGDB annotations for 'human'.
-#' # MSIGDB datasets for other species will be calculated
-#' # in the background using the createOrthologousMsigdbDataset
-#' # function
-#' \dontrun{
-#' runReport( queryFilePath = 'input.mm9.BED',
-#'            gffFilePath = 'annotation.mm9.gtf',
-#'            msigdbFilePath = 'msigdb.human.gmt',
-#'            genomeVersion = 'mm9' )
 #'            }
 #' @import rmarkdown
 #' @import knitr
@@ -733,59 +710,16 @@ calculateCoverageProfileFromTxdb <- function () {
 #' @export
 runReport <- function(queryFilePath = 'testdata',
                       gffFilePath = 'testdata',
-                      msigdbFilePath = 'testdata',
                       annotationSummary = TRUE,
                       goAnalysis = TRUE,
-                      msigdbAnalysis = TRUE,
                       motifAnalysis = TRUE,
                       genomeVersion = 'hg19',
+                      species = 'hsapiens', 
                       outDir = getwd(),
                       printProcessedTables = FALSE,
                       sampleN = 0,
                       quiet = FALSE,
                       selfContained = TRUE) {
-
-  if (genomeVersion %in% c('hg19', 'hg38')) {
-    species <- 'human'
-  } else if (genomeVersion %in% c('mm9', 'mm10')) {
-    species <- 'mouse'
-  } else if (genomeVersion == 'ce10') {
-    species <- 'worm'
-    #TODO#
-    #msigdb and GO term analysis is not supported for ce10 genome
-    #because of gene id issues. However, this will be fixed
-    if (msigdbAnalysis == TRUE) {
-      warning('Turning off msigdbAnalysis for genomeVersion ce10\n')
-      msigdbAnalysis <- FALSE
-    }
-    if (goAnalysis == TRUE) {
-      warning('Turning off msigdbAnalysis for genomeVersion ce10\n')
-      goAnalysis <- FALSE
-    }
-  } else if (genomeVersion == 'dm3') {
-    species <- 'fly'
-  } else {
-    stop (genomeVersion,' is not a supported genome version.')
-  }
-
-  if (species != 'human') {
-    if (queryFilePath == 'testdata') {
-      stop('Test-data only works for human.
-           Please provide a queryFilePath to input in BED format \n')
-    }
-
-    if (gffFilePath == 'testdata') {
-      stop('Test-data only works for human.
-           Please provide a gffFilePath to input in GTF format \n')
-    }
-    
-    if (msigdbFilePath == 'testdata' && msigdbAnalysis == TRUE) {
-      stop('Test-data only works for human.
-         Please provide a gene set dataset with ENTREZ gene ids
-           downloaded from MSIGDB database or
-           set msigdbAnalysis option to FALSE \n')
-    }
-  }
 
   if(queryFilePath != 'testdata') {
     queryFilePath <- normalizePath(queryFilePath)
@@ -794,11 +728,7 @@ runReport <- function(queryFilePath = 'testdata',
   if(gffFilePath != 'testdata') {
     gffFilePath <- normalizePath(gffFilePath)
   }
-
-  if(msigdbFilePath != 'testdata' && msigdbAnalysis == TRUE) {
-    msigdbFilePath <- normalizePath(msigdbFilePath)
-  }
-
+  
   reportFile <- system.file("reporting_scripts", "report.Rmd", package='RCAS')
   headerFile <- system.file("reporting_scripts", "header.html", package='RCAS')
   footerFile <- system.file("reporting_scripts", "footer.html", package='RCAS')
@@ -821,10 +751,8 @@ runReport <- function(queryFilePath = 'testdata',
       ),
     params = list(query = queryFilePath,
                   gff = gffFilePath,
-                  msigdb = msigdbFilePath,
                   annotationSummary = annotationSummary,
                   goAnalysis = goAnalysis,
-                  msigdbAnalysis = msigdbAnalysis,
                   motifAnalysis = motifAnalysis,
                   genomeVersion = genomeVersion,
                   species = species,
