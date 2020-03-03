@@ -141,6 +141,8 @@ importBed <- function (filePath, sampleN = 0, keepStandardChr = TRUE, debug = TR
 #' getTxdbFeatures
 #' 
 #' This function is deprecated. Use getTxdbFeaturesFromGRanges instead. 
+#' 
+#' @export
 getTxdbFeatures <- function (txdb) {
   .Deprecated("getTxdbFeaturesFromGRanges")
 }
@@ -624,38 +626,11 @@ calculateCoverageProfileList <- function (queryRegions,
 
 #' calculateCoverageProfileListFromTxdb
 #'
-#' This function overlaps the input query regions with a target list of
-#' annotation features and calculates the coverage profile along the target
-#' regions.
-#'
-#' @param queryRegions GRanges object imported from a BED file using
-#'   \code{importBed} function
-#' @param txdb A txdb object obtained by using \code{GenomicFeatures::makeTxDb}
-#'   family of functions
-#' @param sampleN If set to a positive integer, \code{targetRegions} will be
-#'   downsampled to \code{sampleN} regions
-#'
-#' @return A list of data.frame objects consisting of two columns: 1. coverage
-#'   level 2. bins. The target regions are divided into 100 equal sized bins and
-#'   coverage level is summarized in a strand-specific manner using the
-#'   \code{genomation::ScoreMatrixBin} function.
-#' @examples
-#' data(gff)
-#' data(queryRegions)
-#' txdb <- GenomicFeatures::makeTxDbFromGRanges(gff)
-#' df <- calculateCoverageProfileListFromTxdb(queryRegions = queryRegions,
-#'                                                    txdb = txdb,
-#'                                                 sampleN = 1000)
+#' This function is deprecated. Use ?calculateCoverageProfileList instead. 
+#' 
 #' @export
-calculateCoverageProfileListFromTxdb <- function (queryRegions,
-                                                  txdb,
-                                                  sampleN = 0) {
-  txdbFeatures = getTxdbFeatures(txdb = txdb)
-  lapply(X = txdbFeatures,
-       FUN = function(x) {
-         calculateCoverageProfile(queryRegions,
-                                  x,
-                                  sampleN = sampleN) })
+calculateCoverageProfileListFromTxdb <- function () {
+  .Deprecated('calculateCoverageProfileList')
 }
 
 #' calculateCoverageProfileFromTxdb
