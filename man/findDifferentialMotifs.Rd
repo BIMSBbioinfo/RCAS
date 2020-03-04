@@ -13,6 +13,21 @@ findDifferentialMotifs(
   maxMismatch = 1
 )
 }
+\arguments{
+\item{querySeqs}{A DNAStringSet object that is the regions of interest.}
+
+\item{controlSeqs}{A DNAStrintSet object that serve as the control}
+
+\item{motifWidth}{A Positive integer (default: 6) for the generated k-mers. Warning: we recommend
+using values below 10 as the computation gets exponentially difficult as the 
+motif width is increased.}
+
+\item{motifN}{A positive integer (default:5) denoting the maximum number of 
+motifs that should be returned by the \code{findDifferentialMotifs} function}
+
+\item{nCores}{A positive integer (default:1) number of cores used for 
+parallel execution.#'}
+}
 \description{
 Find Differential Motifs
 }

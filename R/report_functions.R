@@ -690,7 +690,7 @@ checkSeqDb <- function(genomeVersion) {
   
   message(date(), " => Returning ", db, " as BSgenome object")
   
-  requireNamespace(package = db)
+  require(db, character.only = TRUE)
   return(get(db))
 }
 

@@ -28,17 +28,18 @@ be downsampled only if this value is larger than zero and less than the
 total number of input intervals.}
 
 \item{genomeVersion}{A character string to denote the BS genome library 
-required to extract sequences. Available options are hg19, mm9, ce10 and 
-dm3.}
+required to extract sequences. Example: 'hg19'}
 
 \item{motifN}{A positive integer (default:5) denoting the maximum number of 
-motifs that should be sought by the \code{motifRG::findMotifFgBg} function}
+motifs that should be returned by the \code{findDifferentialMotifs} function}
 
-\item{nCores}{A positive integer (default:4) number of cores used for 
+\item{nCores}{A positive integer (default:1) number of cores used for 
 parallel execution.}
 }
 \value{
-a list of objects returned by the \code{motifRG::findMotif} function
+A list of four objects: 
+k-mer count matrices for query and background and lists of string matches 
+for the top discriminating motifs (motifN).
 }
 \description{
 This function builds a random forest classifier to find the top most

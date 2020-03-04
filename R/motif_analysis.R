@@ -142,6 +142,15 @@ extractMatches <- function(seqs, patterns, minMismatch = 0, maxMismatch = 0) {
 
 #' Find Differential Motifs 
 #' 
+#' @param querySeqs A DNAStringSet object that is the regions of interest. 
+#' @param controlSeqs A DNAStrintSet object that serve as the control
+#' @param motifWidth A Positive integer (default: 6) for the generated k-mers. Warning: we recommend
+#' using values below 10 as the computation gets exponentially difficult as the 
+#' motif width is increased. 
+#' @param motifN A positive integer (default:5) denoting the maximum number of 
+#'   motifs that should be returned by the \code{findDifferentialMotifs} function
+#' @param nCores A positive integer (default:1) number of cores used for 
+#'   parallel execution.#' 
 #' @export
 findDifferentialMotifs <- function(querySeqs, 
                                    controlSeqs, 
@@ -165,6 +174,12 @@ findDifferentialMotifs <- function(querySeqs,
   controlHits <- apply(ctrl, 2, function(x) sum(x > 0))
   candidates <- names(which(log2((queryHits + 1) / (controlHits+1)) > 0))
   
+  if(length(candidates) == 0) {
+    warning("Couldn't find any motifs that occur more often in the query sequences
+            compared to the background. Returning NULL. ")
+    return(NULL)
+  }
+  
   query <- query[,candidates]
   ctrl <- ctrl[,candidates]
   
@@ -176,7 +191,8 @@ findDifferentialMotifs <- function(querySeqs,
   fit <- ranger::ranger(label ~ ., df, importance = 'impurity')
   var.imp <- sort(ranger::importance(fit), decreasing = T)
   #get top variables 
-  top <- names(var.imp[1:motifN])
+  max <- ifelse(motifN < length(candidates), motifN, length(candidates))
+  top <- names(var.imp[1:max])
 
   results <- list("counts_query" = query[,top, drop = F], 
                   "counts_ctrl" = ctrl[,top,drop = F], 
@@ -214,13 +230,15 @@ runMotifRG <- function() {
 #'   be downsampled only if this value is larger than zero and less than the
 #'   total number of input intervals.
 #' @param genomeVersion A character string to denote the BS genome library 
-#'   required to extract sequences. Available options are hg19, mm9, ce10 and 
-#'   dm3.
+#'   required to extract sequences. Example: 'hg19'
 #' @param motifN A positive integer (default:5) denoting the maximum number of 
-#'   motifs that should be sought by the \code{motifRG::findMotifFgBg} function
-#' @param nCores A positive integer (default:4) number of cores used for 
+#'   motifs that should be returned by the \code{findDifferentialMotifs} function
+#' @param nCores A positive integer (default:1) number of cores used for 
 #'   parallel execution.
-#' @return a list of objects returned by the \code{motifRG::findMotif} function
+#' @return A list of four objects: 
+#' k-mer count matrices for query and background and lists of string matches 
+#' for the top discriminating motifs (motifN). 
+#' 
 #' @examples
 #' data(queryRegions)
 #' motifResults <- runMotifDiscovery(queryRegions = queryRegions[1:1000],
@@ -292,15 +310,25 @@ runMotifDiscovery <- function (queryRegions, resizeN = 0, motifWidth = 6,
 #' @export
 getMotifSummaryTable <- function(motifResults){
 
-  data.frame('patterns' = names(motifResults$matches_query),
-             'queryHits' = colSums(motifResults$counts_query),
-             'controlHits' = colSums(motifResults$counts_ctrl),
-             'querySeqs' = colSums(motifResults$counts_query > 0),
-             'controlSeqs' = colSums(motifResults$counts_ctrl > 0),
-             'queryFraction' = round(colSums(motifResults$counts_query > 0) / 
-                                       nrow(motifResults$counts_query), 2),
-             'controlFraction' = round(colSums(motifResults$counts_ctrl > 0) / 
-                                         nrow(motifResults$counts_ctrl), 2))
+  if(!is.null(motifResults)) {
+    data.frame('patterns' = names(motifResults$matches_query),
+               'queryHits' = colSums(motifResults$counts_query),
+               'controlHits' = colSums(motifResults$counts_ctrl),
+               'querySeqs' = colSums(motifResults$counts_query > 0),
+               'controlSeqs' = colSums(motifResults$counts_ctrl > 0),
+               'queryFraction' = round(colSums(motifResults$counts_query > 0) / 
+                                         nrow(motifResults$counts_query), 2),
+               'controlFraction' = round(colSums(motifResults$counts_ctrl > 0) / 
+                                           nrow(motifResults$counts_ctrl), 2))
+  } else {
+    return(data.frame('patterns' = 'NONE',
+                      'queryHits' = 0,
+                      'controlHits' = 0,
+                      'querySeqs' = 0,
+                      'controlSeqs' = 0,
+                      'queryFraction' = 0,
+                      'controlFraction' = 0))
+  }
 }
 
 
