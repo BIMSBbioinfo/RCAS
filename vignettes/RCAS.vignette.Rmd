@@ -25,9 +25,26 @@ For the most up-to-date functionality, usage and installation instructions, and 
 
 # Introduction
 
-RCAS is an automated system that provides dynamic genome annotations for custom input files that contain transcriptomic regions. Such transcriptomic regions could be, for instance, peak regions detected by CLIP-Seq analysis that detect protein-RNA interactions, RNA modifications (alias the epitranscriptome), CAGE-tag locations, or any other collection of target regions at the level of the transcriptome.
+RCAS is an automated system that provides dynamic genome annotations for custom
+input files that contain transcriptomic regions. Such transcriptomic regions
+could be, for instance, peak regions detected by CLIP-Seq analysis that detect
+protein-RNA interactions, RNA modifications (alias the epitranscriptome),
+CAGE-tag locations, or any other collection of target regions at the level of
+the transcriptome.
 
-RCAS is designed as a reporting tool for the functional analysis of RNA-binding sites detected by high-throughput experiments. It takes as input a BED format file containing the genomic coordinates of the RNA binding sites and a GTF file that contains the genomic annotation features usually provided by publicly available databases such as Ensembl and UCSC. RCAS performs overlap operations between the genomic coordinates of the RNA binding sites and the genomic annotation features and produces in-depth annotation summaries such as the distribution of binding sites with respect to transcript features (exons, introns, 5’/3’ UTR regions, exon-intron boundaries, promoter regions, and whole transcripts). Moreover, by detecting the collection of targeted transcripts, RCAS can carry out functional annotation tables for enriched gene sets (annotated by the Molecular Signatures Database) and GO terms. As one of the most important questions that arise during protein-RNA interaction analysis; RCAS has a module for detecting sequence motifs enriched in the targeted regions of the transcriptome. The final report of RCAS consists of high-quality dynamic figures and tables, which are readily applicable for publications or other academic usage.
+RCAS is designed as a reporting tool for the functional analysis of RNA-binding
+sites detected by high-throughput experiments. It takes as input a BED format
+file containing the genomic coordinates of the RNA binding sites and a GTF file
+that contains the genomic annotation features usually provided by publicly
+available databases such as Ensembl and UCSC. RCAS performs overlap operations
+between the genomic coordinates of the RNA binding sites and the genomic
+annotation features and produces in-depth annotation summaries such as the
+distribution of binding sites with respect to gene features (exons, introns,
+5’/3’ UTR regions, exon-intron boundaries, promoter regions, and whole
+transcripts) along with functionally enriched term for targeted genes. Moreover,
+RCAS can darry out discriminative motif discovery in the query regions. The
+final report of RCAS consists of high-quality dynamic figures and tables, which
+are readily applicable for publications or other academic usage.
 
 #  Data input
 
@@ -194,24 +211,24 @@ ggplot2::ggplot(cvgList, aes(x = bins, y = meanCoverage)) +
  facet_wrap( ~ feature, ncol = 3) 
 ```
 
-# Motif Analysis using motifRG
+# Discriminative Motif Discovery
 
 ## Calculating enriched motifs
-With the RCAS package, a motif analysis is also possible.
-RCAS uses `motifRG` library to find enriched motifs among the query regions.
-```{r motif_analysis}
-motifResults <- runMotifRG(queryRegions = queryRegions, 
-                           resizeN = 15, sampleN = 10000,
-                           genomeVersion = 'hg19', 
-                           motifN = 2, nCores = 2)
 
-par(mfrow = c(1,2), mar = c(2,2,2,2))
-for (i in 1:length(motifResults$motifs)) {
-  motifPattern <- motifResults$motifs[[i]]@pattern
-  motifRG::plotMotif(match = motifResults$motifs[[i]]@match$pattern, 
-                     main = paste0('Motif-',i,': ',motifPattern),
-                     entropy = TRUE)
-}
+We build a classifier based on k-mer frequencies (allowing for mismatches) to 
+find the most informative motifs that help discriminate the query sequences from the 
+background distribution. 
+
+```{r motif_analysis}
+motifResults <- runMotifDiscovery(queryRegions = queryRegions, 
+                           resizeN = 15, sampleN = 10000,
+                           genomeVersion = 'hg19', motifWidth = 6,
+                           motifN = 2, nCores = 1)
+
+cowplot::plot_grid(plotlist = lapply(motifResults$matches_query, function(matches) {
+  ggseqlogo::ggseqlogo(matches)
+}), nrow = 1) 
+
 ```
 
 ## motif analysis: getting motif summary statistics
@@ -222,64 +239,18 @@ knitr::kable(summary)
 ```
 
 
-# GO term analysis
+# Functional enrichment  analysis
 
-## Biological processes enriched among targeted genes
-RCAS can perform GO term enrichment analysis to find out
-enriched functions in genes that overlap the query regions. Below is demonstrated how to get
-biological processes terms ('BP') enriched in the genes that overlap query regions and the top 10 GO terms with most fold change increase relative to the background are provided.   
+RCAS makes use of [gprofiler2](https://cran.r-project.org/web/packages/gprofiler2/index.html) package 
+enriched functions in genes that overlap the query regions. 
+
 ```{r GO analysis}
-
-#get all genes from the GTF data
-backgroundGenes <- unique(gff$gene_id)
-#get genes that overlap query regions
 targetedGenes <- unique(overlaps$gene_id)
 
-#run TopGO
-goBP <- runTopGO(ontology = 'BP', 
-                      species = 'human', 
-                      backgroundGenes = backgroundGenes, 
-                      targetedGenes = targetedGenes)
-
-goBP <- goBP[order(goBP$foldEnrichment, decreasing = TRUE),]
-rownames(goBP) <- goBP$GO.ID
-goBP <- subset(goBP, select = -c(Annotated,classicFisher, bh, GO.ID))
-
-knitr::kable(goBP[1:10,])
-```
-
-
-# Gene Set Enrichment Analysis
-
-## MSIGDB gene sets enriched among targeted genes
-RCAS can use gene sets from Molecular Signatures Database
-and calculate gene set enrichment analysis (GSEA)
-to find out which gene sets are enriched
-among the genes targeted by the query regions. 
-
-Below we demonstrate a GSEA case using randomly generated gene sets (in order not to breach MSIGDB licence agreement) that are provided as built-in data in RCAS. The actual MSIGDB gene set annotations must be downloaded by the user from the MSIGDB website. RCAS provides functions to parse the annotations (`RCAS::parseMsigdb`) and map them to other species via orthology (`RCAS::createOrthologousGeneSetList`) to enable GSEA on other species such as mouse and fly. 
-
-```{r msigdb_analysis}
-#geneSets <- parseMsigdb(< path to msigdbFile>)
-data(geneSets)
-resultsGSEA <- runGSEA(geneSetList = geneSets,
-                       backgroundGenes = backgroundGenes, 
-                       targetedGenes = targetedGenes)
-
-knitr::kable(x = resultsGSEA[1:10,])
-```
-
-RCAS also provides functions to map the MSIGDB annotations from human to fly and mouse. 
-```
-#parse human annotations
-refGeneSets <- parseMsigdb(filePath = <path to MSIGDB annotation file>)
-
-#Map the gene sets to other species using orthologous relationships of genes between
-#the reference genome (human) and the target genome (e.g. mouse)
-orthGeneSets <- createOrthologousGeneSetList(referenceGeneSetList = refGeneSets, 
-                                                refGenomeVersion = 'hg19', 
-                                                targetGenomeVersion = 'mm9')
-#the mapped gene sets can be used for GSEA analysis using the runGSEA command.
+res <- RCAS::findEnrichedFunctions(targetGenes = targetedGenes, species = 'hsapiens')
+res <- res[order(res$p_value),]
+resGO <- res[grep('GO:BP', res$source),]
+knitr::kable(subset(resGO[1:10,], select = c('p_value', 'term_name', 'source')))
 ```
 
 # Generating a full report 
@@ -289,11 +260,10 @@ including all the analysis modules described above. There are four main parts of
 the analysis report.
 
 - Annotation summaries via overlap operations 
-- GO term analysis 
-- MSIGDB analysis 
+- Functional term analysis 
 - Motif analysis
 
-By default, runReport() function aims to run all four modules, while the user
+By default, runReport() function aims to run all three modules, while the user
 can turn off these individual modules.
 
 Below are example commands to generate reports using these functionalities.
@@ -306,27 +276,23 @@ runReport()
 ## A custom run for human
 ```
 runReport( queryFilePath = 'input.BED',
-            gffFilePath = 'annotation.gtf',
-            msigdbFilePath = 'human_msigdb.gmt')
+            gffFilePath = 'annotation.gtf')
 ```
 ## To turn off certain modules of the report
 ``` 
 runReport( queryFilePath = 'input.BED',
             gffFilePath = 'annotation.gtf',
-            msigdbFilePath = 'human_msigdb.gmt',
             motifAnalysis = FALSE,
             goAnalysis = FALSE )
 ```
 ## To run the pipeline for species other than human
-If the msigdb module is needed, the msigdbFilePath
-must be set to the MSIGDB annotations for 'human'.
-MSIGDB datasets for other species will be calculated
-in the background using the createOrthologousMsigdbDataset
-function
+
+You can run RCAS for any of the genome versions available in the BSgenome package.  
+See `BSgenome::available.genomes`. 
+
 ```
 runReport( queryFilePath = 'input.mm9.BED',
             gffFilePath = 'annotation.mm9.gtf',
-            msigdbFilePath = 'human_msigdb.gmt',
             genomeVersion = 'mm9' )
 ```
 

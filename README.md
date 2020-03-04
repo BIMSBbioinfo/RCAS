@@ -5,24 +5,18 @@
 
 ## Introduction
 
-RCAS is an R/Bioconductor package designed as a generic reporting tool
-for the functional analysis of transcriptome-wide regions of interest detected
-by high-throughput experiments. Such transcriptomic regions could be,
-for instance, signal peaks detected by CLIP-Seq analysis for protein-RNA
-interaction sites, RNA modification sites (alias the epitranscriptome),
-CAGE-tag locations, or any other collection of query regions at the level of
-the transcriptome. RCAS produces in-depth annotation summaries and
-coverage profiles based on the distribution of the query regions with respect
-to transcript features (exons, introns, 5’/3’ UTR regions, exon-intron
-boundaries, promoter regions). Moreover, RCAS can carry out functional
-enrichment analyses of annotated gene sets, GO terms, and de novo motif
-discovery. RCAS is available in the Bioconductor repository, packaged in multiple
-environments including Conda, Galaxy, and Guix, and as a webservice
-at http://rcas.mdc-berlin.de/.
-
-Currently supported genome builds are hg19 and hg38 (human), mm9 and mm10 (mouse), dm3 (fly), and ce10 (worm). 
-Modules for annotation summaries and motif analysis are supported for each of these genome  builds. 
-GO term and gene-set enrichment analyses are supported for hg19, hg38, mm9, mm10, and dm3. ce10 is currently not supportedfor GO/GSEA modules. 
+RCAS is an R/Bioconductor package designed as a generic reporting tool for the
+functional analysis of transcriptome-wide regions of interest detected by
+high-throughput experiments. Such transcriptomic regions could be, for instance,
+signal peaks detected by CLIP-Seq analysis for protein-RNA interaction sites,
+RNA modification sites (alias the epitranscriptome), CAGE-tag locations, or any
+other collection of query regions at the level of the transcriptome. RCAS
+produces in-depth annotation summaries and coverage profiles based on the
+distribution of the query regions with respect to transcript features (exons,
+introns, 5’/3’ UTR regions, exon-intron boundaries, promoter regions). Moreover,
+RCAS can carry out functional enrichment analyses and discriminative motif
+discovery. RCAS supports all genome versions that are available in
+`BSgenome::available.genomes`
 
 ## installation:
 
@@ -63,10 +57,6 @@ For detailed instructions on how to use RCAS, please see:
 
 
 ### Single Sample Analysis Use Cases
-
-- The reference files needed for reproducing the reports below:
-    - [Homo_sapiens.GRCh37.75.gtf.gz]( http://ftp.ensembl.org/pub/release-75/gtf/homo_sapiens/Homo_sapiens.GRCh37.75.gtf.gz)
-    - [c2.all.v5.1.entrez.gmt](http://software.broadinstitute.org/gsea/msigdb/download_file.jsp?filePath=/resources/msigdb/5.1/c2.all.v5.1.entrez.gmt)
 
 - [RCAS report](https://bimsbstatic.mdc-berlin.de/akalin/buyar/RCAS/1.1.1/PARCLIP_PUM2_Hafner2010b_hg19.bed.RCAS.report.html) for [PUM2](http://www.uniprot.org/uniprot/Q8TB72) RNA-binding sites detected by **PAR-CLIP** technique ([Hafner et al, 2010](https://www.ncbi.nlm.nih.gov/pubmed/20371350))
   - input:  [PARCLIP_PUM2_Hafner2010b_hg19](http://dorina.mdc-berlin.de/api/v1.0/download/regulator/hg19/PARCLIP_PUM2_Hafner2010b_hg19)
