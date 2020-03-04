@@ -11,7 +11,6 @@ runReport(
   goAnalysis = TRUE,
   motifAnalysis = TRUE,
   genomeVersion = "hg19",
-  species = "hsapiens",
   outDir = getwd(),
   printProcessedTables = FALSE,
   sampleN = 0,
@@ -36,8 +35,7 @@ should run GO term enrichment analysis}
 should run motif analysis}
 
 \item{genomeVersion}{A character string to denote for which genome version 
-the analysis is being done. Available options are hg19/hg38 (human), mm9/mm10 
-(mouse), ce10 (worm) and dm3 (fly).}
+the analysis is being done.}
 
 \item{outDir}{Path to the output directory. (default: current working 
 directory)}

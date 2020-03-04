@@ -143,7 +143,7 @@ importBed <- function (filePath, sampleN = 0, keepStandardChr = TRUE, debug = TR
 #' This function is deprecated. Use getTxdbFeaturesFromGRanges instead. 
 #' 
 #' @export
-getTxdbFeatures <- function (txdb) {
+getTxdbFeatures <- function () {
   .Deprecated("getTxdbFeaturesFromGRanges")
 }
 
@@ -712,8 +712,7 @@ checkSeqDb <- function(genomeVersion) {
 #' @param motifAnalysis TRUE/FALSE (default: TRUE) A switch to decide if RCAS 
 #'   should run motif analysis
 #' @param genomeVersion  A character string to denote for which genome version 
-#'   the analysis is being done. Available options are hg19/hg38 (human), mm9/mm10 
-#'   (mouse), ce10 (worm) and dm3 (fly).
+#'   the analysis is being done. 
 #' @param outDir Path to the output directory. (default: current working 
 #'   directory)
 #' @param printProcessedTables boolean value (default: FALSE). If set to TRUE, 
@@ -766,7 +765,6 @@ runReport <- function(queryFilePath = 'testdata',
                       goAnalysis = TRUE,
                       motifAnalysis = TRUE,
                       genomeVersion = 'hg19',
-                      species = 'hsapiens', 
                       outDir = getwd(),
                       printProcessedTables = FALSE,
                       sampleN = 0,
@@ -774,6 +772,11 @@ runReport <- function(queryFilePath = 'testdata',
                       selfContained = TRUE) {
 
   db <- checkSeqDb(genomeVersion)
+  # get species name 
+  # this is needed for gprofiler functional enrichment 
+  fields <- unlist(strsplit(db@organism, ' '))
+  species <- tolower(paste0(unlist(strsplit(fields[1], ''))[1], 
+                 fields[2]))
   
   if(queryFilePath != 'testdata') {
     queryFilePath <- normalizePath(queryFilePath)

@@ -8,8 +8,8 @@ findDifferentialMotifs(
   querySeqs,
   controlSeqs,
   motifWidth = 6,
-  motifN,
-  nCores,
+  motifN = 1,
+  nCores = 1,
   maxMismatch = 1
 )
 }
@@ -22,12 +22,33 @@ findDifferentialMotifs(
 using values below 10 as the computation gets exponentially difficult as the 
 motif width is increased.}
 
-\item{motifN}{A positive integer (default:5) denoting the maximum number of 
+\item{motifN}{A positive integer (default:1) denoting the maximum number of 
 motifs that should be returned by the \code{findDifferentialMotifs} function}
 
 \item{nCores}{A positive integer (default:1) number of cores used for 
-parallel execution.#'}
+parallel execution.}
+
+\item{maxMismatch}{A positive integer (default: 1) - maximum number of
+mismatches to allow when searching for k-mer matches in sequences.}
 }
 \description{
 Find Differential Motifs
+}
+\examples{
+data(queryRegions)
+
+# get query and control sequences
+querySeqs <- extractSequences(queryRegions[1:500], 'hg19')
+controlRegions <- createControlRegions(queryRegions[1:500])
+controlSeqs <- extractSequences(controlRegions, 'hg19')
+
+#run motif discovery
+motifResults <- findDifferentialMotifs(querySeqs = querySeqs, 
+                                       controlSeqs = controlSeqs, 
+                                       motifWidth = 5,
+                                       motifN = 1,
+                                       maxMismatch = 0, 
+                                       nCores = 1)
+#summarize motif results
+getMotifSummaryTable(motifResults)
 }

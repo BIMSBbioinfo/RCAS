@@ -53,7 +53,7 @@ importBedFiles <- function(filePaths, ...) {
 #' @examples
 #' data(gff)
 #' data(queryRegions)
-#' queryRegionsList <- GRangesList(queryRegions, queryRegions)
+#' queryRegionsList <- GenomicRanges::GRangesList(queryRegions, queryRegions)
 #' names(queryRegionsList) <- c('q1', 'q2')
 #' txdbFeatures <- getTxdbFeaturesFromGRanges(gffData = gff)
 #' summaryMatrix <- summarizeQueryRegionsMulti(queryRegionsList = queryRegionsList,
@@ -98,7 +98,7 @@ summarizeQueryRegionsMulti <- function(queryRegionsList, txdbFeatures, nodeN = 1
 #' @examples
 #' data(gff)
 #' data(queryRegions)
-#' queryRegionsList <- GRangesList(queryRegions, queryRegions)
+#' queryRegionsList <- GenomicRanges::GRangesList(queryRegions, queryRegions)
 #' names(queryRegionsList) <- c('q1', 'q2')
 #' txdbFeatures <- getTxdbFeaturesFromGRanges(gffData = gff)
 #' getFeatureBoundaryCoverageMulti(queryRegionsList, txdbFeatures, sampleN = 500)

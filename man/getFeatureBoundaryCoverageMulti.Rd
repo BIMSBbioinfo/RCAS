@@ -30,7 +30,7 @@ GRangesList object.
 \examples{
 data(gff)
 data(queryRegions)
-queryRegionsList <- GRangesList(queryRegions, queryRegions)
+queryRegionsList <- GenomicRanges::GRangesList(queryRegions, queryRegions)
 names(queryRegionsList) <- c('q1', 'q2')
 txdbFeatures <- getTxdbFeaturesFromGRanges(gffData = gff)
 getFeatureBoundaryCoverageMulti(queryRegionsList, txdbFeatures, sampleN = 500)

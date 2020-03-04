@@ -4,7 +4,7 @@
 \alias{getTxdbFeatures}
 \title{getTxdbFeatures}
 \usage{
-getTxdbFeatures(txdb)
+getTxdbFeatures()
 }
 \description{
 This function is deprecated. Use getTxdbFeaturesFromGRanges instead.

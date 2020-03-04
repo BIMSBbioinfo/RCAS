@@ -119,6 +119,8 @@ countPattern <- function(seqs, patterns, maxMismatch = 0, nCores = 1) {
   return(t(M))
 }
 
+#' @importFrom IRanges width
+#' @importFrom Biostrings vmatchPattern
 extractMatches <- function(seqs, patterns, minMismatch = 0, maxMismatch = 0) {
   matches <- lapply(patterns, function(x) {
     m <- Biostrings::vmatchPattern(pattern = x, subject = seqs, max.mismatch = maxMismatch)
@@ -147,16 +149,36 @@ extractMatches <- function(seqs, patterns, minMismatch = 0, maxMismatch = 0) {
 #' @param motifWidth A Positive integer (default: 6) for the generated k-mers. Warning: we recommend
 #' using values below 10 as the computation gets exponentially difficult as the 
 #' motif width is increased. 
-#' @param motifN A positive integer (default:5) denoting the maximum number of 
+#' @param motifN A positive integer (default:1) denoting the maximum number of 
 #'   motifs that should be returned by the \code{findDifferentialMotifs} function
+#' @param maxMismatch A positive integer (default: 1) - maximum number of
+#'   mismatches to allow when searching for k-mer matches in sequences.
 #' @param nCores A positive integer (default:1) number of cores used for 
-#'   parallel execution.#' 
+#'   parallel execution. 
+#' @import ranger
+#' @examples 
+#' data(queryRegions)
+#' 
+#' # get query and control sequences
+#' querySeqs <- extractSequences(queryRegions[1:500], 'hg19')
+#' controlRegions <- createControlRegions(queryRegions[1:500])
+#' controlSeqs <- extractSequences(controlRegions, 'hg19')
+#' 
+#' #run motif discovery
+#' motifResults <- findDifferentialMotifs(querySeqs = querySeqs, 
+#'                                        controlSeqs = controlSeqs, 
+#'                                        motifWidth = 5,
+#'                                        motifN = 1,
+#'                                        maxMismatch = 0, 
+#'                                        nCores = 1)
+#' #summarize motif results
+#' getMotifSummaryTable(motifResults)
 #' @export
 findDifferentialMotifs <- function(querySeqs, 
                                    controlSeqs, 
                                    motifWidth = 6,
-                                   motifN, 
-                                   nCores, 
+                                   motifN = 1, 
+                                   nCores = 1, 
                                    maxMismatch = 1) {
   
   kmers <- generateKmers(k = motifWidth)
@@ -221,24 +243,29 @@ runMotifRG <- function() {
 #' are searched for k-mers allowing for mismatches. A random forest model is 
 #' trained to find the most discriminative motifs.  
 #' 
-#' @param queryRegions GRanges object containing coordinates of input query 
+#' @param queryRegions GRanges object containing coordinates of input query
 #'   regions imported by the \code{\link{importBed}} function
 #' @param resizeN Integer value (default: 0) to resize query regions if they are
 #'   shorter than the value of \code{resize}. Set to 0 to disable resize.
-#' @param sampleN A positive integer value. The queryRegions are randomly 
+#' @param sampleN A positive integer value. The queryRegions are randomly
 #'   downsampled to include intervals as many as \code{sampleN}. The input will
 #'   be downsampled only if this value is larger than zero and less than the
 #'   total number of input intervals.
-#' @param genomeVersion A character string to denote the BS genome library 
+#' @param genomeVersion A character string to denote the BS genome library
 #'   required to extract sequences. Example: 'hg19'
-#' @param motifN A positive integer (default:5) denoting the maximum number of 
-#'   motifs that should be returned by the \code{findDifferentialMotifs} function
-#' @param nCores A positive integer (default:1) number of cores used for 
+#' @param motifWidth A Positive integer (default: 6) for the generated k-mers.
+#'   Warning: we recommend using values below 10 as the computation gets
+#'   exponentially difficult as the motif width is increased.
+#' @param motifN A positive integer (default:5) denoting the maximum number of
+#'   motifs that should be returned by the \code{findDifferentialMotifs}
+#'   function
+#' @param maxMismatch A positive integer (default: 1) - maximum number of
+#'   mismatches to allow when searching for k-mer matches in sequences.
+#' @param nCores A positive integer (default:1) number of cores used for
 #'   parallel execution.
-#' @return A list of four objects: 
-#' k-mer count matrices for query and background and lists of string matches 
-#' for the top discriminating motifs (motifN). 
-#' 
+#' @return A list of four objects: k-mer count matrices for query and background
+#'   and lists of string matches for the top discriminating motifs (motifN).
+#'   
 #' @examples
 #' data(queryRegions)
 #' motifResults <- runMotifDiscovery(queryRegions = queryRegions[1:1000],
@@ -248,7 +275,6 @@ runMotifRG <- function() {
 #'                                   motifN = 1,
 #'                                   maxMismatch = 1,
 #'                                   nCores = 1)
-#' @import IRanges
 #' @export
 runMotifDiscovery <- function (queryRegions, resizeN = 0, motifWidth = 6,
                         sampleN = 0, genomeVersion, maxMismatch = 1,
