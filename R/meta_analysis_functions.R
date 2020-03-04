@@ -178,7 +178,7 @@ getIntervalOverlapMatrix <- function(queryRegionsList, targetRegions, targetRegi
   parallel::clusterExport(cl = cl, 
                           varlist = c('targetRegions'), 
                           envir = environment())
-  summaryRaw <- pbapply::pbsapply(queryRegionsList, 
+  summaryRaw <-  pbapply::pblapply(queryRegionsList[1], 
                                   function(x) {
                                     myOverlaps <- GenomicRanges::findOverlaps(targetRegions, x)
                                     unique(S4Vectors::queryHits(myOverlaps))
@@ -188,12 +188,14 @@ getIntervalOverlapMatrix <- function(queryRegionsList, targetRegions, targetRegi
   rowN <- length(targetRegions)
   colN <- length(queryRegionsList)
   
-  M <- sapply(X = summaryRaw, 
+  M <- do.call(cbind, lapply(X = names(summaryRaw), 
               FUN = function(x) {
                 v <- rep(0, rowN) 
-                v[x] <- 1
+                v[summaryRaw[[x]]] <- 1
+                v <- data.frame(v)
+                colnames(v) <- x  
                 return(v)
-              })
+              }))
   if(!is.null(targetRegionNames)) {
     rownames(M) <- targetRegionNames
   }

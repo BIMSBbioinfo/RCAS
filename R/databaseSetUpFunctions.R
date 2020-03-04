@@ -169,52 +169,41 @@ insertTableFeatureBoundaryCoverageProfiles <- function(conn, bedData, ...) {
 
 insertTableDiscoveredMotifs <- function(conn, bedData, txdbFeatures, ...) {
   
+  samples <- names(bedData)
+  
   if(RSQLite::dbExistsTable(conn, 'discoveredMotifs')) {
     motifData <- RSQLite::dbReadTable(conn, 'discoveredMotifs')
+    samples <- setdiff(names(bedData), motifData$sampleName)
+  }
+  
+  if(length(samples) > 0) {
+    message("Started motif discovery module for new samples...")
+    newMotifData <- lapply(X = samples,
+                           FUN = function(s) {
+                             queryRegions <- bedData[[s]]
+                             message("Discovering motifs for sample ",s)
+                             results <- discoverFeatureSpecificMotifs(
+                               queryRegions = queryRegions, 
+                               txdbFeatures = txdbFeatures,  
+                               ...)
+                             results <- as.data.frame(do.call(rbind, lapply(names(results), function(x) {
+                                 df <- getMotifSummaryTable(results[[x]])
+                                 df$feature <- x
+                                 return(df)
+                               })))
+                             results$sampleName <- s
+                             return(results)
+                           })
+    newMotifData <- as.data.frame(do.call(rbind, newMotifData))
     
-    newSamples <- setdiff(names(bedData), motifData$sampleName)
-    if(length(newSamples) > 0) {
-      message("Started motif discovery module for new samples...")
-      newMotifData <- lapply(X = names(bedData[newSamples]),
-                             FUN = function(s) {
-                               queryRegions <- bedData[[s]]
-                               message("Discovering motifs for sample ",s)
-                               results <- discoverFeatureSpecificMotifs(
-                                 queryRegions = queryRegions, 
-                                 txdbFeatures = txdbFeatures, 
-                                 ...)
-                               results$sampleName <- s
-                               return(results)
-                             })
-      newMotifData <- do.call(rbind, newMotifData)
-      
-      message("Appending new motif discovery stats to 
-              'discoveredMotifs' table")
-      RSQLite::dbWriteTable(conn = conn, 
-                            name = 'discoveredMotifs', 
-                            value = newMotifData, 
-                            append = TRUE)
-    } 
-  } else {
-    message("Started motif discovery module...")
-    motifData <- lapply(X = names(bedData),
-                        FUN = function(s) {
-                          queryRegions <- bedData[[s]]
-                          message("Discovering motifs for sample ",s)
-                          results <- discoverFeatureSpecificMotifs(
-                            queryRegions = queryRegions, 
-                            txdbFeatures = txdbFeatures, 
-                            ...)
-                          results$sampleName <- s
-                          return(results)
-                        })
-    motifData <- do.call(rbind, motifData)
-    message("Saving motif discovery stats in   
+    message("Appending new motif discovery stats to 
             'discoveredMotifs' table")
     RSQLite::dbWriteTable(conn = conn, 
                           name = 'discoveredMotifs', 
-                          value = motifData, 
+                          value = newMotifData, 
                           append = TRUE)
+  } else {
+    message("All samples in the database already have motif analysis done")
   }
 }
 
@@ -394,10 +383,8 @@ createDB <- function(dbPath = file.path(getwd(), 'rcasDB.sqlite'),
                      motifAnalysis = TRUE, 
                      nodeN = 1) {
   
-  #check genome version
-  if (!genomeVersion %in% c('hg19', 'hg38', 'dm3', 'ce10', 'mm9', 'mm10')){
-    stop (genomeVersion,' is not a supported genome version.')
-  }
+  # check if seqdb is available for genome version
+  seqDb <- checkSeqDb(genomeVersion)
   
   if(file.exists(dbPath) & update == FALSE) {
     stop("A database already exists at ",dbPath,"\n",
@@ -445,7 +432,7 @@ createDB <- function(dbPath = file.path(getwd(), 'rcasDB.sqlite'),
                                 txdbFeatures = txdbFeatures, 
                                 genomeVersion = genomeVersion, 
                                 motifN = 1,
-                                nCores = 2,
+                                nCores = 1,
                                 resizeN = 15, 
                                 sampleN = 10000)
   }

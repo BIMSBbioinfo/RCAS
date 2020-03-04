@@ -133,44 +133,19 @@ figureCount <- figureCount + 1
 
 ```{r motifDiscoveryHeader, results = 'asis', eval = evalMotifDiscovery}
 cat("# Motif Discovery\n")
+cat("**Table",tableCount,":** Feature specific motifs discovered for each sample\n")
 ```
 
-```{r motif_logos_prepare, eval = evalMotifDiscovery}
-featuresToPlot <- c('transcripts', 'promoters', 'fiveUTRs', 'threeUTRs', 'introns', 'cds')
-samplesToPlot <- sort(unique(motifData$sampleName))
-motifLogos <- lapply(X = samplesToPlot,
-       FUN = function(s) {
-         logos <- lapply(featuresToPlot, function(f) {
-           matches <- motifData[motifData$sampleName == s &
-                                  motifData$feature == f,]$matches
-           matches <- unlist(Biostrings::strsplit(matches, ';'))
-           p <- ggplot2::ggplot() + 
-             ggseqlogo::geom_logo(data = matches,
-                                  namespace = c('A', 'C', 'G', 'T', 'N', 'O','E'), 
-                                  method = 'bits') +
-             coord_fixed() + 
-             ggseqlogo::theme_logo() %+replace%
-             theme(axis.text.x = element_blank(), 
-                   axis.text.y = element_blank(), 
-                   axis.title.y = element_blank()) + 
-             labs(x = f)
-          return(p)}
+```{r motifDiscovery, eval = evalMotifDiscovery}
+DT::datatable(motifData, 
+          extensions = c('Buttons', 'FixedColumns'), 
+          options = list(fixedColumns = TRUE, 
+                         scrollX = TRUE,
+                         dom = 'Bfrtip',
+                         buttons = c('copy', 'print', 'csv','excel', 'pdf')),
+          filter = 'bottom'
           )
-       return(cowplot::plot_grid(plotlist = logos, nrow = 1))
-       })
-```
-
-```{r motif_logos_plotFigureCaption, results = 'asis', eval = evalMotifDiscovery}
-cat("**Figure",figureCount,":** Feature specific motifs discovered for each sample\n")
-```
-
-```{r motif_logos_plot, eval = evalMotifDiscovery, fig.width=10, fig.height=ifelse(evalMotifDiscovery,  length(samplesToPlot)*1.4, 10)}
-#try to reserve 1.3 inches per each sample (for each sample there is one row of motifs and the height is dynamically adjusted 
-# as "number of samples multiplied by the height needed for one sample")
-
-p <- cowplot::plot_grid(plotlist = motifLogos, nrow = length(samplesToPlot), ncol = 1, labels = samplesToPlot, scale = 1)
-print(p)
-figureCount <- figureCount + 1
+tableCount <- tableCount + 1
 ```
 
 ```{r coverageProfilesHeader, results = 'asis', eval = evalCoverageProfiles}
