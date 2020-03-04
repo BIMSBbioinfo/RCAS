@@ -2,18 +2,6 @@ library(RCAS)
 context("Functions to get txdbFeatures and calculating coverage profiles")
 
 data(gff)
-txdb <- GenomicFeatures::makeTxDbFromGRanges(gff)
-test_that("Importing txdb", {
-  expect_is(txdb, 'TxDb')
-})
-
-features <- getTxdbFeatures(txdb)
-test_that("Parsing features from txdb", {
-  expect_is(features, 'list')
-  expect_equal(length(names(features)), 7)
-  expect_match(names(features)[1], "transcripts")
-  expect_match(names(features)[7], "threeUTRs")
-})
 
 features <- getTxdbFeaturesFromGRanges(gffData = gff)
 test_that("Parsing features from GFF", {
@@ -61,25 +49,6 @@ test_that("Getting a list of coverage profiles
   expect_equal(dim(profileList), c(700, 4))
 })
 
-profile <- calculateCoverageProfileFromTxdb(queryRegions = queryRegions,
-                                                txdb = txdb,
-                                                type = 'exons',
-                                                sampleN = 1000)
-
-test_that("Getting coverage profile of query regions
-          over a single gene feature from a TxDb object", {
-            expect_is(profile, 'ScoreMatrix')
-            expect_equal(ncol(profile), 100)
-          })
-
-profileList <- calculateCoverageProfileListFromTxdb(queryRegions = queryRegions,
-                                                    txdb = txdb,
-                                                    sampleN = 1000)
-test_that("Getting a list of coverage profiles
-          over all gene features from a txdb object", {
-            expect_is(profileList, 'list')
-            expect_equal(length(names(profileList)), length(features))
-          })
 
 transcriptEndCoverage <- getFeatureBoundaryCoverage(
                                 queryRegions = queryRegions,

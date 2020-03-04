@@ -1,14 +1,10 @@
 library(RCAS)
 context("tests for main runReport function")
 
-testBedFile <- system.file('extdata', 'testfile.bed', package = 'RCAS')
-
 test_that("Testing runReport function", {
   expect_error(runReport(genomeVersion = 'foo'),
-               regexp = "not a supported genome version.")
-  expect_error(runReport(genomeVersion = 'mm9'),
-               regexp = "Test-data only works for human")
-  expect_error(runReport(queryFilePath = testBedFile, genomeVersion = 'mm9'),
-               regexp = 'Test-data only works for human')
+               regexp = "Can't find a genome sequence")
+  expect_error(runReport(genomeVersion = '9'),
+               regexp = "match the genome version to an unambigous genome sequence")
 })
 

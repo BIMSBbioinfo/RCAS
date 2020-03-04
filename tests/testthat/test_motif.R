@@ -18,7 +18,7 @@ test_that("Extracting sequences of a GRanges object from a BSGenome object", {
 })
 
 motifs <- runMotifDiscovery(queryRegions = queryRegions, genomeVersion = 'hg19', 
-                            motifWidth = 5, maxMismatch = 0, 
+                            motifWidth = 4, maxMismatch = 0, 
                             motifN = 1, nCores = 1)
 test_that("Motif analysis ... ",{
   expect_is(motifs, 'list')
