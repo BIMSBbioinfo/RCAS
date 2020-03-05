@@ -1,7 +1,7 @@
 Package: RCAS
 Type: Package
 Title: RNA Centric Annotation System
-Version: 1.13.3
+Version: 1.13.4
 Date: 2020-03-04
 Authors@R: c(person("Bora", "Uyar", email='bora.uyar@mdc-berlin.de', role=c("aut", "cre")),
               person("Dilmurat", "Yusuf", role=c("aut")),
@@ -55,4 +55,3 @@ Suggests: testthat,
 SystemRequirements: pandoc (>= 1.12.3)
 VignetteBuilder: knitr
 biocViews: Software, GeneTarget, MotifAnnotation, MotifDiscovery, GO, Transcriptomics, GenomeAnnotation, GeneSetEnrichment, Coverage
-PackageStatus: Deprecated
