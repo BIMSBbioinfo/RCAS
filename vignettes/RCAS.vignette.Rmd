@@ -11,7 +11,7 @@ vignette: >
 
 
 ```{r global_options, include=FALSE}
-knitr::opts_chunk$set(warning = FALSE, message = FALSE, eval = FALSE, fig.width = 7, fig.height = 4.2)
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, eval = TRUE, fig.width = 7, fig.height = 4.2)
 ```
 
 
