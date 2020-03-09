@@ -3,8 +3,8 @@
 #' Find enriched functional terms among the genes that overlap
 #' the regions of interest. 
 #' 
-#' This function is basically a call to gProfileR::gprofiler function. 
-#' It is here to function as a replacement for other deprecated functional
+#' This function is basically a call to gprofiler2::gost function. 
+#' It is here to serve as a replacement for other deprecated functional
 #' enrichment functions. 
 #' 
 #' @examples 
@@ -16,10 +16,10 @@
 #' 
 #' @param targetGenes Vector of Ensembl gene ids or gene names 
 #' @param species First letter of genus + species name: e.g. hsapiens
-#' 
+#' @param ... Other arguments to be passed to gprofiler2::gost 
 #' @importFrom gprofiler2 gost
 #' @export
-findEnrichedFunctions <- function(targetGenes, species) {
+findEnrichedFunctions <- function(targetGenes, species, ...) {
  res <- gprofiler2::gost(query = targetGenes, organism = species)
  return(res$result)
 }

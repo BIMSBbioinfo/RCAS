@@ -4,20 +4,22 @@
 \alias{findEnrichedFunctions}
 \title{findEnrichedFunctions}
 \usage{
-findEnrichedFunctions(targetGenes, species)
+findEnrichedFunctions(targetGenes, species, ...)
 }
 \arguments{
 \item{targetGenes}{Vector of Ensembl gene ids or gene names}
 
 \item{species}{First letter of genus + species name: e.g. hsapiens}
+
+\item{...}{Other arguments to be passed to gprofiler2::gost}
 }
 \description{
 Find enriched functional terms among the genes that overlap
 the regions of interest.
 }
 \details{
-This function is basically a call to gProfileR::gprofiler function. 
-It is here to function as a replacement for other deprecated functional
+This function is basically a call to gprofiler2::gost function. 
+It is here to serve as a replacement for other deprecated functional
 enrichment functions.
 }
 \examples{
