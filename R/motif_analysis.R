@@ -239,7 +239,7 @@ runMotifRG <- function() {
 #' This function builds a random forest classifier to find the top most
 #' discriminative motifs in the query regions compared to the background. The
 #' background sequences are automatically generated based on the query regions.
-#' First k-mers of a fixed length are generated. The query and control sequences
+#' First, k-mers of a fixed length are generated. The query and control sequences
 #' are searched for k-mers allowing for mismatches. A random forest model is 
 #' trained to find the most discriminative motifs.  
 #' 
