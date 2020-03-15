@@ -225,10 +225,7 @@ motifResults <- runMotifDiscovery(queryRegions = queryRegions,
                            genomeVersion = 'hg19', motifWidth = 6,
                            motifN = 2, nCores = 1)
 
-cowplot::plot_grid(plotlist = lapply(motifResults$matches_query, function(matches) {
-  ggseqlogo::ggseqlogo(matches)
-}), nrow = 1) 
-
+ggseqlogo::ggseqlogo(motifResults$matches_query)
 ```
 
 ## motif analysis: getting motif summary statistics
