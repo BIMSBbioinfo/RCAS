@@ -207,8 +207,8 @@ findDifferentialMotifs <- function(querySeqs,
   
   # train a random forest model 
   df <- as.data.frame(rbind(query[,candidates], ctrl[,candidates]))
-  df$label <- c(rep("query", nrow(query)), 
-                   rep("ctrl", nrow(ctrl)))
+  df$label <- as.factor(c(rep("query", nrow(query)), 
+                          rep("ctrl", nrow(ctrl))))
   
   fit <- ranger::ranger(label ~ ., df, importance = 'impurity')
   var.imp <- sort(ranger::importance(fit), decreasing = T)
