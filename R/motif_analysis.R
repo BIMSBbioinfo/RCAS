@@ -106,9 +106,10 @@ generateKmers <- function(k, letters = c("A", "C", "G", "T")) {
 }
 
 countPattern <- function(seqs, patterns, maxMismatch = 0, nCores = 1) {
-  cl <- parallel::makeCluster(nCores)
+  
+  cl <- parallel::makeForkCluster(nnodes = nCores)
   parallel::clusterExport(cl = cl, varlist = c('seqs', 'patterns', 'maxMismatch'), 
-                          envir = environment())
+                            envir = environment())
   M <- do.call(rbind, pbapply::pblapply(cl = cl, X = patterns, 
                                FUN = function(x) {
                                  Biostrings::vcountPattern(x, seqs, 
@@ -194,6 +195,7 @@ findDifferentialMotifs <- function(querySeqs,
   # only keep patterns that are more frequent in the query
   queryHits <- apply(query, 2, function(x) sum(x > 0))
   controlHits <- apply(ctrl, 2, function(x) sum(x > 0))
+  
   candidates <- names(which(log2((queryHits + 1) / (controlHits+1)) > 0))
   
   if(length(candidates) == 0) {
