@@ -26,5 +26,4 @@ motifResults <- runMotifDiscovery(queryRegions = queryRegions[1:1000],
                                   maxMismatch = 1,
                                   nCores = 2)
 motifSummary <- getMotifSummaryTable(motifResults)
-
 }

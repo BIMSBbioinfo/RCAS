@@ -334,7 +334,7 @@ runMotifDiscovery <- function (queryRegions, resizeN = 0, motifWidth = 6,
 #'                                   maxMismatch = 1,
 #'                                   nCores = 2)
 #' motifSummary <- getMotifSummaryTable(motifResults)
-#'
+#' @importFrom stats fisher.test
 #' @export
 getMotifSummaryTable <- function(motifResults){
 
