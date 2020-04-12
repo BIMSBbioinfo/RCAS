@@ -339,15 +339,28 @@ runMotifDiscovery <- function (queryRegions, resizeN = 0, motifWidth = 6,
 getMotifSummaryTable <- function(motifResults){
 
   if(!is.null(motifResults)) {
-    data.frame('patterns' = names(motifResults$matches_query),
-               'queryHits' = colSums(motifResults$counts_query),
-               'controlHits' = colSums(motifResults$counts_ctrl),
-               'querySeqs' = colSums(motifResults$counts_query > 0),
+    df <- data.frame('patterns' = names(motifResults$matches_query),
+               'queryHits' = colSums(motifResults$counts_query), # total number of motifs in sequences
+               'controlHits' = colSums(motifResults$counts_ctrl), 
+               'querySeqs' = colSums(motifResults$counts_query > 0), #number of seqs with motifs 
                'controlSeqs' = colSums(motifResults$counts_ctrl > 0),
                'queryFraction' = round(colSums(motifResults$counts_query > 0) / 
                                          nrow(motifResults$counts_query), 2),
                'controlFraction' = round(colSums(motifResults$counts_ctrl > 0) / 
                                            nrow(motifResults$counts_ctrl), 2))
+    # for each motif pattern, calculate p-value and odds ratio of the motif
+    # occurrence in query sequences compared to the control sequences. 
+    df <- cbind(df, do.call(rbind, apply(df, 1, function(r) {
+      querySeqCount <- as.numeric(r[4])
+      ctrlSeqCount <- as.numeric(r[5])
+      t <- fisher.test(matrix(data = c(querySeqCount, ctrlSeqCount, 
+                                  nrow(motifResults$counts_query) - querySeqCount, 
+                                  nrow(motifResults$counts_ctrl) - ctrlSeqCount), 
+                         nrow = 2), alternative = 'greater')
+      return(data.frame('oddsRatio' = round(t$estimate[[1]], 2), 
+                        'pvalue' = t$p.value))
+    })))
+    return(df)
   } else {
     return(data.frame('patterns' = 'NONE',
                       'queryHits' = 0,
@@ -355,7 +368,9 @@ getMotifSummaryTable <- function(motifResults){
                       'querySeqs' = 0,
                       'controlSeqs' = 0,
                       'queryFraction' = 0,
-                      'controlFraction' = 0))
+                      'controlFraction' = 0, 
+                      'oddsRatio' = 1,
+                      'pvalue' = 1))
   }
 }
 

@@ -25,6 +25,6 @@ test_that("Motif analysis ... ",{
 })
 
 test_that("Motif summary table", {
-  expect_equal(length(colnames(getMotifSummaryTable(motifs))), 7)
+  expect_equal(length(colnames(getMotifSummaryTable(motifs))), 9)
   expect_equal(colnames(getMotifSummaryTable(motifs))[1], 'patterns')
 })
