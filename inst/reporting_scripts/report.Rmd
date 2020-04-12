@@ -326,6 +326,33 @@ motifLogos <- lapply(names(motifData), function(f) {
 names(motifLogos) <- names(motifData)
 ```
 
+```{r motif_analysis_table, results = 'asis', eval=motifAnalysis} 
+cat("## Summary stats for top discovered motifs\n")
+cat("**Table",tableCount,":** Top discriminative motif discovered for each transcript feature")  
+# drop 'patterns' column, keep rownames with feature types
+dt <- data.table(do.call(rbind, lapply(names(motifData), function(f) { 
+  s <- getMotifSummaryTable(motifData[[f]])
+  s$Feature <- f
+  return(s)
+})))
+
+# reorder columns
+dt <- dt[,c('Feature', 'patterns', 'queryFraction', 'controlFraction', 'oddsRatio', 'pvalue', 
+            'querySeqs', 'controlSeqs', 'queryHits', 'controlHits')]
+DT::datatable(dt, 
+          extensions = c('Buttons', 'FixedColumns'), 
+          options = list(fixedColumns = TRUE, 
+                         scrollX = TRUE,
+                         dom = 'Bfrtip',
+                         buttons = c('copy', 'print', 'csv','excel', 'pdf')),
+          filter = 'bottom'
+          )
+if(params$printProcessedTables == TRUE) {
+  write.table(x = dt, file=paste0('Table',tableCount,'.motifSummaryTable.tsv'), quote = FALSE, sep = '\t', row.names = TRUE)
+} 
+tableCount <- tableCount + 1
+```
+
 ```{r motif_analysis_plot_figcap, results='asis', eval=motifAnalysis}
 cat('## Top motifs discovered in the sequences of the query regions {.tabset}\n')
 for (i in 1:length(motifLogos)) {
