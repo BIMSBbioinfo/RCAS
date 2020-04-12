@@ -4,7 +4,9 @@
 \name{queryRegions}
 \alias{queryRegions}
 \title{Sample BED file imported as a GRanges object}
-\format{GRanges object with 10000 ranges and 2 metadata columns}
+\format{
+GRanges object with 10000 ranges and 2 metadata columns
+}
 \source{
 \url{http://dorina.mdc-berlin.de/regulators}
 }

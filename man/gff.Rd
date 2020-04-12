@@ -4,7 +4,9 @@
 \name{gff}
 \alias{gff}
 \title{Sample GFF file imported as a GRanges object}
-\format{GRanges object with 238010 ranges and 16 metadata columns}
+\format{
+GRanges object with 238010 ranges and 16 metadata columns
+}
 \source{
 \url{ftp://ftp.ensembl.org/pub/release-75/gtf/homo_sapiens/Homo_sapiens.GRCh37.75.gtf.gz}
 }
