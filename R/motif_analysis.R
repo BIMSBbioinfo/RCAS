@@ -107,7 +107,7 @@ generateKmers <- function(k, letters = c("A", "C", "G", "T")) {
 
 countPattern <- function(seqs, patterns, maxMismatch = 0, nCores = 1) {
   
-  cl <- parallel::makeForkCluster(nnodes = nCores)
+  cl <- parallel::makeCluster(nCores)
   parallel::clusterExport(cl = cl, varlist = c('seqs', 'patterns', 'maxMismatch'), 
                             envir = environment())
   M <- do.call(rbind, pbapply::pblapply(cl = cl, X = patterns, 
