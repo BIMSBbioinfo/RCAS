@@ -50,7 +50,7 @@ importGtf <- function (filePath,  saveObjectAsRds = TRUE, readFromRds = TRUE,
     message('Reading existing granges.rds object from ',rdsFilePath)
     gff <- readRDS(rdsFilePath)
   } else {
-    message('importing gtf file from', filePath)
+    message('importing gtf file from ', filePath)
     gff <- rtracklayer::import.gff(filePath, ...)
   }
 
@@ -63,11 +63,11 @@ importGtf <- function (filePath,  saveObjectAsRds = TRUE, readFromRds = TRUE,
 
     if (saveObjectAsRds == TRUE) {
       if (!file.exists(rdsFilePath)){
-        message('Saving gff object in RDS file at',rdsFilePath)
+        message('Saving gff object in RDS file at ',rdsFilePath)
         saveRDS(gff, file=rdsFilePath)
       } else {
         if (overwriteObjectAsRds == TRUE) {
-          message('Overwriting gff object in RDS file at',rdsFilePath)
+          message('Overwriting gff object in RDS file at ',rdsFilePath)
           saveRDS(gff, file=rdsFilePath)
         } else {
           message('File ',rdsFilePath,' already exists.
@@ -361,11 +361,22 @@ queryGff <- function(queryRegions, gffData) {
   overlaps = GenomicRanges::findOverlaps(queryRegions, gffData)
   overlapsQuery = queryRegions[S4Vectors::queryHits(overlaps)]
   overlapsGff = gffData[S4Vectors::subjectHits(overlaps)]
-  overlapsGff$overlappingQuery = paste(GenomicRanges::seqnames(overlapsQuery),
-                                       GenomicRanges::start(overlapsQuery),
-                                       GenomicRanges::end(overlapsQuery),
-                                       GenomicRanges::strand(overlapsQuery),
-                                       sep=':')
+  
+  # prepare some data for the overlapping query region 
+  # to keep along with overlapping gff features 
+  query_mcols <- mcols(overlapsQuery)
+  colnames(query_mcols) <- paste0('query_', colnames(query_mcols))
+  
+  queryData <- cbind(
+    data.frame('queryIndex' = S4Vectors::queryHits(overlaps), 
+               'queryRange' = paste0(GenomicRanges::seqnames(overlapsQuery), ':', 
+                                  GenomicRanges::start(overlapsQuery), '-', 
+                                  GenomicRanges::end(overlapsQuery), ':',
+                                  GenomicRanges::strand(overlapsQuery))),
+    query_mcols)
+  
+  # update mcols portion of overlapping gff feature data           
+  mcols(overlapsGff) <- cbind(mcols(overlapsGff), queryData)
   return (overlapsGff)
 }
 

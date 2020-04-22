@@ -94,7 +94,7 @@ overlaps <- as.data.table(queryGff(queryRegions = queryRegions, gffData = gff))
 To find out the distribution of the query regions across gene types:
 ```{r query_gene_types}
 biotype_col <- grep('gene_biotype', colnames(overlaps), value = T)
-df <- overlaps[,length(unique(overlappingQuery)), by = biotype_col]
+df <- overlaps[,length(unique(queryIndex)), by = biotype_col]
 colnames(df) <- c("feature", "count")
 df$percent <- round(df$count / length(queryRegions) * 100, 1)
 df <- df[order(count, decreasing = TRUE)]
