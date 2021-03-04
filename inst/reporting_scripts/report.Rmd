@@ -197,26 +197,31 @@ cat("**Figure",figureCount,":** The number of query regions that overlap differe
 ```
 
 ```{r query_gene_types, eval=annotationSummary}
-biotype_col <- grep('gene_biotype', colnames(overlaps.dt), value = T)
-df <- overlaps.dt[,length(unique(queryIndex)), by = biotype_col]
-colnames(df) <- c("feature", "count")
-df$percent <- round(df$count / length(queryRegions) * 100, 1)
-df <- df[order(count, decreasing = TRUE)]
-p <- plotly::plot_ly(data = df, 
-             type = "bar",
-             x = df$feature,
-             y = df$percent,
-             text = paste("count:", df$count), color=df$feature)
-plotly::layout(p = p, 
-       margin = list(l=100, r=100, b=150), 
-       xaxis = list(showticklabels = TRUE,  tickangle = 90), 
-       yaxis = list(title = paste("% query,", 
-                                  "n =", length(queryRegions))),
-       font = list(size = 14))
-if(params$printProcessedTables == TRUE) {
-  write.table(x = df, file=paste0('Figure',figureCount,'.query_gene_types.data.tsv'), quote = FALSE, sep = '\t', row.names = TRUE)
-} 
-figureCount <- figureCount + 1
+biotype_col <- grep('gene_biotype', colnames(overlaps.dt), value = T)[1]
+if(!is.na(biotype_col)) {
+  message("Using ",biotype_col," field in the GTF file for gene biotype plot")
+  df <- overlaps.dt[,length(unique(queryIndex)), by = biotype_col]
+  colnames(df) <- c("feature", "count")
+  df$percent <- round(df$count / length(queryRegions) * 100, 1)
+  df <- df[order(count, decreasing = TRUE)]
+  p <- plotly::plot_ly(data = df, 
+               type = "bar",
+               x = df$feature,
+               y = df$percent,
+               text = paste("count:", df$count), color=df$feature)
+  plotly::layout(p = p, 
+         margin = list(l=100, r=100, b=150), 
+         xaxis = list(showticklabels = TRUE,  tickangle = 90), 
+         yaxis = list(title = paste("% query,", 
+                                    "n =", length(queryRegions))),
+         font = list(size = 14))
+  if(params$printProcessedTables == TRUE) {
+    write.table(x = df, file=paste0('Figure',figureCount,'.query_gene_types.data.tsv'), quote = FALSE, sep = '\t', row.names = TRUE)
+  } 
+  figureCount <- figureCount + 1
+} else {
+  warning("Skipping gene biotype plot because no such field exists in input GTF file.")
+}
 ```
 
 ```{r transcriptBoundaryCoverage_figcap, results='asis', eval = annotationSummary}
