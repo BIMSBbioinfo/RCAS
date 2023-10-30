@@ -785,7 +785,7 @@ runReport <- function(queryFilePath = 'testdata',
   db <- checkSeqDb(genomeVersion)
   # get species name 
   # this is needed for gprofiler functional enrichment 
-  fields <- unlist(strsplit(db@organism, ' '))
+  fields <- unlist(strsplit(db@metadata$organism, ' '))
   species <- tolower(paste0(unlist(strsplit(fields[1], ''))[1], 
                  fields[2]))
   
