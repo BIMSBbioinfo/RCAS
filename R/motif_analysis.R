@@ -419,3 +419,37 @@ discoverFeatureSpecificMotifs <- function(queryRegions, txdbFeatures, ...) {
   names(results) <- names(txdbFeatures)
   return(results)
 }
+
+
+
+#' getPWM
+#' 
+#' Given a vector of strings of equal width, generate a position-specific 
+#' weight matrix based on the frequency of occurrence of the unique letters
+#' found in the sequences. 
+#' 
+#' @param sequences vector of strings of equal widths. 
+#' @param letters vector of characters to consider as the an alphabet
+#' @examples
+#' 
+#' sequences = c("GGAGAG", "GAAGAA", "TGAGAA", "GGAGAA", "GAAGAA")
+#' getPWM(sequences)
+#' 
+#' @return A matrix of position-specific-weights.   
+#' @export 
+getPWM <- function(sequences, letters = c('A', 'C', 'G', 'T')) {
+  chars <- strsplit(sequences, '')
+  if(length(unique(lengths(chars))) > 1) {
+    stop("getPWM: All sequences must be of the same width.")
+  }
+  m <- do.call(rbind, chars) # matrix of chars 
+  # for each position, count occurrences 
+  counts <- apply(m, 2, function(y) {
+    sapply(letters, function(l) {
+      sum(y == l)
+    })
+  })
+  # convert counts to fractions
+  pwm <- apply(counts, 2, function(x) x / sum(x))
+  return(pwm)
+}
