@@ -89,7 +89,7 @@ In order to avoid redundant preprocessing of the same input files, we have devel
   - **annotationSummaries**: Contains the number of overlaps between the input sample and the target transcript features categorised by feature type (i.e. transcripts, exons, promoters, UTRs, introns, cds). 
   - **geneOverlaps**: Contains the number of overlaps between the input sample and the target genes. 
   - **featureBoundaryCoverageProfiles**: Contains the coverage scores computed by [genomation::scoreMatrix function](https://bioconductor.org/packages/release/bioc/vignettes/genomation/inst/doc/GenomationManual.html)
-  - **discoveredMotifs**: Contains enriched motifs per each transcript feature for each sample. The motif enrichments are computed using [motifRG package](https://www.bioconductor.org/packages/release/bioc/html/motifRG.html).  
+  - **discoveredMotifs**: Contains enriched motifs per each transcript feature for each sample.  
   - **processedSamples**: Contains a mapping between the processed sample and the path to the BED file that contains the data for the corresponding sample. 
 
 To create a database with preprocessed data, use `RCAS::createDB()` function. When starting a fresh database, we can provide a file name that does not exist at the corresponding folder must be provided. If a database already exists at the given location, an error will be returned. 
