@@ -223,9 +223,9 @@ background distribution.
 motifResults <- runMotifDiscovery(queryRegions = queryRegions, 
                            resizeN = 15, sampleN = 10000,
                            genomeVersion = 'hg19', motifWidth = 6,
-                           motifN = 2, nCores = 1)
+                           motifN = 1, nCores = 1)
 
-ggseqlogo::ggseqlogo(motifResults$matches_query)
+seqLogo::seqLogo(getPWM(motifResults$matches_query[[1]]))
 ```
 
 ## motif analysis: getting motif summary statistics

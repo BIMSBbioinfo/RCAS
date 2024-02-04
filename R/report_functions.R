@@ -768,6 +768,7 @@ checkSeqDb <- function(genomeVersion) {
 #' @importFrom plotly add_trace
 #' @importFrom plotly add_ribbons
 #' @importFrom plotly layout
+#' @importFrom seqLogo seqLogo
 #' @import DT
 #' @export
 runReport <- function(queryFilePath = 'testdata',

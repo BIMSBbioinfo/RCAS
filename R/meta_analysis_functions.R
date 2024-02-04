@@ -250,8 +250,6 @@ getIntervalOverlapMatrix <- function(queryRegionsList, targetRegions, targetRegi
 #' @import ggplot2
 #' @importFrom pheatmap pheatmap
 #' @importFrom cowplot plot_grid
-#' @importFrom ggseqlogo geom_logo
-#' @importFrom ggseqlogo theme_logo
 #' @import DT
 #' @export
 runReportMetaAnalysis <- function(dbPath = 'RCAS.sqlite',

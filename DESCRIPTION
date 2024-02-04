@@ -45,11 +45,11 @@ Imports:
     pheatmap,
     ggplot2,
     cowplot,
-    ggseqlogo,
+    seqLogo,
     utils, 
     ranger,
     gprofiler2
-RoxygenNote: 7.1.0
+RoxygenNote: 7.2.3
 Suggests: testthat,
     covr,
     BiocManager
