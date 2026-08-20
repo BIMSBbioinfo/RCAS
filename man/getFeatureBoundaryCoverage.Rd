@@ -41,8 +41,8 @@ regions across these boundaries.
 \examples{
 data(queryRegions)
 data(gff)
-txdb <- GenomicFeatures::makeTxDbFromGRanges(gff)
-transcriptCoords <- GenomicFeatures::transcripts(txdb)
+txdbFeatures <- getTxdbFeaturesFromGRanges(gff)
+transcriptCoords <- txdbFeatures$transcripts
 transcriptEndCoverage <- getFeatureBoundaryCoverage (
                                      queryRegions = queryRegions,
                                     featureCoords = transcriptCoords,

@@ -19,12 +19,13 @@ Description: RCAS is an R/Bioconductor package designed as a generic reporting t
     RCAS can carry out functional enrichment analyses and discriminative motif
     discovery. 
 License: Artistic-2.0
+Encoding: UTF-8
 LazyData: TRUE
 Depends: R (>= 3.3.0),
     plotly (>= 4.5.2),
-    DT (>= 0.2),
-    data.table,
+    DT (>= 0.2)
 Imports:
+    data.table,
     GenomicRanges,
     IRanges,
     BSgenome, 
@@ -49,10 +50,11 @@ Imports:
     utils, 
     ranger,
     gprofiler2
-RoxygenNote: 7.2.3
 Suggests: testthat,
     covr,
-    BiocManager
+    BiocManager,
+    txdbmaker
 SystemRequirements: pandoc (>= 1.12.3)
 VignetteBuilder: knitr
 biocViews: Software, GeneTarget, MotifAnnotation, MotifDiscovery, GO, Transcriptomics, GenomeAnnotation, GeneSetEnrichment, Coverage
+Config/roxygen2/version: 8.0.0

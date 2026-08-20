@@ -169,7 +169,12 @@ getTxdbFeatures <- function () {
 #' @export
 getTxdbFeaturesFromGRanges <- function (gffData) {
 
-  txdb <- GenomicFeatures::makeTxDbFromGRanges(gffData)
+  makeTxDb <- if ("makeTxDbFromGRanges" %in% getNamespaceExports("GenomicFeatures")) {
+    getExportedValue("GenomicFeatures", "makeTxDbFromGRanges")
+  } else {
+    getExportedValue("txdbmaker", "makeTxDbFromGRanges")
+  }
+  txdb <- makeTxDb(gffData)
 
   transcripts <- GenomicFeatures::transcripts(txdb)
   m <- match(transcripts$tx_name, gffData$transcript_id)
@@ -404,8 +409,8 @@ queryGff <- function(queryRegions, gffData) {
 #' @examples
 #' data(queryRegions)
 #' data(gff)
-#' txdb <- GenomicFeatures::makeTxDbFromGRanges(gff)
-#' transcriptCoords <- GenomicFeatures::transcripts(txdb)
+#' txdbFeatures <- getTxdbFeaturesFromGRanges(gff)
+#' transcriptCoords <- txdbFeatures$transcripts
 #' transcriptEndCoverage <- getFeatureBoundaryCoverage (
 #'                                      queryRegions = queryRegions,
 #'                                     featureCoords = transcriptCoords,
@@ -471,8 +476,8 @@ getFeatureBoundaryCoverage <- function (queryRegions,
 #' @examples
 #' data(queryRegions)
 #' data(gff)
-#' txdb <- GenomicFeatures::makeTxDbFromGRanges(gff)
-#' transcriptCoords <- GenomicFeatures::transcripts(txdb)
+#' txdbFeatures <- getTxdbFeaturesFromGRanges(gff)
+#' transcriptCoords <- txdbFeatures$transcripts
 #' transcriptEndCoverageBin <- getFeatureBoundaryCoverageBin (
 #'                                      queryRegions = queryRegions,
 #'                                     featureCoords = transcriptCoords,

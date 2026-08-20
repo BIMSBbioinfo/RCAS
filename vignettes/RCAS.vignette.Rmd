@@ -65,6 +65,7 @@ the user should execute two RCAS functions called importBed() and importGtf().
 ## Importing sample data
 ```{r sample_data}
 library(RCAS)
+library(data.table)
 data(queryRegions) #sample queryRegions in BED format()
 data(gff)          #sample GFF file
 ```
